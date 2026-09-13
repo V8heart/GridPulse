@@ -1,3 +1,19 @@
+---
+threat_id: B-NORMAL-001
+category: benign
+synthetic_source_labels: ["normal_baseline", "normal_checkpoint", "normal_dataloader_stall", "normal_distributed_training", "normal_eval_train_switch", "normal_hpo_search"]
+swing_ratio: [0.0663, 1.5494]
+periodicity_strength: [0.6788, 0.968]
+duty_regularity: [0.0, 0.8617]
+mean_power_level: any
+ramp_level: high
+multi_gpu_sync: optional
+min_duration_s: null
+ramp_max_w_per_s: [24.052, 2252.9626]
+high_load_fraction: [0.0, 0.7275]
+longest_high_seconds: [0.0, 11.35]
+---
+
 # 정상 워크로드 프로파일 (오탐 방지용 기준)
 
 ## 목적

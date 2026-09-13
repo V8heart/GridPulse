@@ -1,3 +1,19 @@
+---
+threat_id: T-CRYPTO-001
+category: attack
+synthetic_source_labels: ["cryptojacking"]
+swing_ratio: [0.0224, 0.0288]
+periodicity_strength: [0.7386, 0.8337]
+duty_regularity: [0.0, 0.1624]
+mean_power_level: elevated
+ramp_level: low
+multi_gpu_sync: not_applicable
+min_duration_s: null
+ramp_max_w_per_s: [16.9784, 22.6389]
+high_load_fraction: [1.0, 1.0]
+longest_high_seconds: [20.0, 20.0]
+---
+
 # GPU 크립토재킹 (Cryptojacking)
 
 ## 출처

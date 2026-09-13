@@ -1,9 +1,11 @@
 {
   "backend": "tfidf",
-  "positive_cases": 9,
+  "positive_cases": 15,
   "top1_accuracy": 1.0,
+  "legacy_positive_cases": 9,
+  "legacy_top1_accuracy": 1.0,
   "unknown_cases": 3,
-  "unknown_max_similarity": 0.25474708967575654,
+  "unknown_max_similarity": 0.11051031175260763,
   "unknown_threshold": 0.28,
   "unknown_rejection_rate": 1.0,
   "details": [
@@ -11,73 +13,109 @@
       "case_id": "syn-normal-baseline-100-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.3325612425638921
+      "top1_score": 0.27755595279959905
     },
     {
       "case_id": "syn-normal-ddp-101-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.3509550183188533
+      "top1_score": 0.28347435479111877
     },
     {
       "case_id": "syn-normal-hpo-102-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.3552811824644328
+      "top1_score": 0.28407747281197615
     },
     {
       "case_id": "syn-normal-checkpoint-103-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.3573353975481287
+      "top1_score": 0.28075041073742707
     },
     {
       "case_id": "syn-normal-dataloader-104-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.3528124175795316
+      "top1_score": 0.2779556073418454
     },
     {
       "case_id": "syn-normal-eval-105-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.33717364043699566
+      "top1_score": 0.27642612841995523
     },
     {
       "case_id": "syn-attack-swma-200-gpu0",
       "expected": "swma",
       "top1": "swma",
-      "top1_score": 0.4111865554495891
+      "top1_score": 0.319464385185173
     },
     {
       "case_id": "syn-attack-ltma-201-gpu0",
       "expected": "ltma",
       "top1": "ltma",
-      "top1_score": 0.3463988568059101
+      "top1_score": 0.354541252936443
     },
     {
       "case_id": "syn-attack-crypto-202-gpu0",
       "expected": "cryptojacking",
       "top1": "cryptojacking",
-      "top1_score": 0.412973839682473
+      "top1_score": 0.3034094183912837
     },
     {
       "case_id": "unknown_single_impulse",
       "expected": null,
-      "top1": "cryptojacking",
-      "top1_score": 0.23335365266983382
+      "top1": "unknown",
+      "top1_score": 0.0
     },
     {
       "case_id": "unknown_slow_drift",
       "expected": null,
-      "top1": "cryptojacking",
-      "top1_score": 0.25474708967575654
+      "top1": "normal_workloads",
+      "top1_score": 0.10386986375013463
     },
     {
       "case_id": "unknown_random_walk",
       "expected": null,
-      "top1": "ltma",
-      "top1_score": 0.2405079300461714
+      "top1": "normal_workloads",
+      "top1_score": 0.11051031175260763
+    },
+    {
+      "case_id": "doc-hidden-ml-training",
+      "expected": "hidden_ml_training",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.2237078976744606
+    },
+    {
+      "case_id": "doc-llmjacking",
+      "expected": "llmjacking",
+      "top1": "llmjacking",
+      "top1_score": 0.36451657405128207
+    },
+    {
+      "case_id": "doc-sponge-attack",
+      "expected": "sponge_attack",
+      "top1": "sponge_attack",
+      "top1_score": 0.38644367081453274
+    },
+    {
+      "case_id": "doc-coordinated-multi-gpu",
+      "expected": "coordinated_multi_gpu",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.34863974220304816
+    },
+    {
+      "case_id": "doc-burst-ramp-attack",
+      "expected": "burst_ramp_attack",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.26947758430199725
+    },
+    {
+      "case_id": "doc-benign-periodic",
+      "expected": "benign_periodic",
+      "top1": "benign_periodic",
+      "top1_score": 0.25877381833443225
     }
   ]
 }

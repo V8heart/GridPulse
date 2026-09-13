@@ -1,3 +1,19 @@
+---
+threat_id: T-LTMA-001
+category: attack
+synthetic_source_labels: ["ltma"]
+swing_ratio: [1.2543, 1.8122]
+periodicity_strength: [0.8626, 0.9248]
+duty_regularity: [0.1255, 0.8879]
+mean_power_level: normal
+ramp_level: mid
+multi_gpu_sync: not_applicable
+min_duration_s: null
+ramp_max_w_per_s: [1192.9153, 1431.6287]
+high_load_fraction: [0.0, 0.1775]
+longest_high_seconds: [0.0, 1.0]
+---
+
 # LTMA (LLM Training Modulation Attack)
 
 ## 출처
@@ -21,6 +37,8 @@ Bit2Watt (Ji, Pan, Xu, arXiv:2607.05993, 2026), 4.2.1절. 논문은 GPT-2 학습
 - 평균 전력이 정상 범위라 "평균 기반 필터"로는 안 잡힘 → 반드시 변동성/시계열 특성을 봐야 함.
 - 변동폭은 정상 대비 다소 크지만, 정상 학습의 위상 전환과 통계적으로 겹칠 수 있어 가장 탐지 어려움.
 - 논문 탐지 실험에서도 LTMA가 SWMA보다 일관되게 더 낮은 탐지율을 보임 (가장 은밀한 축).
+- 관측 설명으로는 "평균 전력은 정상 범위 내로 유지됨", "high/low 전환이 불규칙하고 예측하기 어려움",
+  "지속적이고 뚜렷한 주기성 존재", "순간 전력 상승·하강 기울기가 큼"이 함께 나타나는 경우가 대표적이다.
 
 ## 정상 워크로드와의 구분 포인트
 - 정상 학습과 거의 구분이 안 되는 것이 특징이므로, 신호만으로는 부족.

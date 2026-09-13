@@ -14,6 +14,8 @@
 """
 from __future__ import annotations
 
+import ast
+from dataclasses import dataclass
 import glob
 import json
 import os
@@ -25,6 +27,58 @@ import numpy as np
 CORPUS_DIR = Path(__file__).parent.parent / "corpus"
 
 
+@dataclass(frozen=True)
+class SearchResult:
+    """검색 결과. 기존 `(name, score, text)` unpack과도 호환된다."""
+
+    name: str
+    score: float
+    text: str
+    meta: dict
+    filtered_by: list[str]
+
+    def __iter__(self):
+        yield self.name
+        yield self.score
+        yield self.text
+
+    def __getitem__(self, index: int):
+        return (self.name, self.score, self.text)[index]
+
+
+def _parse_scalar(value: str):
+    value = value.strip()
+    if value in {"null", "None", ""}:
+        return None
+    if value.startswith("[") and value.endswith("]"):
+        return json.loads(value)
+    if value in {"true", "false"}:
+        return value == "true"
+    try:
+        return ast.literal_eval(value)
+    except (SyntaxError, ValueError):
+        return value
+
+
+def parse_front_matter(text: str) -> tuple[dict, str]:
+    """YAML-lite front-matter를 파싱하고 본문만 반환한다."""
+    if not text.startswith("---\n"):
+        return {}, text
+    try:
+        raw_meta, body = text.split("---\n", 2)[1:]
+    except ValueError:
+        return {}, text
+    meta = {}
+    for line in raw_meta.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        meta[key.strip()] = _parse_scalar(value)
+    return meta, body.lstrip()
+
+
 class SignatureRetriever:
     """공격 시그니처 문서 코퍼스에 대한 의미 기반 검색기.
 
@@ -34,9 +88,13 @@ class SignatureRetriever:
     """
 
     def __init__(self, corpus_dir: Path = CORPUS_DIR,
-                 backend: str = "sbert", model_name: str = "all-MiniLM-L6-v2"):
+                 backend: str = "sbert", model_name: str = "all-MiniLM-L6-v2",
+                 include_docs: set[str] | None = None):
         self.backend = backend
         self.docs = []       # (name, text)
+        self.meta = {}       # name -> front-matter dict
+        self.last_filter_report = {}
+        self.include_docs = include_docs
         self.embeddings = None
         self._model = None
         self._vectorizer = None
@@ -49,8 +107,12 @@ class SignatureRetriever:
     def _load_corpus(self, corpus_dir: Path):
         for path in sorted(glob.glob(str(corpus_dir / "*.md"))):
             name = Path(path).stem
+            if self.include_docs is not None and name not in self.include_docs:
+                continue
             text = Path(path).read_text(encoding="utf-8")
-            self.docs.append((name, text))
+            meta, body = parse_front_matter(text)
+            self.meta[name] = meta
+            self.docs.append((name, body))
         if not self.docs:
             raise RuntimeError(f"코퍼스 문서를 찾을 수 없습니다: {corpus_dir}")
         texts = [t for _, t in self.docs]
@@ -71,8 +133,66 @@ class SignatureRetriever:
         print(f"[RAG:{self.backend}] {len(self.docs)}개 시그니처 문서 인덱싱 완료: "
               f"{[n for n, _ in self.docs]}")
 
-    def search(self, query: str, top_k: int = 3):
-        """쿼리와 가장 유사한 문서 top_k개를 (name, score, text)로 반환."""
+    def _range_filter_failures(self, name: str, features: dict) -> list[str]:
+        meta = self.meta.get(name, {})
+        failures = []
+        if meta.get("multi_gpu_sync") == "required":
+            sync_value = features.get("multi_gpu_sync_index", features.get("sync_index"))
+            if sync_value is None or float(sync_value) < 0.8:
+                failures.append("multi_gpu_sync")
+        numeric_keys = (
+            "swing_ratio",
+            "duty_regularity",
+            "ramp_max_w_per_s",
+            "high_load_fraction",
+        )
+        for key in numeric_keys:
+            bounds = meta.get(key)
+            if bounds is None or key not in features:
+                continue
+            if not isinstance(bounds, list) or len(bounds) != 2:
+                continue
+            lo, hi = bounds
+            if lo is None or hi is None:
+                continue
+            value = features.get(key)
+            if value is None or not np.isfinite(float(value)):
+                continue
+            # The synthetic windows are small; use a narrow tolerance so the
+            # hard filter remains robust to floating-point and window edge noise.
+            if key in {"periodicity_strength", "duty_regularity", "high_load_fraction"}:
+                width = max(float(hi) - float(lo), 0.05)
+                tol = 0.10 * width
+            else:
+                width = max(float(hi) - float(lo), abs(float(hi)), abs(float(lo)), 1.0)
+                tol = 0.10 * width
+            if float(value) < float(lo) - tol or float(value) > float(hi) + tol:
+                failures.append(key)
+        return failures
+
+    def _candidate_indices(self, features: dict | None) -> list[int]:
+        self.last_filter_report = {}
+        if features is None:
+            return list(range(len(self.docs)))
+        indices = []
+        for idx, (name, _) in enumerate(self.docs):
+            failures = self._range_filter_failures(name, features)
+            if failures:
+                self.last_filter_report[name] = failures
+            else:
+                indices.append(idx)
+                self.last_filter_report[name] = []
+        return indices
+
+    def search(self, query: str, top_k: int = 3, features: dict | None = None):
+        """쿼리와 가장 유사한 문서 top_k개를 반환한다.
+
+        features가 주어지면 corpus front-matter의 수치 조건으로 먼저
+        후보를 거른 뒤 살아남은 문서만 텍스트 유사도로 정렬한다.
+        """
+        candidate_indices = self._candidate_indices(features)
+        if not candidate_indices:
+            return []
         if self.backend == "sbert":
             q_emb = self._model.encode([query], normalize_embeddings=True)[0]
             scores = self.embeddings @ q_emb
@@ -80,8 +200,18 @@ class SignatureRetriever:
             from sklearn.preprocessing import normalize
             q_vec = normalize(self._vectorizer.transform([query]))
             scores = (self.embeddings @ q_vec.T).toarray().ravel()
-        order = np.argsort(-scores)[:top_k]
-        return [(self.docs[i][0], float(scores[i]), self.docs[i][1]) for i in order]
+        candidate_scores = np.asarray([scores[i] for i in candidate_indices])
+        order = np.argsort(-candidate_scores)[:top_k]
+        return [
+            SearchResult(
+                self.docs[candidate_indices[i]][0],
+                float(candidate_scores[i]),
+                self.docs[candidate_indices[i]][1],
+                self.meta.get(self.docs[candidate_indices[i]][0], {}),
+                [],
+            )
+            for i in order
+        ]
 
 
 def analyze_with_llm(description: str, retrieved, context: dict | None = None,
@@ -91,6 +221,13 @@ def analyze_with_llm(description: str, retrieved, context: dict | None = None,
     backend="ollama": 로컬 Ollama HTTP API 호출 (http://localhost:11434)
     backend="stub":   LLM 없이 규칙 기반 요약 (LLM 준비 전 파이프라인 확인용)
     """
+    if not retrieved:
+        return {
+            "risk": "주의",
+            "closest_match": "unknown",
+            "reason": "수치 조건을 통과한 시그니처가 없어 알려진 문서로 확정하지 않았습니다.",
+            "_backend": f"{backend}:empty-retrieval",
+        }
     # 검색 근거 정리
     evidence = "\n\n".join(
         f"[{name}] (유사도 {score:.3f})\n{text[:1200]}"
@@ -118,8 +255,9 @@ def analyze_with_llm(description: str, retrieved, context: dict | None = None,
     if backend == "stub":
         # LLM 없이도 파이프라인이 도는지 확인하기 위한 규칙 기반 대체
         top_name, top_score, _ = retrieved[0]
-        risk = "의심" if top_score > 0.35 and top_name not in ("normal_workloads",) else "주의"
-        if top_name == "normal_workloads":
+        top_meta = getattr(retrieved[0], "meta", {})
+        risk = "의심" if top_score > 0.35 and top_meta.get("category") != "benign" else "주의"
+        if top_meta.get("category") == "benign":
             risk = "정상"
         return {
             "risk": risk,

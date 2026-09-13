@@ -1,0 +1,47 @@
+{
+  "model_name": "all-MiniLM-L6-v2",
+  "max_model_tokens": 256,
+  "documents": {
+    "benign_periodic": {
+      "token_count": 1198,
+      "exceeds_256": true
+    },
+    "burst_ramp_attack": {
+      "token_count": 1182,
+      "exceeds_256": true
+    },
+    "coordinated_multi_gpu": {
+      "token_count": 1187,
+      "exceeds_256": true
+    },
+    "cryptojacking": {
+      "token_count": 1078,
+      "exceeds_256": true
+    },
+    "hidden_ml_training": {
+      "token_count": 1203,
+      "exceeds_256": true
+    },
+    "llmjacking": {
+      "token_count": 1093,
+      "exceeds_256": true
+    },
+    "ltma": {
+      "token_count": 1592,
+      "exceeds_256": true
+    },
+    "normal_workloads": {
+      "token_count": 1136,
+      "exceeds_256": true
+    },
+    "sponge_attack": {
+      "token_count": 1172,
+      "exceeds_256": true
+    },
+    "swma": {
+      "token_count": 1153,
+      "exceeds_256": true
+    }
+  },
+  "notes": "If documents exceed 256 tokens in SBERT mode, either keep documents shorter or evaluate a multilingual embedding model. This run does not change models."
+}

@@ -253,9 +253,20 @@ def run(args):
         # 3단계: RAG + LLM
         context_query = context_to_query(context)
         query = f"{desc} {context_query}".strip()
-        retrieved = retriever.search(query, top_k=3)
+        retrieved = retriever.search(query, top_k=3, features=feats)
         verdict = analyze_with_llm(desc, retrieved, context=context,
                                     backend=args.llm_backend, model=args.llm_model)
+        top_meta = getattr(retrieved[0], "meta", {}) if retrieved else {}
+        if top_meta.get("category") == "benign":
+            verdict = {
+                **verdict,
+                "risk": "정상",
+                "benign_match": retrieved[0].name,
+                "reason": (
+                    f"benign corpus '{retrieved[0].name}' 수치 조건과 문서가 함께 "
+                    f"매칭되어 경보를 억제합니다. {verdict.get('reason', '')}"
+                ).strip(),
+            }
         raw_attack_id = w["attack_id"].iloc[0] if "attack_id" in w.columns else None
         attack_id = (
             str(raw_attack_id)
@@ -284,6 +295,11 @@ def run(args):
             "features": {k: round(float(v), 5) for k, v in feats.items()},
             "description": desc,
             "rag_top": [(n, round(s, 3)) for n, s, _ in retrieved],
+            "rag_filter_excluded": {
+                name: reasons
+                for name, reasons in retriever.last_filter_report.items()
+                if reasons
+            },
             "threat_id": verdict.get("closest_match"),
             "anomaly_score": round(anomaly_score(components), 5),
             "score_components": {key: round(value, 5) for key, value in components.items()},

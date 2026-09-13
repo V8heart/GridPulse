@@ -1,0 +1,54 @@
+{
+  "tfidf": {
+    "backend": "tfidf",
+    "legacy_4_docs": {
+      "backend": "tfidf",
+      "positive_cases": 9,
+      "top1_accuracy": 1.0,
+      "legacy_positive_cases": 9,
+      "legacy_top1_accuracy": 1.0,
+      "unknown_cases": 3,
+      "unknown_max_similarity": 0.155842592993446,
+      "unknown_threshold": 0.28,
+      "unknown_rejection_rate": 1.0
+    },
+    "expanded_10_docs": {
+      "backend": "tfidf",
+      "positive_cases": 15,
+      "top1_accuracy": 1.0,
+      "legacy_positive_cases": 9,
+      "legacy_top1_accuracy": 1.0,
+      "unknown_cases": 3,
+      "unknown_max_similarity": 0.11051031175260763,
+      "unknown_threshold": 0.28,
+      "unknown_rejection_rate": 1.0
+    },
+    "legacy_accuracy_regressed": false
+  },
+  "sbert": {
+    "backend": "sbert",
+    "legacy_4_docs": {
+      "backend": "sbert",
+      "positive_cases": 9,
+      "top1_accuracy": 1.0,
+      "legacy_positive_cases": 9,
+      "legacy_top1_accuracy": 1.0,
+      "unknown_cases": 3,
+      "unknown_max_similarity": 0.3342423439025879,
+      "unknown_threshold": 0.28,
+      "unknown_rejection_rate": 0.3333333333333333
+    },
+    "expanded_10_docs": {
+      "backend": "sbert",
+      "positive_cases": 15,
+      "top1_accuracy": 0.4,
+      "legacy_positive_cases": 9,
+      "legacy_top1_accuracy": 0.4444444444444444,
+      "unknown_cases": 3,
+      "unknown_max_similarity": 0.3342423439025879,
+      "unknown_threshold": 0.28,
+      "unknown_rejection_rate": 0.3333333333333333
+    },
+    "legacy_accuracy_regressed": true
+  }
+}

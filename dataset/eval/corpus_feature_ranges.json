@@ -1,0 +1,708 @@
+{
+  "basis": "dataset/synthetic/all_v2.csv; stage1 windows window=200 stride=100 baseline_mean_w=120",
+  "documents": {
+    "swma": {
+      "threat_id": "T-SWMA-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "swma"
+      ],
+      "swing_ratio": [
+        1.6563,
+        1.6879
+      ],
+      "periodicity_strength": [
+        0.8986,
+        0.9006
+      ],
+      "duty_regularity": [
+        1.0,
+        1.0
+      ],
+      "mean_power_level": "elevated",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        2985.3311,
+        3020.8382
+      ],
+      "high_load_fraction": [
+        0.5,
+        0.5
+      ],
+      "longest_high_seconds": [
+        1.0,
+        1.0
+      ],
+      "ranges": {
+        "mean_w": [
+          183.4926,
+          184.17
+        ],
+        "swing_ratio": [
+          1.6563,
+          1.6879
+        ],
+        "periodicity_strength": [
+          0.8986,
+          0.9006
+        ],
+        "duty_regularity": [
+          1.0,
+          1.0
+        ],
+        "ramp_max_w_per_s": [
+          2985.3311,
+          3020.8382
+        ],
+        "high_load_fraction": [
+          0.5,
+          0.5
+        ],
+        "longest_high_seconds": [
+          1.0,
+          1.0
+        ],
+        "n_transitions": [
+          19.0,
+          19.0
+        ]
+      }
+    },
+    "ltma": {
+      "threat_id": "T-LTMA-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "ltma"
+      ],
+      "swing_ratio": [
+        1.2543,
+        1.8122
+      ],
+      "periodicity_strength": [
+        0.8626,
+        0.9248
+      ],
+      "duty_regularity": [
+        0.1255,
+        0.8879
+      ],
+      "mean_power_level": "normal",
+      "ramp_level": "mid",
+      "multi_gpu_sync": "not_applicable",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        1192.9153,
+        1431.6287
+      ],
+      "high_load_fraction": [
+        0.0,
+        0.1775
+      ],
+      "longest_high_seconds": [
+        0.0,
+        1.0
+      ],
+      "ranges": {
+        "mean_w": [
+          95.3462,
+          135.6823
+        ],
+        "swing_ratio": [
+          1.2543,
+          1.8122
+        ],
+        "periodicity_strength": [
+          0.8626,
+          0.9248
+        ],
+        "duty_regularity": [
+          0.1255,
+          0.8879
+        ],
+        "ramp_max_w_per_s": [
+          1192.9153,
+          1431.6287
+        ],
+        "high_load_fraction": [
+          0.0,
+          0.1775
+        ],
+        "longest_high_seconds": [
+          0.0,
+          1.0
+        ],
+        "n_transitions": [
+          3.0,
+          8.5
+        ]
+      }
+    },
+    "cryptojacking": {
+      "threat_id": "T-CRYPTO-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "cryptojacking"
+      ],
+      "swing_ratio": [
+        0.0224,
+        0.0288
+      ],
+      "periodicity_strength": [
+        0.7386,
+        0.8337
+      ],
+      "duty_regularity": [
+        0.0,
+        0.1624
+      ],
+      "mean_power_level": "elevated",
+      "ramp_level": "low",
+      "multi_gpu_sync": "not_applicable",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        16.9784,
+        22.6389
+      ],
+      "high_load_fraction": [
+        1.0,
+        1.0
+      ],
+      "longest_high_seconds": [
+        20.0,
+        20.0
+      ],
+      "ranges": {
+        "mean_w": [
+          284.4091,
+          285.397
+        ],
+        "swing_ratio": [
+          0.0224,
+          0.0288
+        ],
+        "periodicity_strength": [
+          0.7386,
+          0.8337
+        ],
+        "duty_regularity": [
+          0.0,
+          0.1624
+        ],
+        "ramp_max_w_per_s": [
+          16.9784,
+          22.6389
+        ],
+        "high_load_fraction": [
+          1.0,
+          1.0
+        ],
+        "longest_high_seconds": [
+          20.0,
+          20.0
+        ],
+        "n_transitions": [
+          17.0,
+          32.5
+        ]
+      }
+    },
+    "normal_workloads": {
+      "threat_id": "B-NORMAL-001",
+      "category": "benign",
+      "synthetic_source_labels": [
+        "normal_baseline",
+        "normal_checkpoint",
+        "normal_dataloader_stall",
+        "normal_distributed_training",
+        "normal_eval_train_switch",
+        "normal_hpo_search"
+      ],
+      "swing_ratio": [
+        0.0663,
+        1.5494
+      ],
+      "periodicity_strength": [
+        0.6788,
+        0.968
+      ],
+      "duty_regularity": [
+        0.0,
+        0.8617
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        24.052,
+        2252.9626
+      ],
+      "high_load_fraction": [
+        0.0,
+        0.7275
+      ],
+      "longest_high_seconds": [
+        0.0,
+        11.35
+      ],
+      "ranges": {
+        "mean_w": [
+          119.9349,
+          188.323
+        ],
+        "swing_ratio": [
+          0.0663,
+          1.5494
+        ],
+        "periodicity_strength": [
+          0.6788,
+          0.968
+        ],
+        "duty_regularity": [
+          0.0,
+          0.8617
+        ],
+        "ramp_max_w_per_s": [
+          24.052,
+          2252.9626
+        ],
+        "high_load_fraction": [
+          0.0,
+          0.7275
+        ],
+        "longest_high_seconds": [
+          0.0,
+          11.35
+        ],
+        "n_transitions": [
+          1.0,
+          31.75
+        ]
+      }
+    },
+    "benign_periodic": {
+      "threat_id": "B-PERIODIC-001",
+      "category": "benign",
+      "synthetic_source_labels": [
+        "normal_checkpoint",
+        "normal_dataloader_stall",
+        "normal_distributed_training",
+        "normal_eval_train_switch",
+        "normal_hpo_search"
+      ],
+      "swing_ratio": [
+        0.3978,
+        1.5494
+      ],
+      "periodicity_strength": [
+        0.6788,
+        0.968
+      ],
+      "duty_regularity": [
+        0.0,
+        0.8617
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        585.1232,
+        2252.9626
+      ],
+      "high_load_fraction": [
+        0.0,
+        0.7275
+      ],
+      "longest_high_seconds": [
+        0.0,
+        11.35
+      ],
+      "ranges": {
+        "mean_w": [
+          122.2177,
+          190.6589
+        ],
+        "swing_ratio": [
+          0.3978,
+          1.5494
+        ],
+        "periodicity_strength": [
+          0.6788,
+          0.968
+        ],
+        "duty_regularity": [
+          0.0,
+          0.8617
+        ],
+        "ramp_max_w_per_s": [
+          585.1232,
+          2252.9626
+        ],
+        "high_load_fraction": [
+          0.0,
+          0.7275
+        ],
+        "longest_high_seconds": [
+          0.0,
+          11.35
+        ],
+        "n_transitions": [
+          1.0,
+          6.0
+        ]
+      }
+    },
+    "hidden_ml_training": {
+      "threat_id": "T-HIDDEN-ML-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "normal_distributed_training",
+        "normal_hpo_search"
+      ],
+      "swing_ratio": [
+        0.3978,
+        1.5494
+      ],
+      "periodicity_strength": [
+        0.7616,
+        0.935
+      ],
+      "duty_regularity": [
+        0.0,
+        0.7496
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": 60,
+      "ramp_max_w_per_s": [
+        585.1232,
+        2252.9626
+      ],
+      "high_load_fraction": [
+        0.0725,
+        0.6925
+      ],
+      "longest_high_seconds": [
+        1.45,
+        11.35
+      ],
+      "ranges": {
+        "mean_w": [
+          146.5934,
+          195.4656
+        ],
+        "swing_ratio": [
+          0.3978,
+          1.5494
+        ],
+        "periodicity_strength": [
+          0.7616,
+          0.935
+        ],
+        "duty_regularity": [
+          0.0,
+          0.7496
+        ],
+        "ramp_max_w_per_s": [
+          585.1232,
+          2252.9626
+        ],
+        "high_load_fraction": [
+          0.0725,
+          0.6925
+        ],
+        "longest_high_seconds": [
+          1.45,
+          11.35
+        ],
+        "n_transitions": [
+          2.0,
+          6.0
+        ]
+      }
+    },
+    "llmjacking": {
+      "threat_id": "T-LLMJACKING-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "normal_hpo_search"
+      ],
+      "swing_ratio": [
+        0.988,
+        1.5494
+      ],
+      "periodicity_strength": [
+        0.7616,
+        0.9225
+      ],
+      "duty_regularity": [
+        0.0,
+        0.4442
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        1636.246,
+        2252.9626
+      ],
+      "high_load_fraction": [
+        0.0725,
+        0.6925
+      ],
+      "longest_high_seconds": [
+        1.45,
+        11.35
+      ],
+      "ranges": {
+        "mean_w": [
+          144.2672,
+          206.2819
+        ],
+        "swing_ratio": [
+          0.988,
+          1.5494
+        ],
+        "periodicity_strength": [
+          0.7616,
+          0.9225
+        ],
+        "duty_regularity": [
+          0.0,
+          0.4442
+        ],
+        "ramp_max_w_per_s": [
+          1636.246,
+          2252.9626
+        ],
+        "high_load_fraction": [
+          0.0725,
+          0.6925
+        ],
+        "longest_high_seconds": [
+          1.45,
+          11.35
+        ],
+        "n_transitions": [
+          2.0,
+          4.0
+        ]
+      }
+    },
+    "sponge_attack": {
+      "threat_id": "T-SPONGE-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "cryptojacking"
+      ],
+      "swing_ratio": [
+        0.0224,
+        0.0288
+      ],
+      "periodicity_strength": [
+        0.7386,
+        0.8337
+      ],
+      "duty_regularity": [
+        0.0,
+        0.1624
+      ],
+      "mean_power_level": "elevated",
+      "ramp_level": "low",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        16.9784,
+        22.6389
+      ],
+      "high_load_fraction": [
+        1.0,
+        1.0
+      ],
+      "longest_high_seconds": [
+        20.0,
+        20.0
+      ],
+      "ranges": {
+        "mean_w": [
+          284.4091,
+          285.397
+        ],
+        "swing_ratio": [
+          0.0224,
+          0.0288
+        ],
+        "periodicity_strength": [
+          0.7386,
+          0.8337
+        ],
+        "duty_regularity": [
+          0.0,
+          0.1624
+        ],
+        "ramp_max_w_per_s": [
+          16.9784,
+          22.6389
+        ],
+        "high_load_fraction": [
+          1.0,
+          1.0
+        ],
+        "longest_high_seconds": [
+          20.0,
+          20.0
+        ],
+        "n_transitions": [
+          17.0,
+          32.5
+        ]
+      }
+    },
+    "coordinated_multi_gpu": {
+      "threat_id": "T-COORD-GPU-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "normal_distributed_training",
+        "swma"
+      ],
+      "swing_ratio": [
+        0.3978,
+        1.6879
+      ],
+      "periodicity_strength": [
+        0.8706,
+        0.935
+      ],
+      "duty_regularity": [
+        0.0,
+        1.0
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "required",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        585.1232,
+        3020.8382
+      ],
+      "high_load_fraction": [
+        0.1575,
+        0.5
+      ],
+      "longest_high_seconds": [
+        1.0,
+        4.7
+      ],
+      "ranges": {
+        "mean_w": [
+          165.6658,
+          186.5839
+        ],
+        "swing_ratio": [
+          0.3978,
+          1.6879
+        ],
+        "periodicity_strength": [
+          0.8706,
+          0.935
+        ],
+        "duty_regularity": [
+          0.0,
+          1.0
+        ],
+        "ramp_max_w_per_s": [
+          585.1232,
+          3020.8382
+        ],
+        "high_load_fraction": [
+          0.1575,
+          0.5
+        ],
+        "longest_high_seconds": [
+          1.0,
+          4.7
+        ],
+        "n_transitions": [
+          3.05,
+          19.0
+        ]
+      }
+    },
+    "burst_ramp_attack": {
+      "threat_id": "T-BURST-RAMP-001",
+      "category": "attack",
+      "synthetic_source_labels": [
+        "normal_checkpoint",
+        "normal_dataloader_stall",
+        "normal_hpo_search"
+      ],
+      "swing_ratio": [
+        0.6161,
+        1.5494
+      ],
+      "periodicity_strength": [
+        0.6788,
+        0.9345
+      ],
+      "duty_regularity": [
+        0.0,
+        0.8617
+      ],
+      "mean_power_level": "any",
+      "ramp_level": "high",
+      "multi_gpu_sync": "optional",
+      "min_duration_s": null,
+      "ramp_max_w_per_s": [
+        701.9137,
+        2252.9626
+      ],
+      "high_load_fraction": [
+        0.0,
+        0.6925
+      ],
+      "longest_high_seconds": [
+        0.0,
+        11.35
+      ],
+      "ranges": {
+        "mean_w": [
+          109.3853,
+          185.0661
+        ],
+        "swing_ratio": [
+          0.6161,
+          1.5494
+        ],
+        "periodicity_strength": [
+          0.6788,
+          0.9345
+        ],
+        "duty_regularity": [
+          0.0,
+          0.8617
+        ],
+        "ramp_max_w_per_s": [
+          701.9137,
+          2252.9626
+        ],
+        "high_load_fraction": [
+          0.0,
+          0.6925
+        ],
+        "longest_high_seconds": [
+          0.0,
+          11.35
+        ],
+        "n_transitions": [
+          2.0,
+          6.85
+        ]
+      }
+    }
+  }
+}

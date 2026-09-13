@@ -1,3 +1,19 @@
+---
+threat_id: T-SWMA-001
+category: attack
+synthetic_source_labels: ["swma"]
+swing_ratio: [1.6563, 1.6879]
+periodicity_strength: [0.8986, 0.9006]
+duty_regularity: [1.0, 1.0]
+mean_power_level: elevated
+ramp_level: high
+multi_gpu_sync: optional
+min_duration_s: null
+ramp_max_w_per_s: [2985.3311, 3020.8382]
+high_load_fraction: [0.5, 0.5]
+longest_high_seconds: [1.0, 1.0]
+---
+
 # SWMA (Synthetic Workload Modulation Attack)
 
 ## 출처
