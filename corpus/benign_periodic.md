@@ -1,19 +1,24 @@
 ---
 threat_id: B-PERIODIC-001
 category: benign
-synthetic_source_labels: ["normal_checkpoint", "normal_dataloader_stall", "normal_distributed_training", "normal_eval_train_switch", "normal_hpo_search"]
-swing_ratio: [0.3978, 1.5494]
-periodicity_strength: [0.6788, 0.968]
-duty_regularity: [0.0, 0.8617]
-mean_power_level: any
-ramp_level: high
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [585.1232, 2252.9626]
-high_load_fraction: [0.0, 0.7275]
-longest_high_seconds: [0.0, 11.35]
+mitre_technique: null
+evidence:
+  - name: period_match
+    necessity: required
+    description: "강한 주기성이 정상 job 진행 로그로 설명됨"
+  - name: declared_context_consistent
+    necessity: supporting
+    description: "선언 작업과 관측 패턴이 일치"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # 정상이지만 공격과 유사한 주기적 워크로드 (Benign Periodic Workload)
 
 ## 관측 요약

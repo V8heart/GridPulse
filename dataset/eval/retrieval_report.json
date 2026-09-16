@@ -1,73 +1,775 @@
 {
   "backend": "tfidf",
-  "positive_cases": 15,
-  "top1_accuracy": 1.0,
-  "legacy_positive_cases": 9,
-  "legacy_top1_accuracy": 1.0,
+  "positive_cases": 126,
+  "top1_accuracy": 0.2698412698412698,
+  "legacy_positive_cases": 126,
+  "legacy_top1_accuracy": 0.2698412698412698,
   "unknown_cases": 3,
-  "unknown_max_similarity": 0.11051031175260763,
+  "unknown_max_similarity": 0.16276674239226355,
   "unknown_threshold": 0.28,
   "unknown_rejection_rate": 1.0,
   "details": [
     {
-      "case_id": "syn-normal-baseline-100-gpu0",
+      "case_id": "syn-normal-baseline-80004-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.27755595279959905
+      "top1_score": 0.11599216392953754
     },
     {
-      "case_id": "syn-normal-ddp-101-gpu0",
+      "case_id": "syn-normal-baseline-80008-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.28347435479111877
+      "top1_score": 0.11467420057465011
     },
     {
-      "case_id": "syn-normal-hpo-102-gpu0",
+      "case_id": "syn-normal-baseline-80009-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.28407747281197615
+      "top1_score": 0.1154078653860769
     },
     {
-      "case_id": "syn-normal-checkpoint-103-gpu0",
+      "case_id": "syn-normal-baseline-80014-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.28075041073742707
+      "top1_score": 0.11499107288639779
     },
     {
-      "case_id": "syn-normal-dataloader-104-gpu0",
+      "case_id": "syn-normal-baseline-80015-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.2779556073418454
+      "top1_score": 0.1154078653860769
     },
     {
-      "case_id": "syn-normal-eval-105-gpu0",
+      "case_id": "syn-normal-baseline-80017-gpu0",
       "expected": "normal_workloads",
       "top1": "normal_workloads",
-      "top1_score": 0.27642612841995523
+      "top1_score": 0.11499107288639779
     },
     {
-      "case_id": "syn-attack-swma-200-gpu0",
+      "case_id": "syn-normal-ddp-80103-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18568441336956124
+    },
+    {
+      "case_id": "syn-normal-ddp-80105-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18568441336956124
+    },
+    {
+      "case_id": "syn-normal-ddp-80107-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1898081027671931
+    },
+    {
+      "case_id": "syn-normal-ddp-80108-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1898081027671931
+    },
+    {
+      "case_id": "syn-normal-ddp-80109-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1851766650797719
+    },
+    {
+      "case_id": "syn-normal-ddp-80116-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1851766650797719
+    },
+    {
+      "case_id": "syn-normal-hpo-80203-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.2361535333788221
+    },
+    {
+      "case_id": "syn-normal-hpo-80208-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.2324818418580225
+    },
+    {
+      "case_id": "syn-normal-hpo-80215-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.22419076671575525
+    },
+    {
+      "case_id": "syn-normal-hpo-80216-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.22419076671575525
+    },
+    {
+      "case_id": "syn-normal-hpo-80218-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.23718158329619024
+    },
+    {
+      "case_id": "syn-normal-hpo-80219-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.23718158329619024
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80305-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17791695906649016
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80306-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17923703204565286
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80308-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17923703204565286
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80310-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17923703204565286
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80311-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17526748806744347
+    },
+    {
+      "case_id": "syn-normal-checkpoint-80318-gpu0",
+      "expected": "normal_workloads",
+      "top1": "burst_ramp_attack",
+      "top1_score": 0.17652904478211232
+    },
+    {
+      "case_id": "syn-normal-dataloader-80408-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.27148236271643783
+    },
+    {
+      "case_id": "syn-normal-dataloader-80412-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.27148236271643783
+    },
+    {
+      "case_id": "syn-normal-dataloader-80413-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.2696720507127778
+    },
+    {
+      "case_id": "syn-normal-dataloader-80414-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.26564228862363204
+    },
+    {
+      "case_id": "syn-normal-dataloader-80415-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.2710566153360226
+    },
+    {
+      "case_id": "syn-normal-dataloader-80416-gpu0",
+      "expected": "normal_workloads",
+      "top1": "ltma",
+      "top1_score": 0.2713824391927082
+    },
+    {
+      "case_id": "syn-normal-eval-80500-gpu0",
+      "expected": "normal_workloads",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.18043513461669955
+    },
+    {
+      "case_id": "syn-normal-eval-80505-gpu0",
+      "expected": "normal_workloads",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.18043513461669955
+    },
+    {
+      "case_id": "syn-normal-eval-80509-gpu0",
+      "expected": "normal_workloads",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.18043513461669955
+    },
+    {
+      "case_id": "syn-normal-eval-80514-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19516364404323255
+    },
+    {
+      "case_id": "syn-normal-eval-80516-gpu0",
+      "expected": "normal_workloads",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.18043513461669955
+    },
+    {
+      "case_id": "syn-normal-eval-80519-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18408457902049033
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80601-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1961419987240101
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80602-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1965145568856965
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80607-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19989513887897148
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80611-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1857754834429914
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80612-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18474827750988754
+    },
+    {
+      "case_id": "syn-normal-sync-ddp-80616-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1941942920340441
+    },
+    {
+      "case_id": "syn-normal-fsdp-80704-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.18153088713707322
+    },
+    {
+      "case_id": "syn-normal-fsdp-80708-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.2363265218416418
+    },
+    {
+      "case_id": "syn-normal-fsdp-80709-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.17895626098955844
+    },
+    {
+      "case_id": "syn-normal-fsdp-80711-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.1826613588219978
+    },
+    {
+      "case_id": "syn-normal-fsdp-80717-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.18586873427174813
+    },
+    {
+      "case_id": "syn-normal-fsdp-80719-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.1826613588219978
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80800-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19487839792986078
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80805-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19241405192217179
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80807-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18975228114922146
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80808-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1870661878387196
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80812-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19241405192217179
+    },
+    {
+      "case_id": "syn-normal-flat-pretrain-80817-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19090184181315534
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80903-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.23280797301745507
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80908-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.2357778484719082
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80912-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.14174286176474368
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80913-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.2404218776322471
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80914-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24506600587243804
+    },
+    {
+      "case_id": "syn-normal-infer-bursty-80915-gpu0",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.17416360175253717
+    },
+    {
+      "case_id": "syn-normal-mixed-81001-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19294383011576888
+    },
+    {
+      "case_id": "syn-normal-mixed-81001-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24266583668163003
+    },
+    {
+      "case_id": "syn-normal-mixed-81004-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19329892263564874
+    },
+    {
+      "case_id": "syn-normal-mixed-81004-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24135561505070924
+    },
+    {
+      "case_id": "syn-normal-mixed-81009-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19404911376166678
+    },
+    {
+      "case_id": "syn-normal-mixed-81009-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24267541021933142
+    },
+    {
+      "case_id": "syn-normal-mixed-81011-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19105937974756582
+    },
+    {
+      "case_id": "syn-normal-mixed-81011-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24267541021933142
+    },
+    {
+      "case_id": "syn-normal-mixed-81015-gpu0",
+      "expected": "normal_workloads",
+      "top1": "swma",
+      "top1_score": 0.18586873427174813
+    },
+    {
+      "case_id": "syn-normal-mixed-81015-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.24171686979354678
+    },
+    {
+      "case_id": "syn-normal-mixed-81018-gpu0",
+      "expected": "normal_workloads",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19586900384184638
+    },
+    {
+      "case_id": "syn-normal-mixed-81018-gpu1",
+      "expected": "normal_workloads",
+      "top1": "llmjacking",
+      "top1_score": 0.1741989164289172
+    },
+    {
+      "case_id": "syn-attack-swma-90004-gpu0",
       "expected": "swma",
       "top1": "swma",
-      "top1_score": 0.319464385185173
+      "top1_score": 0.1952615418086896
     },
     {
-      "case_id": "syn-attack-ltma-201-gpu0",
+      "case_id": "syn-attack-swma-90005-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma-90006-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma-90009-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma-90011-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma-90016-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90102-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.17991632069562807
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90106-gpu0",
+      "expected": "swma",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.1565019181849486
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90110-gpu0",
+      "expected": "swma",
+      "top1": "ltma",
+      "top1_score": 0.16286263272888887
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90113-gpu0",
+      "expected": "swma",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.1489587649288268
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90117-gpu0",
+      "expected": "swma",
+      "top1": "ltma",
+      "top1_score": 0.15930280125237387
+    },
+    {
+      "case_id": "syn-attack-swma_shallow-90119-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.17385094286264655
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90200-gpu0",
+      "expected": "swma",
+      "top1": "llmjacking",
+      "top1_score": 0.22858456487000545
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90203-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1890890160398304
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90206-gpu0",
+      "expected": "swma",
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.1656417203758178
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90208-gpu0",
+      "expected": "swma",
+      "top1": "llmjacking",
+      "top1_score": 0.2359799734358813
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90216-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.18633380674255953
+    },
+    {
+      "case_id": "syn-attack-swma_jitter-90219-gpu0",
+      "expected": "swma",
+      "top1": "llmjacking",
+      "top1_score": 0.2282162092324411
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90303-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18758234928020356
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90306-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18593918066671808
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90308-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19919617891102384
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90309-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18898021249349858
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90316-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1769595413890644
+    },
+    {
+      "case_id": "syn-attack-swma_piggyback-90319-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18408457902049033
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90402-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18688775166132696
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90403-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18317784932132442
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90406-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.1917482251815417
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90409-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19481333040647666
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90415-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19311871575301187
+    },
+    {
+      "case_id": "syn-attack-swma_mimicry-90418-gpu0",
+      "expected": "swma",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18893618921814723
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90505-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90505-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90508-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90508-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90511-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.19752588434077148
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90511-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.19652933447625873
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90514-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90514-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.19752588434077148
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90516-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90516-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.19752588434077148
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90519-gpu0",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-swma_coordinated-90519-gpu1",
+      "expected": "swma",
+      "top1": "swma",
+      "top1_score": 0.1952615418086896
+    },
+    {
+      "case_id": "syn-attack-ltma-90601-gpu0",
       "expected": "ltma",
       "top1": "ltma",
-      "top1_score": 0.354541252936443
+      "top1_score": 0.2680932052357461
     },
     {
-      "case_id": "syn-attack-crypto-202-gpu0",
+      "case_id": "syn-attack-ltma-90603-gpu0",
+      "expected": "ltma",
+      "top1": "ltma",
+      "top1_score": 0.2632945860968411
+    },
+    {
+      "case_id": "syn-attack-ltma-90608-gpu0",
+      "expected": "ltma",
+      "top1": "ltma",
+      "top1_score": 0.2680932052357461
+    },
+    {
+      "case_id": "syn-attack-ltma-90611-gpu0",
+      "expected": "ltma",
+      "top1": "ltma",
+      "top1_score": 0.2667464435231614
+    },
+    {
+      "case_id": "syn-attack-ltma-90613-gpu0",
+      "expected": "ltma",
+      "top1": "ltma",
+      "top1_score": 0.26353683910602044
+    },
+    {
+      "case_id": "syn-attack-ltma-90617-gpu0",
+      "expected": "ltma",
+      "top1": "ltma",
+      "top1_score": 0.2645055906943084
+    },
+    {
+      "case_id": "syn-attack-crypto-90702-gpu0",
       "expected": "cryptojacking",
-      "top1": "cryptojacking",
-      "top1_score": 0.3034094183912837
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19090184181315534
+    },
+    {
+      "case_id": "syn-attack-crypto-90705-gpu0",
+      "expected": "cryptojacking",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18592871247449685
+    },
+    {
+      "case_id": "syn-attack-crypto-90709-gpu0",
+      "expected": "cryptojacking",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19487839792986078
+    },
+    {
+      "case_id": "syn-attack-crypto-90711-gpu0",
+      "expected": "cryptojacking",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.18592871247449685
+    },
+    {
+      "case_id": "syn-attack-crypto-90717-gpu0",
+      "expected": "cryptojacking",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19090184181315534
+    },
+    {
+      "case_id": "syn-attack-crypto-90719-gpu0",
+      "expected": "cryptojacking",
+      "top1": "hidden_ml_training",
+      "top1_score": 0.19090184181315534
     },
     {
       "case_id": "unknown_single_impulse",
       "expected": null,
-      "top1": "unknown",
-      "top1_score": 0.0
+      "top1": "llmjacking",
+      "top1_score": 0.11416097014254623
     },
     {
       "case_id": "unknown_slow_drift",
@@ -78,44 +780,44 @@
     {
       "case_id": "unknown_random_walk",
       "expected": null,
-      "top1": "normal_workloads",
-      "top1_score": 0.11051031175260763
+      "top1": "coordinated_multi_gpu",
+      "top1_score": 0.16276674239226355
     },
     {
       "case_id": "doc-hidden-ml-training",
       "expected": "hidden_ml_training",
       "top1": "hidden_ml_training",
-      "top1_score": 0.2237078976744606
+      "top1_score": 0.12370789767446058
     },
     {
       "case_id": "doc-llmjacking",
       "expected": "llmjacking",
       "top1": "llmjacking",
-      "top1_score": 0.36451657405128207
+      "top1_score": 0.26451657405128204
     },
     {
       "case_id": "doc-sponge-attack",
       "expected": "sponge_attack",
       "top1": "sponge_attack",
-      "top1_score": 0.38644367081453274
+      "top1_score": 0.2864436708145327
     },
     {
       "case_id": "doc-coordinated-multi-gpu",
       "expected": "coordinated_multi_gpu",
       "top1": "coordinated_multi_gpu",
-      "top1_score": 0.34863974220304816
+      "top1_score": 0.24863974220304816
     },
     {
       "case_id": "doc-burst-ramp-attack",
       "expected": "burst_ramp_attack",
       "top1": "burst_ramp_attack",
-      "top1_score": 0.26947758430199725
+      "top1_score": 0.16947758430199725
     },
     {
       "case_id": "doc-benign-periodic",
       "expected": "benign_periodic",
       "top1": "benign_periodic",
-      "top1_score": 0.25877381833443225
+      "top1_score": 0.15877381833443224
     }
   ]
 }

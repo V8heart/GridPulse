@@ -15,3 +15,7 @@ dataset/**/summary.md
 *_out.npz
 *_out.txt
 stage1_results.csv
+dataset/synthetic/normal/syn-*.csv
+dataset/synthetic/attacks/syn-*.csv
+dataset/synthetic/steps/
+dataset/synthetic/all_v3.csv

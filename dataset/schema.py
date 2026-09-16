@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,10 @@ CORE_COLUMNS = [
     "collection_timestamp",
     "raw_timestamp",
     "session_id",
+    "gt_attack_id",
+    "gt_label",
+    "gt_variant",
+    "gt_params_json",
     "attack_id",
     "waveform_kind",
     "waveform_frequency_hz",
@@ -31,6 +36,12 @@ CORE_COLUMNS = [
     "actual_interval_ms",
     "value_changed",
     "pid",
+    "declared_process_name",
+    "declared_user",
+    "declared_job_type",
+    "declared_job_family",
+    "declared_gres",
+    "gpu_model",
     "process_name",
     "id_user",
     "job_type",
@@ -44,7 +55,20 @@ REQUIRED_COLUMNS = {
     "gpu_id",
     "sample_hz",
     "power_w",
+}
+
+INFERENCE_FORBIDDEN_COLUMNS = {
+    "gt_label",
+    "gt_attack_id",
+    "gt_variant",
+    "gt_params_json",
+    "power_phys_w",
     "label",
+    "attack_id",
+    "waveform_kind",
+    "waveform_frequency_hz",
+    "waveform_amplitude_frac",
+    "waveform_duty_cycle",
 }
 
 NUMERIC_COLUMNS = {
@@ -56,6 +80,7 @@ NUMERIC_COLUMNS = {
     "gpu_id",
     "sample_hz",
     "power_w",
+    "power_phys_w",
     "util_gpu_pct",
     "mem_copy_util_pct",
     "sm_clock_mhz",
@@ -65,6 +90,20 @@ NUMERIC_COLUMNS = {
     "actual_interval_ms",
     "pid",
 }
+
+LEGACY_TO_DECLARED = {
+    "label": "gt_label",
+    "attack_id": "gt_attack_id",
+    "job_type": "declared_job_type",
+    "id_user": "declared_user",
+    "gres_req": "declared_gres",
+    "process_name": "declared_process_name",
+}
+
+
+def strip_ground_truth(df: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy with labels/attack params removed for inference."""
+    return df.drop(columns=[c for c in INFERENCE_FORBIDDEN_COLUMNS if c in df], errors="ignore").copy()
 
 
 @dataclass(frozen=True)
@@ -81,11 +120,23 @@ class SessionManifest:
     workload: str | None = None
     notes: str | None = None
     attack_id: str | None = None
+    split: str | None = None
+    progress_log_path: str | None = None
+    gt_variant: str | None = None
 
 
 def normalize_frame(df: pd.DataFrame) -> pd.DataFrame:
     """누락된 선택 컬럼을 추가하고 공통 컬럼 순서로 정렬한다."""
     out = df.copy()
+    for legacy, new_name in LEGACY_TO_DECLARED.items():
+        if legacy in out and new_name not in out:
+            out[new_name] = out[legacy]
+            warnings.warn(
+                f"legacy column {legacy!r} mapped to {new_name!r}; "
+                "new datasets should write declared/gt columns directly",
+                RuntimeWarning,
+                stacklevel=2,
+            )
     for column in CORE_COLUMNS:
         if column not in out:
             out[column] = np.nan if column in NUMERIC_COLUMNS else pd.NA
@@ -100,6 +151,8 @@ def validate_frame(df: pd.DataFrame, *, require_nonempty: bool = True) -> None:
     missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:
         raise ValueError(f"필수 컬럼 누락: {sorted(missing)}")
+    if "label" not in df and "gt_label" not in df:
+        raise ValueError("필수 컬럼 누락: ['label' 또는 'gt_label']")
 
     for column in NUMERIC_COLUMNS & set(df.columns):
         values = pd.to_numeric(df[column], errors="coerce")
@@ -116,9 +169,10 @@ def validate_frame(df: pd.DataFrame, *, require_nonempty: bool = True) -> None:
     if "sample_hz" in df and (pd.to_numeric(df["sample_hz"], errors="coerce") <= 0).any():
         raise ValueError("sample_hz는 양수여야 합니다.")
 
+    label_col = "label" if "label" in df and not df["label"].isna().all() else "gt_label"
     grouped = df.groupby(["session_id", "gpu_id"], dropna=False)
     for key, group in grouped:
-        if group["label"].nunique(dropna=False) != 1:
+        if group[label_col].nunique(dropna=False) != 1:
             raise ValueError(f"세션 {key} 안에 여러 label이 섞였습니다.")
         hz = pd.to_numeric(group["sample_hz"], errors="coerce").dropna()
         if hz.nunique() != 1:

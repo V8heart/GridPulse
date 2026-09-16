@@ -43,7 +43,7 @@ def test_parse_front_matter_excludes_metadata_from_body():
 def test_retriever_filters_by_feature_ranges(tmp_path):
     _write_doc(tmp_path / "matching.md", "matching", category="attack", swing=[1.0, 2.0])
     _write_doc(tmp_path / "excluded.md", "excluded", category="attack", swing=[0.0, 0.2])
-    retriever = SignatureRetriever(corpus_dir=tmp_path, backend="tfidf")
+    retriever = SignatureRetriever(corpus_dir=tmp_path, backend="tfidf", range_filter="hard")
     results = retriever.search(
         "규칙적인 high low 전환",
         features={"swing_ratio": 1.5, "periodicity_strength": 0.9, "duty_regularity": 0.9},
@@ -54,7 +54,7 @@ def test_retriever_filters_by_feature_ranges(tmp_path):
 
 def test_empty_filtered_retrieval_becomes_unknown(tmp_path):
     _write_doc(tmp_path / "excluded.md", "excluded", category="attack", swing=[0.0, 0.2])
-    retriever = SignatureRetriever(corpus_dir=tmp_path, backend="tfidf")
+    retriever = SignatureRetriever(corpus_dir=tmp_path, backend="tfidf", range_filter="hard")
     results = retriever.search(
         "규칙적인 high low 전환",
         features={"swing_ratio": 2.0, "periodicity_strength": 0.9, "duty_regularity": 0.9},

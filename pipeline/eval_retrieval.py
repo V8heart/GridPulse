@@ -18,7 +18,7 @@ from pipeline.rag_analyzer import SignatureRetriever
 from pipeline.run_pipeline import context_to_query, infer_sample_hz
 
 LEGACY_DOCS = {"swma", "ltma", "cryptojacking", "normal_workloads"}
-EXPANDED_SYNTHETIC_CASES = [
+DOC_SANITY_CASES = [
     {
         "case_id": "doc-hidden-ml-training",
         "kind": "positive",
@@ -138,11 +138,17 @@ EXPANDED_SYNTHETIC_CASES = [
 
 
 def expected_document(label: str) -> str:
-    return "normal_workloads" if label.startswith("normal") else label
+    if label.startswith("normal"):
+        return "normal_workloads"
+    if label.startswith("swma"):
+        return "swma"
+    return label
 
 
-def build_cases(telemetry: Path) -> list[dict]:
+def build_cases(telemetry: Path, session_ids: set[str] | None = None, *, include_doc_sanity: bool = True) -> list[dict]:
     df = pd.read_csv(telemetry)
+    if session_ids is not None:
+        df = df[df["session_id"].astype(str).isin(session_ids)]
     cases = []
     for (session_id, gpu_id), group in df.groupby(["session_id", "gpu_id"], sort=False):
         hz = infer_sample_hz(group)
@@ -157,7 +163,8 @@ def build_cases(telemetry: Path) -> list[dict]:
             for key in ("id_user", "job_type", "gres_req")
             if key in group
         }
-        label = str(group["label"].iloc[0])
+        label_col = "gt_label" if "gt_label" in group else "label"
+        label = str(group[label_col].iloc[0])
         cases.append({
             "case_id": f"{session_id}-gpu{gpu_id}",
             "kind": "positive",
@@ -186,7 +193,7 @@ def build_cases(telemetry: Path) -> list[dict]:
             "query": description,
             "features": feats,
         })
-    return cases + EXPANDED_SYNTHETIC_CASES
+    return cases + (DOC_SANITY_CASES if include_doc_sanity else [])
 
 
 def evaluate(
@@ -209,10 +216,11 @@ def evaluate(
             top_name, top_score = "unknown", 0.0
         if case["kind"] == "positive":
             expected = case["expected_document"]
-            if include_docs is None or expected in include_docs:
+            official = not str(case["case_id"]).startswith("doc-")
+            if official and (include_docs is None or expected in include_docs):
                 positive += 1
                 correct += int(top_name == expected)
-            if expected in LEGACY_DOCS:
+            if official and expected in LEGACY_DOCS:
                 legacy_positive += 1
                 legacy_correct += int(top_name == expected)
         else:
@@ -286,6 +294,8 @@ def write_token_stats(corpus_dir: Path, output: Path, model_name: str = "all-Min
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v2.csv")
+    parser.add_argument("--split-manifest", type=Path, default=None)
+    parser.add_argument("--split", choices=["train", "cal", "test", "all"], default="test")
     parser.add_argument("--cases-out", type=Path, default=ROOT / "dataset/eval/retrieval_eval.jsonl")
     parser.add_argument("--report-out", type=Path, default=ROOT / "dataset/eval/retrieval_report.json")
     parser.add_argument("--scaling-out", type=Path, default=ROOT / "dataset/eval/retrieval_scaling.json")
@@ -294,7 +304,11 @@ def main() -> None:
     parser.add_argument("--unknown-threshold", type=float, default=0.28)
     parser.add_argument("--write-scaling", action="store_true")
     args = parser.parse_args()
-    cases = build_cases(args.telemetry)
+    session_ids = None
+    if args.split_manifest and args.split != "all":
+        manifest = json.loads(args.split_manifest.read_text(encoding="utf-8"))
+        session_ids = set(map(str, manifest[args.split]))
+    cases = build_cases(args.telemetry, session_ids=session_ids, include_doc_sanity=True)
     args.cases_out.parent.mkdir(parents=True, exist_ok=True)
     args.cases_out.write_text(
         "\n".join(json.dumps(case, ensure_ascii=False) for case in cases) + "\n",

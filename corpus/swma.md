@@ -1,19 +1,27 @@
 ---
 threat_id: T-SWMA-001
-category: attack
-synthetic_source_labels: ["swma"]
-swing_ratio: [1.6563, 1.6879]
-periodicity_strength: [0.8986, 0.9006]
-duty_regularity: [1.0, 1.0]
-mean_power_level: elevated
-ramp_level: high
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [2985.3311, 3020.8382]
-high_load_fraction: [0.5, 0.5]
-longest_high_seconds: [1.0, 1.0]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: period_mismatch
+    necessity: supporting
+    description: "전력 지배 주파수가 선언된 학습 진행 로그와 불일치"
+  - name: feature_range_match
+    necessity: supporting
+    description: "train split에서 적합된 SWMA feature range에 근접"
+  - name: progress_log_present_training
+    necessity: exclusion
+    description: "정상 학습 진행 로그가 전력 주기를 설명하면 배제 방향"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # SWMA (Synthetic Workload Modulation Attack)
 
 ## 출처

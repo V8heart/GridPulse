@@ -22,6 +22,20 @@ def smooth_noise(rng: np.random.Generator, size: int, scale: float, width: int =
     return np.convolve(noise, np.ones(width) / width, mode="valid")
 
 
+def trailing_moving_average(values: np.ndarray, sample_hz: float, window_s: float) -> np.ndarray:
+    """Emulate NVML-style trailing average while preserving array length."""
+    data = np.asarray(values, dtype=float)
+    if window_s <= 0:
+        return data.copy()
+    width = max(1, int(round(window_s * sample_hz)))
+    cumsum = np.cumsum(np.r_[0.0, data])
+    result = np.empty_like(data, dtype=float)
+    for idx in range(len(data)):
+        start = max(0, idx + 1 - width)
+        result[idx] = (cumsum[idx + 1] - cumsum[start]) / (idx + 1 - start)
+    return result
+
+
 def _derived_util(power: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     low, high = float(np.percentile(power, 5)), float(np.percentile(power, 95))
     span = max(high - low, 10.0)
@@ -37,10 +51,19 @@ def build_frame(
     seed: int = DEFAULT_SEED,
     gpu_id: int = 0,
     util_gpu_pct: np.ndarray | None = None,
-    id_user: str = "sim_user",
+    declared_user: str | None = None,
+    declared_job_type: str | None = None,
+    declared_job_family: str | None = None,
+    declared_process_name: str | None = None,
+    id_user: str | None = None,
     job_type: str | None = None,
-    gres_req: str = "gpu:1",
+    declared_gres: str | None = None,
+    gres_req: str | None = None,
     attack_id: str | None = None,
+    gt_variant: str | None = None,
+    gt_params_json: str | None = None,
+    power_phys_w: np.ndarray | None = None,
+    gpu_model: str = "RTX4090-synthetic",
     waveform_kind: str | None = None,
     waveform_frequency_hz: float | None = None,
     waveform_amplitude_frac: float | None = None,
@@ -53,10 +76,23 @@ def build_frame(
     power = np.asarray(power_w, dtype=float)
     if len(power) < 8 or not np.isfinite(power).all():
         raise ValueError("power_w에는 8개 이상의 유한한 값이 필요합니다.")
+    if declared_job_type is None or declared_job_family is None or declared_process_name is None:
+        raise ValueError("declared_job_type/family/process_name must be provided explicitly")
+    if declared_user is None:
+        raise ValueError("declared_user must be provided explicitly")
+    if declared_gres is None:
+        declared_gres = gres_req or "gpu:1"
+    if id_user is None:
+        id_user = declared_user
+    if job_type is None:
+        job_type = declared_job_type
 
     util = _derived_util(power, rng) if util_gpu_pct is None else np.asarray(util_gpu_pct, dtype=float)
     if len(util) != len(power):
         raise ValueError("util_gpu_pct 길이는 power_w와 같아야 합니다.")
+    phys = power if power_phys_w is None else np.asarray(power_phys_w, dtype=float)
+    if len(phys) != len(power):
+        raise ValueError("power_phys_w 길이는 power_w와 같아야 합니다.")
     util = np.clip(util, 0, 100)
     mem_copy = np.clip(util * 0.55 + rng.normal(0, 4, len(power)), 0, 100)
     sm_clock = np.clip(210 + util * 25 + rng.normal(0, 35, len(power)), 210, 2520)
@@ -81,6 +117,10 @@ def build_frame(
             "collection_timestamp": collection.astype(str),
             "raw_timestamp": np.nan,
             "session_id": session_id,
+            "gt_attack_id": attack_id or session_id,
+            "gt_label": label,
+            "gt_variant": gt_variant,
+            "gt_params_json": gt_params_json,
             "attack_id": attack_id or session_id,
             "waveform_kind": waveform_kind,
             "waveform_frequency_hz": (
@@ -95,6 +135,7 @@ def build_frame(
             "gpu_id": gpu_id,
             "sample_hz": float(sample_hz),
             "power_w": np.clip(power, 0, 500),
+            "power_phys_w": np.clip(phys, 0, 500),
             "util_gpu_pct": util,
             "mem_copy_util_pct": mem_copy,
             "sm_clock_mhz": sm_clock,
@@ -104,10 +145,16 @@ def build_frame(
             "actual_interval_ms": interval_ms,
             "value_changed": changed,
             "pid": np.nan,
-            "process_name": f"synthetic_{label}",
+            "declared_process_name": declared_process_name,
+            "declared_user": declared_user,
+            "declared_job_type": declared_job_type,
+            "declared_job_family": declared_job_family,
+            "declared_gres": declared_gres,
+            "gpu_model": gpu_model,
+            "process_name": declared_process_name,
             "id_user": id_user,
-            "job_type": job_type or label,
-            "gres_req": gres_req,
+            "job_type": job_type,
+            "gres_req": declared_gres,
             "label": label,
         }
     )

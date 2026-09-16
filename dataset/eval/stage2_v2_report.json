@@ -1,0 +1,4326 @@
+{
+  "backend": "stub",
+  "cases": 575,
+  "top1_accuracy": 0.1356521739130435,
+  "determinism_rate": 1.0,
+  "fallback_rate": 0.7460869565217392,
+  "details": [
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows0-300",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows150-450",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows300-600",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows450-750",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows600-900",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows750-1050",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80600:gpu0:rows900-1200",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows0-300",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows150-450",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows300-600",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows450-750",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows600-900",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows750-1050",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80605:gpu0:rows900-1200",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows0-300",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows150-450",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows300-600",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows450-750",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows600-900",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows750-1050",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80611:gpu0:rows900-1200",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows0-300",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows150-450",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows300-600",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows450-750",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows600-900",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows750-1050",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-sync-ddp-80618:gpu0:rows900-1200",
+      "expected": "normal_sync_ddp",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows0-300",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows150-450",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows300-600",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows450-750",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows600-900",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows750-1050",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80702:gpu0:rows900-1200",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows0-300",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows150-450",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows300-600",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows450-750",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows600-900",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows750-1050",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80704:gpu0:rows900-1200",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows0-300",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows150-450",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows300-600",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows450-750",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows600-900",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows750-1050",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80705:gpu0:rows900-1200",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows0-300",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows150-450",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows300-600",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows450-750",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows600-900",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows750-1050",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-fsdp-80719:gpu0:rows900-1200",
+      "expected": "normal_fsdp_deep_trough",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows0-300",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows150-450",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows300-600",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows450-750",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows600-900",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows750-1050",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80800:gpu0:rows900-1200",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-flat-pretrain-80817:gpu0:rows300-600",
+      "expected": "normal_flat_pretrain",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80912:gpu0:rows600-900",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80912:gpu0:rows750-1050",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80912:gpu0:rows900-1200",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80918:gpu0:rows150-450",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80918:gpu0:rows300-600",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-infer-bursty-80918:gpu0:rows450-750",
+      "expected": "normal_inference_bursty",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows0-300",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows150-450",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows300-600",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows450-750",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows600-900",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows750-1050",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81009:gpu1:rows900-1200",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-normal-mixed-81017:gpu0:rows300-600",
+      "expected": "normal_mixed_tenants",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma-90009:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90104:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90105:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90106:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90107:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90108:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90109:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90110:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90110:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90110:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90110:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90110:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90111:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90112:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90113:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90114:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90115:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90116:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90118:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_shallow-90119:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90201:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90203:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90205:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90206:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90209:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90210:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90212:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90214:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_jitter-90218:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90300:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90304:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90305:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90308:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90311:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90315:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90317:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90317:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_piggyback-90319:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90401:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90402:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90402:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90402:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90403:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90405:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90407:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90409:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90410:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90410:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90411:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90411:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90412:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90413:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90413:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90414:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90414:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90414:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90419:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_mimicry-90419:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": false,
+      "matched_evidence": [
+        "period_match"
+      ]
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90500:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90501:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90502:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90503:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90504:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90505:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90506:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90510:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90511:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90512:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90515:gpu1:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows0-300",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows150-450",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows300-600",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows450-750",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows600-900",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows750-1050",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-swma_coordinated-90516:gpu0:rows900-1200",
+      "expected": "swma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90600:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90601:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90603:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90604:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90606:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90607:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90608:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90610:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90612:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90613:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90613:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90615:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90617:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90618:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows0-300",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows150-450",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows300-600",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows450-750",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows600-900",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows750-1050",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-ltma-90619:gpu0:rows900-1200",
+      "expected": "ltma",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90706:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90707:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90708:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90709:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90710:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90714:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90718:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows0-300",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows150-450",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows300-600",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows450-750",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows600-900",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows750-1050",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    },
+    {
+      "window_id": "syn-attack-crypto-90719:gpu0:rows900-1200",
+      "expected": "cryptojacking",
+      "closest_match": "benign_periodic",
+      "fallback_used": true,
+      "matched_evidence": []
+    }
+  ]
+}

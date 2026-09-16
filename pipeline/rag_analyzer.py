@@ -89,12 +89,19 @@ class SignatureRetriever:
 
     def __init__(self, corpus_dir: Path = CORPUS_DIR,
                  backend: str = "sbert", model_name: str = "all-MiniLM-L6-v2",
-                 include_docs: set[str] | None = None):
+                 include_docs: set[str] | None = None,
+                 range_path: Path | None = None,
+                 range_filter: str = "soft",
+                 range_lambda: float = 0.1):
         self.backend = backend
         self.docs = []       # (name, text)
         self.meta = {}       # name -> front-matter dict
+        self.ranges = {}
         self.last_filter_report = {}
+        self.last_evidence_missing = {}
         self.include_docs = include_docs
+        self.range_filter = range_filter
+        self.range_lambda = range_lambda
         self.embeddings = None
         self._model = None
         self._vectorizer = None
@@ -103,6 +110,27 @@ class SignatureRetriever:
             from sentence_transformers import SentenceTransformer
             self._model = SentenceTransformer(model_name)
         self._load_corpus(corpus_dir)
+        self._load_ranges(range_path)
+
+    def _load_ranges(self, range_path: Path | None) -> None:
+        if self.range_filter == "off":
+            return
+        candidates = []
+        if range_path is not None:
+            candidates.append(Path(range_path))
+        candidates.append(CORPUS_DIR.parent / "dataset" / "eval" / "corpus_feature_ranges.json")
+        for path in candidates:
+            if not path.exists():
+                continue
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            docs = data.get("documents", {})
+            for name, item in docs.items():
+                self.ranges[name] = item.get("ranges", {})
+            if self.ranges:
+                return
 
     def _load_corpus(self, corpus_dir: Path):
         for path in sorted(glob.glob(str(corpus_dir / "*.md"))):
@@ -139,7 +167,9 @@ class SignatureRetriever:
         if meta.get("multi_gpu_sync") == "required":
             sync_value = features.get("multi_gpu_sync_index", features.get("sync_index"))
             if sync_value is None or float(sync_value) < 0.8:
-                failures.append("multi_gpu_sync")
+                self.last_evidence_missing.setdefault(name, []).append("multi_gpu_sync_index")
+                if self.range_filter == "hard":
+                    failures.append("multi_gpu_sync")
         numeric_keys = (
             "swing_ratio",
             "duty_regularity",
@@ -147,7 +177,7 @@ class SignatureRetriever:
             "high_load_fraction",
         )
         for key in numeric_keys:
-            bounds = meta.get(key)
+            bounds = self.ranges.get(name, {}).get(key, meta.get(key))
             if bounds is None or key not in features:
                 continue
             if not isinstance(bounds, list) or len(bounds) != 2:
@@ -172,6 +202,7 @@ class SignatureRetriever:
 
     def _candidate_indices(self, features: dict | None) -> list[int]:
         self.last_filter_report = {}
+        self.last_evidence_missing = {}
         if features is None:
             return list(range(len(self.docs)))
         indices = []
@@ -179,9 +210,11 @@ class SignatureRetriever:
             failures = self._range_filter_failures(name, features)
             if failures:
                 self.last_filter_report[name] = failures
+                if self.range_filter == "hard":
+                    continue
             else:
-                indices.append(idx)
                 self.last_filter_report[name] = []
+            indices.append(idx)
         return indices
 
     def search(self, query: str, top_k: int = 3, features: dict | None = None):
@@ -200,7 +233,13 @@ class SignatureRetriever:
             from sklearn.preprocessing import normalize
             q_vec = normalize(self._vectorizer.transform([query]))
             scores = (self.embeddings @ q_vec.T).toarray().ravel()
-        candidate_scores = np.asarray([scores[i] for i in candidate_indices])
+        candidate_scores = np.asarray([scores[i] for i in candidate_indices], dtype=float)
+        if features is not None and self.range_filter == "soft":
+            penalties = np.asarray([
+                len(self.last_filter_report.get(self.docs[i][0], [])) * self.range_lambda
+                for i in candidate_indices
+            ])
+            candidate_scores = candidate_scores - penalties
         order = np.argsort(-candidate_scores)[:top_k]
         return [
             SearchResult(

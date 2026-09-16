@@ -1,19 +1,24 @@
 ---
 threat_id: T-BURST-RAMP-001
-category: attack
-synthetic_source_labels: ["normal_checkpoint", "normal_dataloader_stall", "normal_hpo_search"]
-swing_ratio: [0.6161, 1.5494]
-periodicity_strength: [0.6788, 0.9345]
-duty_regularity: [0.0, 0.8617]
-mean_power_level: any
-ramp_level: high
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [701.9137, 2252.9626]
-high_load_fraction: [0.0, 0.6925]
-longest_high_seconds: [0.0, 11.35]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: feature_range_match
+    necessity: supporting
+    description: "train split에서 적합된 feature range와 근접"
+  - name: context_inconsistency
+    necessity: supporting
+    description: "선언 컨텍스트와 관측 evidence가 불일치"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # 급격 부하 변동 공격 (Burst / Ramp Load Attack)
 
 ## 관측 요약

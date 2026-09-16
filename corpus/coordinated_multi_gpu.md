@@ -1,19 +1,24 @@
 ---
 threat_id: T-COORD-GPU-001
-category: attack
-synthetic_source_labels: ["normal_distributed_training", "swma"]
-swing_ratio: [0.3978, 1.6879]
-periodicity_strength: [0.8706, 0.935]
-duty_regularity: [0.0, 1.0]
-mean_power_level: any
-ramp_level: high
-multi_gpu_sync: required
-min_duration_s: null
-ramp_max_w_per_s: [585.1232, 3020.8382]
-high_load_fraction: [0.1575, 0.5]
-longest_high_seconds: [1.0, 4.7]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: feature_range_match
+    necessity: supporting
+    description: "train split에서 적합된 feature range와 근접"
+  - name: context_inconsistency
+    necessity: supporting
+    description: "선언 컨텍스트와 관측 evidence가 불일치"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # 다중 GPU 협조 부하 변조 (Coordinated Multi-GPU Modulation)
 
 ## 관측 요약

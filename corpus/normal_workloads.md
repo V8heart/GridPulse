@@ -1,19 +1,24 @@
 ---
 threat_id: B-NORMAL-001
 category: benign
-synthetic_source_labels: ["normal_baseline", "normal_checkpoint", "normal_dataloader_stall", "normal_distributed_training", "normal_eval_train_switch", "normal_hpo_search"]
-swing_ratio: [0.0663, 1.5494]
-periodicity_strength: [0.6788, 0.968]
-duty_regularity: [0.0, 0.8617]
-mean_power_level: any
-ramp_level: high
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [24.052, 2252.9626]
-high_load_fraction: [0.0, 0.7275]
-longest_high_seconds: [0.0, 11.35]
+mitre_technique: null
+evidence:
+  - name: period_match
+    necessity: supporting
+    description: "전력 주기가 정상 진행 로그와 일치"
+  - name: explained_changepoint
+    necessity: supporting
+    description: "변화점이 체크포인트/평가/요청 이벤트로 설명됨"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # 정상 워크로드 프로파일 (오탐 방지용 기준)
 
 ## 목적

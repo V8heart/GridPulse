@@ -18,8 +18,12 @@ from pipeline.rag_analyzer import SignatureRetriever
 from pipeline.run_pipeline import context_to_query, infer_sample_hz, stage1_screen
 
 
-def evaluate(path: Path, *, baseline: float, window: int, stride: int) -> dict:
+def evaluate(path: Path, *, baseline: float, window: int, stride: int,
+             split_manifest: Path | None = None, split: str = "test") -> dict:
     df = pd.read_csv(path)
+    if split_manifest and split != "all":
+        manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
+        df = df[df["session_id"].astype(str).isin(set(map(str, manifest[split])))]
     retriever = SignatureRetriever(backend="tfidf")
     windows = []
     filter_counts: Counter[str] = Counter()
@@ -35,7 +39,9 @@ def evaluate(path: Path, *, baseline: float, window: int, stride: int) -> dict:
             stride=stride,
         )
         for _, item in screened.iterrows():
-            normal = str(item["label"]).startswith("normal")
+            label_col = "gt_label" if "gt_label" in group else "label"
+            label_value = str(group[label_col].iloc[0])
+            normal = label_value.startswith("normal")
             record = {"normal": normal, "candidate": bool(item["is_candidate"]), "rag_correct": None}
             if item["is_candidate"]:
                 reasons = [reason for reason in str(item["candidate_reasons"]).split(",") if reason]
@@ -55,7 +61,7 @@ def evaluate(path: Path, *, baseline: float, window: int, stride: int) -> dict:
                 top = retriever.search(
                     f"{description} {context_to_query(context)}".strip(), top_k=1
                 )[0][0]
-                expected = "normal_workloads" if normal else str(item["label"])
+                expected = "normal_workloads" if normal else ("swma" if label_value.startswith("swma") else label_value)
                 record["rag_correct"] = top == expected
                 record["top1"] = top
             windows.append(record)
@@ -84,6 +90,8 @@ def evaluate(path: Path, *, baseline: float, window: int, stride: int) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--telemetry", type=Path, default=Path("dataset/synthetic/all_v2.csv"))
+    parser.add_argument("--split-manifest", type=Path, default=None)
+    parser.add_argument("--split", choices=["train", "cal", "test", "all"], default="test")
     parser.add_argument("--baseline-mean", type=float, default=120)
     parser.add_argument("--window", type=int, default=200)
     parser.add_argument("--stride", type=int, default=100)
@@ -94,6 +102,8 @@ def main() -> None:
         baseline=args.baseline_mean,
         window=args.window,
         stride=args.stride,
+        split_manifest=args.split_manifest,
+        split=args.split,
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

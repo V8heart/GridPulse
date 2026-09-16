@@ -1,6 +1,6 @@
 [
   {
-    "session_id": "syn-normal-baseline-100",
+    "session_id": "syn-normal-baseline-80000",
     "label": "normal_baseline",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -8,13 +8,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 100,
-    "workload": "normal_baseline",
+    "seed": 80000,
+    "workload": "notebook",
     "notes": null,
-    "attack_id": "normal-control"
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
   },
   {
-    "session_id": "syn-normal-ddp-101",
+    "session_id": "syn-normal-baseline-80001",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80001,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80002",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80002,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80003",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80003,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80004",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80004,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80005",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80005,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80006",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80006,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80007",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80007,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80008",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80008,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80009",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80009,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80010",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80010,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80011",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80011,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80012",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80012,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80013",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80013,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80014",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80014,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80015",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80015,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80016",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80016,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80017",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80017,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80018",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80018,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-baseline-80019",
+    "label": "normal_baseline",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80019,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "normal-control",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "baseline_idle"
+  },
+  {
+    "session_id": "syn-normal-ddp-80100",
     "label": "normal_distributed_training",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -22,13 +348,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 101,
-    "workload": "normal_distributed_training",
+    "seed": 80100,
+    "workload": "llm_finetune",
     "notes": null,
-    "attack_id": "syn-normal-ddp-101"
+    "attack_id": "syn-normal-ddp-80100",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
   },
   {
-    "session_id": "syn-normal-hpo-102",
+    "session_id": "syn-normal-ddp-80101",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80101,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80101",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80102",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80102,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80102",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80103",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80103,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80103",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80104",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80104,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80104",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80105",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80105,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80105",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80106",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80106,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80106",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80107",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80107,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80107",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80108",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80108,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80108",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80109",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80109,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80109",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80110",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80110,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80110",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80111",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80111,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80111",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80112",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80112,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80112",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80113",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80113,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80113",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80114",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80114,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80114",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80115",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80115,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80115",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80116",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80116,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80116",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80117",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80117,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80117",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80118",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80118,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80118",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-ddp-80119",
+    "label": "normal_distributed_training",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80119,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-ddp-80119",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "legacy_irregular_ddp"
+  },
+  {
+    "session_id": "syn-normal-hpo-80200",
     "label": "normal_hpo_search",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -36,13 +688,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 102,
-    "workload": "normal_hpo_search",
+    "seed": 80200,
+    "workload": "ddp_training",
     "notes": null,
-    "attack_id": "syn-normal-hpo-102"
+    "attack_id": "syn-normal-hpo-80200",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
   },
   {
-    "session_id": "syn-normal-checkpoint-103",
+    "session_id": "syn-normal-hpo-80201",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80201,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80201",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80202",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80202,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80202",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80203",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80203,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80203",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80204",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80204,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80204",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80205",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80205,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80205",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80206",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80206,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80206",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80207",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80207,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80207",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80208",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80208,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80208",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80209",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80209,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80209",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80210",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80210,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80210",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80211",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80211,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80211",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80212",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80212,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80212",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80213",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80213,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80213",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80214",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80214,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80214",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80215",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80215,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80215",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80216",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80216,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80216",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80217",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80217,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80217",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80218",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80218,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80218",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-hpo-80219",
+    "label": "normal_hpo_search",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80219,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-hpo-80219",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "hpo_search"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80300",
     "label": "normal_checkpoint",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -50,13 +1028,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 103,
-    "workload": "normal_checkpoint",
+    "seed": 80300,
+    "workload": "hpo_sweep",
     "notes": null,
-    "attack_id": "syn-normal-checkpoint-103"
+    "attack_id": "syn-normal-checkpoint-80300",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80300.jsonl",
+    "gt_variant": "checkpoint"
   },
   {
-    "session_id": "syn-normal-dataloader-104",
+    "session_id": "syn-normal-checkpoint-80301",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80301,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80301",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80301.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80302",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80302,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80302",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80302.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80303",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80303,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80303",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80303.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80304",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80304,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80304",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80304.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80305",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80305,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80305",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80305.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80306",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80306,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80306",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80306.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80307",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80307,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80307",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80307.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80308",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80308,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80308",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80308.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80309",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80309,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80309",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80309.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80310",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80310,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80310",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80310.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80311",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80311,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80311",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80311.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80312",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80312,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80312",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80312.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80313",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80313,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80313",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80313.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80314",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80314,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80314",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80314.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80315",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80315,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80315",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80315.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80316",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80316,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80316",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80316.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80317",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80317,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80317",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80317.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80318",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80318,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80318",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80318.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-checkpoint-80319",
+    "label": "normal_checkpoint",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80319,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-checkpoint-80319",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-checkpoint-80319.jsonl",
+    "gt_variant": "checkpoint"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80400",
     "label": "normal_dataloader_stall",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -64,13 +1368,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 104,
-    "workload": "normal_dataloader_stall",
+    "seed": 80400,
+    "workload": "ddp_training",
     "notes": null,
-    "attack_id": "syn-normal-dataloader-104"
+    "attack_id": "syn-normal-dataloader-80400",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
   },
   {
-    "session_id": "syn-normal-eval-105",
+    "session_id": "syn-normal-dataloader-80401",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80401,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80401",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80402",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80402,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80402",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80403",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80403,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80403",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80404",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80404,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80404",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80405",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80405,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80405",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80406",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80406,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80406",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80407",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80407,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80407",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80408",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80408,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80408",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80409",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80409,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80409",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80410",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80410,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80410",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80411",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80411,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80411",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80412",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80412,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80412",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80413",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80413,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80413",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80414",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80414,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80414",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80415",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80415,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80415",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80416",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80416,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80416",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80417",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80417,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80417",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80418",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80418,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80418",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-dataloader-80419",
+    "label": "normal_dataloader_stall",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80419,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "syn-normal-dataloader-80419",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "dataloader_stall"
+  },
+  {
+    "session_id": "syn-normal-eval-80500",
     "label": "normal_eval_train_switch",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -78,13 +1708,2059 @@
       0
     ],
     "rows": 1200,
-    "seed": 105,
-    "workload": "normal_eval_train_switch",
+    "seed": 80500,
+    "workload": "hpo_sweep",
     "notes": null,
-    "attack_id": "syn-normal-eval-105"
+    "attack_id": "syn-normal-eval-80500",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80500.jsonl",
+    "gt_variant": "eval_train_switch"
   },
   {
-    "session_id": "syn-attack-swma-200",
+    "session_id": "syn-normal-eval-80501",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80501,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80501",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80501.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80502",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80502,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80502",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80502.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80503",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80503,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80503",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80503.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80504",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80504,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80504",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80504.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80505",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80505,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80505",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80505.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80506",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80506,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80506",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80506.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80507",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80507,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80507",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80507.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80508",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80508,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80508",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80508.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80509",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80509,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80509",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80509.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80510",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80510,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80510",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80510.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80511",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80511,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80511",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80511.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80512",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80512,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80512",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80512.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80513",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80513,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80513",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80513.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80514",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80514,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80514",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80514.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80515",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80515,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80515",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80515.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80516",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80516,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80516",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80516.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80517",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80517,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80517",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80517.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80518",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80518,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80518",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80518.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-eval-80519",
+    "label": "normal_eval_train_switch",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80519,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-eval-80519",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-eval-80519.jsonl",
+    "gt_variant": "eval_train_switch"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80600",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80600,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80600",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80600.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80601",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80601,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80601",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80601.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80602",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80602,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80602",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80602.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80603",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80603,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80603",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80603.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80604",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80604,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80604",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80604.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80605",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80605,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80605",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80605.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80606",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80606,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80606",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80606.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80607",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80607,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80607",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80607.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80608",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80608,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80608",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80608.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80609",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80609,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80609",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80609.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80610",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80610,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80610",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80610.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80611",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80611,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80611",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80611.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80612",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80612,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80612",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80612.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80613",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80613,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80613",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80613.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80614",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80614,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80614",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80614.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80615",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80615,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80615",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80615.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80616",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80616,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80616",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80616.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80617",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80617,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80617",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80617.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80618",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80618,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80618",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80618.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-sync-ddp-80619",
+    "label": "normal_sync_ddp",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80619,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-80619",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-sync-ddp-80619.jsonl",
+    "gt_variant": "sync_ddp"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80700",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80700,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80700",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80700.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80701",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80701,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80701",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80701.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80702",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80702,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80702",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80702.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80703",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80703,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80703",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80703.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80704",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80704,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80704",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80704.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80705",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80705,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80705",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80705.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80706",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80706,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80706",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80706.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80707",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80707,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80707",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80707.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80708",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80708,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80708",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80708.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80709",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80709,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80709",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80709.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80710",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80710,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80710",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80710.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80711",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80711,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80711",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80711.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80712",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80712,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80712",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80712.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80713",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80713,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80713",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80713.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80714",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80714,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80714",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80714.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80715",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80715,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80715",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80715.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80716",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80716,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80716",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80716.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80717",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80717,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80717",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80717.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80718",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80718,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80718",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80718.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-fsdp-80719",
+    "label": "normal_fsdp_deep_trough",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80719,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-fsdp-80719",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-fsdp-80719.jsonl",
+    "gt_variant": "fsdp_deep_trough"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80800",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80800,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80800",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80800.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80801",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80801,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80801",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80801.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80802",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80802,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80802",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80802.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80803",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80803,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80803",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80803.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80804",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80804,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80804",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80804.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80805",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80805,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80805",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80805.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80806",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80806,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80806",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80806.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80807",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80807,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80807",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80807.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80808",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80808,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80808",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80808.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80809",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80809,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80809",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80809.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80810",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80810,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80810",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80810.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80811",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80811,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80811",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80811.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80812",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80812,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80812",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80812.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80813",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80813,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80813",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80813.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80814",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80814,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80814",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80814.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80815",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80815,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80815",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80815.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80816",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80816,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80816",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80816.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80817",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80817,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80817",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80817.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80818",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80818,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80818",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80818.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-flat-pretrain-80819",
+    "label": "normal_flat_pretrain",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80819,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-flat-pretrain-80819",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-flat-pretrain-80819.jsonl",
+    "gt_variant": "flat_pretrain"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80900",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80900,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80900",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80900.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80901",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80901,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80901",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80901.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80902",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80902,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80902",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80902.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80903",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80903,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80903",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80903.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80904",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80904,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80904",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80904.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80905",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80905,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80905",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80905.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80906",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80906,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80906",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80906.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80907",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80907,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80907",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80907.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80908",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80908,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80908",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80908.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80909",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80909,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80909",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80909.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80910",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80910,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80910",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80910.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80911",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80911,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80911",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80911.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80912",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80912,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80912",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80912.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80913",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80913,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80913",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80913.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80914",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80914,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80914",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80914.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80915",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80915,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80915",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80915.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80916",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80916,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80916",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80916.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80917",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80917,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80917",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80917.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80918",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80918,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80918",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80918.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-infer-bursty-80919",
+    "label": "normal_inference_bursty",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 80919,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-infer-bursty-80919",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-infer-bursty-80919.jsonl",
+    "gt_variant": "inference_bursty"
+  },
+  {
+    "session_id": "syn-normal-mixed-81000",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81000,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81000",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81000.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81001",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81001,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81001",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81001.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81002",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81002,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81002",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81002.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81003",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81003,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81003",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81003.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81004",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81004,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81004",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81004.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81005",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81005,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81005",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81005.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81006",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81006,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81006",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81006.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81007",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81007,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81007",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81007.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81008",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81008,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81008",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81008.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81009",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81009,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81009",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81009.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81010",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81010,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81010",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81010.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81011",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81011,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81011",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81011.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81012",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81012,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81012",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81012.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81013",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81013,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81013",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81013.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81014",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81014,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81014",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81014.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81015",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81015,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81015",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81015.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81016",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81016,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81016",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81016.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81017",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81017,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81017",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81017.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81018",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81018,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81018",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81018.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-normal-mixed-81019",
+    "label": "normal_mixed_tenants",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 81019,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "syn-normal-sync-ddp-81019",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-normal-mixed-81019.jsonl",
+    "gt_variant": "mixed_tenants"
+  },
+  {
+    "session_id": "syn-attack-swma-90000",
     "label": "swma",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -92,13 +3768,2059 @@
       0
     ],
     "rows": 1200,
-    "seed": 200,
-    "workload": "unknown_cuda_workload",
+    "seed": 90000,
+    "workload": "hpo_sweep",
     "notes": null,
-    "attack_id": "swma-periodic-primary"
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
   },
   {
-    "session_id": "syn-attack-ltma-201",
+    "session_id": "syn-attack-swma-90001",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90001,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90002",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90002,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90003",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90003,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90004",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90004,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90005",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90005,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90006",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90006,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90007",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90007,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90008",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90008,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90009",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90009,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90010",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90010,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90011",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90011,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90012",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90012,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90013",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90013,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90014",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90014,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90015",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90015,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90016",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90016,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90017",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90017,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90018",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90018,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma-90019",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90019,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90100",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90100,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_shallow-f3.14-d0.52-s90100",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90101",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90101,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_shallow-f3.18-d0.42-s90101",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90102",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90102,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.05-d0.52-s90102",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90103",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90103,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.03-d0.68-s90103",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90104",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90104,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma_shallow-f0.54-d0.34-s90104",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90105",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90105,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_shallow-f3.86-d0.57-s90105",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90106",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90106,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_shallow-f1.15-d0.43-s90106",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90107",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90107,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_shallow-f0.69-d0.37-s90107",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90108",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90108,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.88-d0.48-s90108",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90109",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90109,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_shallow-f1.18-d0.34-s90109",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90110",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90110,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.20-d0.69-s90110",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90111",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90111,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.31-d0.69-s90111",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90112",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90112,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.55-d0.31-s90112",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90113",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90113,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_shallow-f0.82-d0.69-s90113",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90114",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90114,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma_shallow-f3.19-d0.60-s90114",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90115",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90115,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma_shallow-f1.62-d0.61-s90115",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90116",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90116,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.72-d0.62-s90116",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90117",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90117,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_shallow-f2.02-d0.65-s90117",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90118",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90118,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_shallow-f1.50-d0.36-s90118",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_shallow-90119",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90119,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_shallow-f0.68-d0.58-s90119",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_shallow"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90200",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90200,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90200",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90201",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90201,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90201",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90202",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90202,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma-jitter-s90202",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90203",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90203,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-jitter-s90203",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90204",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90204,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-jitter-s90204",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90205",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90205,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90205",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90206",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90206,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-jitter-s90206",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90207",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90207,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90207",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90208",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90208,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma-jitter-s90208",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90209",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90209,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-jitter-s90209",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90210",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90210,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-jitter-s90210",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90211",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90211,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma-jitter-s90211",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90212",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90212,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-jitter-s90212",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90213",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90213,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-jitter-s90213",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90214",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90214,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma-jitter-s90214",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90215",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90215,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-jitter-s90215",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90216",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90216,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-jitter-s90216",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90217",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90217,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma-jitter-s90217",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90218",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90218,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90218",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_jitter-90219",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90219,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-jitter-s90219",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_jitter"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90300",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90300,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90300",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90300.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90301",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90301,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90301",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90301.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90302",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90302,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90302",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90302.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90303",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90303,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90303",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90303.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90304",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90304,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90304",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90304.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90305",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90305,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90305",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90305.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90306",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90306,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90306",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90306.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90307",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90307,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90307",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90307.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90308",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90308,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90308",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90308.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90309",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90309,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90309",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90309.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90310",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90310,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90310",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90310.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90311",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90311,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90311",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90311.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90312",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90312,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90312",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90312.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90313",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90313,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90313",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90313.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90314",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90314,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90314",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90314.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90315",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90315,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90315",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90315.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90316",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90316,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90316",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90316.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90317",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90317,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90317",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90317.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90318",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90318,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90318",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90318.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_piggyback-90319",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90319,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma_piggyback-s90319",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_piggyback-90319.jsonl",
+    "gt_variant": "swma_piggyback"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90400",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90400,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90400",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90400.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90401",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90401,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90401",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90401.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90402",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90402,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90402",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90402.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90403",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90403,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90403",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90403.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90404",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90404,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90404",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90404.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90405",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90405,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90405",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90405.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90406",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90406,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90406",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90406.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90407",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90407,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90407",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90407.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90408",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90408,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90408",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90408.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90409",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90409,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90409",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90409.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90410",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90410,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90410",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90410.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90411",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90411,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90411",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90411.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90412",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90412,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90412",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90412.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90413",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90413,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90413",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90413.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90414",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90414,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90414",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90414.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90415",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90415,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90415",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90415.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90416",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90416,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90416",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90416.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90417",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90417,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90417",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90417.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90418",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90418,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90418",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90418.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_mimicry-90419",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90419,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma_mimicry-s90419",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-swma_mimicry-90419.jsonl",
+    "gt_variant": "swma_mimicry"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90500",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90500,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90501",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90501,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90502",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90502,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90503",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90503,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90504",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90504,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90505",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90505,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90506",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90506,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90507",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90507,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90508",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90508,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90509",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90509,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90510",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90510,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90511",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90511,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90512",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90512,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90513",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90513,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90514",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90514,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90515",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90515,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90516",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90516,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90517",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90517,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90518",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90518,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-swma_coordinated-90519",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0,
+      1
+    ],
+    "rows": 2400,
+    "seed": 90519,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma-periodic-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_coordinated"
+  },
+  {
+    "session_id": "syn-attack-ltma-90600",
     "label": "ltma",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -106,13 +5828,339 @@
       0
     ],
     "rows": 1200,
-    "seed": 201,
-    "workload": "llm_training",
+    "seed": 90600,
+    "workload": "notebook",
     "notes": null,
-    "attack_id": "ltma-irregular-primary"
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90600.jsonl",
+    "gt_variant": "ltma"
   },
   {
-    "session_id": "syn-attack-crypto-202",
+    "session_id": "syn-attack-ltma-90601",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90601,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90601.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90602",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90602,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90602.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90603",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90603,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90603.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90604",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90604,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90604.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90605",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90605,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90605.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90606",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90606,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90606.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90607",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90607,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90607.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90608",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90608,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90608.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90609",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90609,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90609.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90610",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90610,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90610.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90611",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90611,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90611.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90612",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90612,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90612.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90613",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90613,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90613.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90614",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90614,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90614.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90615",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90615,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "cal",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90615.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90616",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90616,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90616.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90617",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90617,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "test",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90617.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90618",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90618,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90618.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-ltma-90619",
+    "label": "ltma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90619,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "ltma-irregular-primary",
+    "split": "train",
+    "progress_log_path": "/home/agew1597/KDN/dataset/synthetic/steps/syn-attack-ltma-90619.jsonl",
+    "gt_variant": "ltma"
+  },
+  {
+    "session_id": "syn-attack-crypto-90700",
     "label": "cryptojacking",
     "source": "synthetic",
     "sample_hz": 10.0,
@@ -120,9 +6168,335 @@
       0
     ],
     "rows": 1200,
-    "seed": 202,
-    "workload": "unregistered_hash_benchmark",
+    "seed": 90700,
+    "workload": "hpo_sweep",
     "notes": null,
-    "attack_id": "cryptojacking-steady-primary"
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90701",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90701,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90702",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90702,
+    "workload": "llm_pretrain",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90703",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90703,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90704",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90704,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90705",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90705,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90706",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90706,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90707",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90707,
+    "workload": "notebook",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90708",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90708,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90709",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90709,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90710",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90710,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90711",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90711,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90712",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90712,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90713",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90713,
+    "workload": "evaluation",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90714",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90714,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90715",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90715,
+    "workload": "ddp_training",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90716",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90716,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "train",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90717",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90717,
+    "workload": "hpo_sweep",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90718",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90718,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "cal",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-crypto-90719",
+    "label": "cryptojacking",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 90719,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "cryptojacking-steady-primary",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "cryptojacking"
   }
 ]

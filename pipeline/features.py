@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import numpy as np
+from scipy import signal, stats
 
 
 def compute_window_features(power: np.ndarray,
@@ -155,6 +156,89 @@ def features_to_description(feats: dict, baseline_mean_w: float | None = None) -
         parts.append("순간 전력 상승·하강 기울기가 큼")
 
     return ". ".join(parts) + "."
+
+
+def _band_key(lo: float, hi: float) -> str:
+    hi_text = "nyq" if np.isinf(hi) else f"{hi:g}"
+    return f"{lo:g}_{hi_text}"
+
+
+def compute_window_features_v2(
+    power: np.ndarray,
+    util: np.ndarray | None = None,
+    sample_hz: float = 1.0,
+    *,
+    band_edges_hz: tuple[tuple[float, float], ...] = ((0.05, 0.1), (0.1, 0.7), (0.7, 2.0), (2.0, np.inf)),
+    tdp_w: float = 450.0,
+    nvml_avg_window_s: float | None = None,
+) -> dict:
+    """AI datacenter oriented Stage-1 v2 features."""
+    base = compute_window_features(power, util, sample_hz=sample_hz)
+    if not base:
+        return {}
+    x = np.asarray(power, dtype=float)
+    x = x[np.isfinite(x)]
+    if len(x) < 8:
+        return base
+    centered = x - np.nanmean(x)
+    nperseg = min(256, len(centered))
+    freqs, psd = signal.welch(centered, fs=sample_hz, nperseg=nperseg)
+    positive = freqs > 0
+    freqs, psd = freqs[positive], psd[positive]
+    total_power = float(np.trapz(psd, freqs)) if len(freqs) else 0.0
+    band_power = {}
+    band_frac = {}
+    reliability = {}
+    for lo, hi in band_edges_hz:
+        upper = min(hi, sample_hz / 2.0) if np.isfinite(hi) else sample_hz / 2.0
+        mask = (freqs >= lo) & (freqs < upper)
+        key = _band_key(lo, hi)
+        value = float(np.trapz(psd[mask], freqs[mask])) if np.any(mask) else 0.0
+        band_power[key] = value
+        band_frac[key] = value / total_power if total_power > 0 else 0.0
+        center = (lo + upper) / 2.0 if upper > lo else lo
+        reliability[key] = 1.0 if not nvml_avg_window_s else float(abs(np.sinc(center * nvml_avg_window_s)))
+    if len(psd):
+        peak_idx = int(np.argmax(psd))
+        dominant_freq_hz = float(freqs[peak_idx])
+        median_psd = float(np.median(psd)) if np.median(psd) > 0 else 1e-12
+        dominant_peak_prominence = float(psd[peak_idx] / median_psd)
+        prob = psd / np.sum(psd) if np.sum(psd) > 0 else np.zeros_like(psd)
+        spectral_entropy = float(-np.sum(prob[prob > 0] * np.log2(prob[prob > 0])) / np.log2(len(prob))) if len(prob) > 1 else 0.0
+    else:
+        dominant_freq_hz = 0.0
+        dominant_peak_prominence = 0.0
+        spectral_entropy = 0.0
+
+    p5, p95 = np.percentile(x, [5, 95])
+    swing_abs_w = float(p95 - p5)
+    ramp = np.abs(np.diff(x)) * sample_hz
+    out = {
+        **base,
+        "dominant_freq_hz": dominant_freq_hz,
+        "dominant_peak_prominence": dominant_peak_prominence,
+        "spectral_entropy": spectral_entropy,
+        "band_power_w2": band_power,
+        "band_frac": band_frac,
+        "band_reliability": reliability,
+        "swing_abs_w": swing_abs_w,
+        "swing_frac_tdp": swing_abs_w / tdp_w if tdp_w > 0 else 0.0,
+        "ramp_p95_w_per_s": float(np.percentile(ramp, 95)) if len(ramp) else 0.0,
+        "quality_flag": "ok" if nvml_avg_window_s is not None else "assumed_bandwidth",
+    }
+    if util is not None:
+        u = np.asarray(util, dtype=float)
+        mask = np.isfinite(u) & np.isfinite(np.asarray(power, dtype=float))
+        if np.count_nonzero(mask) >= 3:
+            slope, intercept, _, _ = stats.theilslopes(np.asarray(power, dtype=float)[mask], u[mask])
+            residual = np.asarray(power, dtype=float)[mask] - (slope * u[mask] + intercept)
+            med = np.median(residual)
+            out.update({
+                "util_slope_w_per_pct": float(slope),
+                "util_intercept_w": float(intercept),
+                "util_residual_mad_w": float(np.median(np.abs(residual - med))),
+            })
+    return out
 
 
 if __name__ == "__main__":

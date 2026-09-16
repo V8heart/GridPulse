@@ -1,19 +1,24 @@
 ---
 threat_id: T-CRYPTO-001
-category: attack
-synthetic_source_labels: ["cryptojacking"]
-swing_ratio: [0.0224, 0.0288]
-periodicity_strength: [0.7386, 0.8337]
-duty_regularity: [0.0, 0.1624]
-mean_power_level: elevated
-ramp_level: low
-multi_gpu_sync: not_applicable
-min_duration_s: null
-ramp_max_w_per_s: [16.9784, 22.6389]
-high_load_fraction: [1.0, 1.0]
-longest_high_seconds: [20.0, 20.0]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: persistent_high_load
+    necessity: supporting
+    description: "평탄하고 높은 부하가 장시간 지속"
+  - name: progress_log_present_training
+    necessity: exclusion
+    description: "정상 학습 로그가 지속 고부하를 설명하면 배제 방향"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # GPU 크립토재킹 (Cryptojacking)
 
 ## 출처

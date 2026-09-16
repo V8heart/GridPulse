@@ -1,0 +1,17 @@
+alpha: 0.05
+alpha_high_impact: 0.10
+score_mode: max_plus_evidence
+tdp_w: 450.0
+nvml_avg_window_s: 1.0
+tau_peak: 8.0
+tau_sync: 0.8
+evidence_weights:
+  period_mismatch: 1.0
+  unexplained_changepoint: 0.8
+  cross_job_sync: 1.0
+  progress_log_missing: 0.25
+grid_weights:
+  "0.05_0.1": 0.5
+  "0.1_0.7": 1.0
+  "0.7_2": 0.7
+  "2_nyq": 0.2

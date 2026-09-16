@@ -1,0 +1,352 @@
+{
+  "cohort_keys": [
+    "declared_job_family",
+    "gpu_model"
+  ],
+  "features": [
+    "mean_w",
+    "swing_abs_w",
+    "band_frac_0.1_0.7",
+    "band_frac_0.7_2",
+    "dominant_freq_hz",
+    "util_slope_w_per_pct",
+    "util_residual_mad_w",
+    "spectral_entropy"
+  ],
+  "min_windows": 10,
+  "stats": {
+    "full:evaluation|RTX4090-synthetic": {
+      "n": 28,
+      "features": {
+        "mean_w": {
+          "median": 177.2180488039474,
+          "mad": 40.050884391139206
+        },
+        "swing_abs_w": {
+          "median": 199.160146871005,
+          "mad": 60.39591018270899
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.6739752421906424,
+          "mad": 0.21619949070029693
+        },
+        "band_frac_0.7_2": {
+          "median": 0.004349079565227362,
+          "mad": 0.0018151980169541673
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.0390625
+        },
+        "util_slope_w_per_pct": {
+          "median": 2.287811550852461,
+          "mad": 0.40313845351413125
+        },
+        "util_residual_mad_w": {
+          "median": 3.2919521994212513,
+          "mad": 0.66911479774501
+        },
+        "spectral_entropy": {
+          "median": 0.40285189168547253,
+          "mad": 0.07000869558150485
+        }
+      }
+    },
+    "full:inference|RTX4090-synthetic": {
+      "n": 112,
+      "features": {
+        "mean_w": {
+          "median": 211.48195209501188,
+          "mad": 27.798996857656846
+        },
+        "swing_abs_w": {
+          "median": 291.91220159032696,
+          "mad": 18.390953711457797
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7031661236759645,
+          "mad": 0.10796235949736105
+        },
+        "band_frac_0.7_2": {
+          "median": 0.007164353203456207,
+          "mad": 0.0030469164861061924
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 3.4187472995806627,
+          "mad": 0.13986928510280627
+        },
+        "util_residual_mad_w": {
+          "median": 4.618554523422102,
+          "mad": 0.27783091918403
+        },
+        "spectral_entropy": {
+          "median": 0.4502427391893789,
+          "mad": 0.02489296198877128
+        }
+      }
+    },
+    "full:interactive|RTX4090-synthetic": {
+      "n": 77,
+      "features": {
+        "mean_w": {
+          "median": 119.96153376247722,
+          "mad": 0.2652525979190443
+        },
+        "swing_abs_w": {
+          "median": 4.785036224290792,
+          "mad": 0.5273176455670665
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7573089554292466,
+          "mad": 0.09211662106824492
+        },
+        "band_frac_0.7_2": {
+          "median": 0.010137010077663926,
+          "mad": 0.004737443581411004
+        },
+        "dominant_freq_hz": {
+          "median": 0.15625,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 0.10862262352213842,
+          "mad": 0.0009547069767889133
+        },
+        "util_residual_mad_w": {
+          "median": 0.13903596593463874,
+          "mad": 0.009112003147286885
+        },
+        "spectral_entropy": {
+          "median": 0.4769446825667393,
+          "mad": 0.030050913421290015
+        }
+      }
+    },
+    "full:training|RTX4090-synthetic": {
+      "n": 623,
+      "features": {
+        "mean_w": {
+          "median": 184.22383609533722,
+          "mad": 47.21904537160327
+        },
+        "swing_abs_w": {
+          "median": 135.13084343728286,
+          "mad": 67.03367694564167
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7170093666640184,
+          "mad": 0.24510957714178871
+        },
+        "band_frac_0.7_2": {
+          "median": 0.0038337604099550806,
+          "mad": 0.0021491830265530556
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 1.5374466123914485,
+          "mad": 0.8432896578688702
+        },
+        "util_residual_mad_w": {
+          "median": 1.7907924610748793,
+          "mad": 1.0091091619995822
+        },
+        "spectral_entropy": {
+          "median": 0.35536405047041714,
+          "mad": 0.0797650374145708
+        }
+      }
+    },
+    "family:evaluation": {
+      "n": 28,
+      "features": {
+        "mean_w": {
+          "median": 177.2180488039474,
+          "mad": 40.050884391139206
+        },
+        "swing_abs_w": {
+          "median": 199.160146871005,
+          "mad": 60.39591018270899
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.6739752421906424,
+          "mad": 0.21619949070029693
+        },
+        "band_frac_0.7_2": {
+          "median": 0.004349079565227362,
+          "mad": 0.0018151980169541673
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.0390625
+        },
+        "util_slope_w_per_pct": {
+          "median": 2.287811550852461,
+          "mad": 0.40313845351413125
+        },
+        "util_residual_mad_w": {
+          "median": 3.2919521994212513,
+          "mad": 0.66911479774501
+        },
+        "spectral_entropy": {
+          "median": 0.40285189168547253,
+          "mad": 0.07000869558150485
+        }
+      }
+    },
+    "family:inference": {
+      "n": 112,
+      "features": {
+        "mean_w": {
+          "median": 211.48195209501188,
+          "mad": 27.798996857656846
+        },
+        "swing_abs_w": {
+          "median": 291.91220159032696,
+          "mad": 18.390953711457797
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7031661236759645,
+          "mad": 0.10796235949736105
+        },
+        "band_frac_0.7_2": {
+          "median": 0.007164353203456207,
+          "mad": 0.0030469164861061924
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 3.4187472995806627,
+          "mad": 0.13986928510280627
+        },
+        "util_residual_mad_w": {
+          "median": 4.618554523422102,
+          "mad": 0.27783091918403
+        },
+        "spectral_entropy": {
+          "median": 0.4502427391893789,
+          "mad": 0.02489296198877128
+        }
+      }
+    },
+    "family:interactive": {
+      "n": 77,
+      "features": {
+        "mean_w": {
+          "median": 119.96153376247722,
+          "mad": 0.2652525979190443
+        },
+        "swing_abs_w": {
+          "median": 4.785036224290792,
+          "mad": 0.5273176455670665
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7573089554292466,
+          "mad": 0.09211662106824492
+        },
+        "band_frac_0.7_2": {
+          "median": 0.010137010077663926,
+          "mad": 0.004737443581411004
+        },
+        "dominant_freq_hz": {
+          "median": 0.15625,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 0.10862262352213842,
+          "mad": 0.0009547069767889133
+        },
+        "util_residual_mad_w": {
+          "median": 0.13903596593463874,
+          "mad": 0.009112003147286885
+        },
+        "spectral_entropy": {
+          "median": 0.4769446825667393,
+          "mad": 0.030050913421290015
+        }
+      }
+    },
+    "family:training": {
+      "n": 623,
+      "features": {
+        "mean_w": {
+          "median": 184.22383609533722,
+          "mad": 47.21904537160327
+        },
+        "swing_abs_w": {
+          "median": 135.13084343728286,
+          "mad": 67.03367694564167
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7170093666640184,
+          "mad": 0.24510957714178871
+        },
+        "band_frac_0.7_2": {
+          "median": 0.0038337604099550806,
+          "mad": 0.0021491830265530556
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 1.5374466123914485,
+          "mad": 0.8432896578688702
+        },
+        "util_residual_mad_w": {
+          "median": 1.7907924610748793,
+          "mad": 1.0091091619995822
+        },
+        "spectral_entropy": {
+          "median": 0.35536405047041714,
+          "mad": 0.0797650374145708
+        }
+      }
+    },
+    "global": {
+      "n": 840,
+      "features": {
+        "mean_w": {
+          "median": 183.25587531918217,
+          "mad": 52.06604168309488
+        },
+        "swing_abs_w": {
+          "median": 136.56788390979352,
+          "mad": 76.20249200635385
+        },
+        "band_frac_0.1_0.7": {
+          "median": 0.7170134378048019,
+          "mad": 0.19855835423455231
+        },
+        "band_frac_0.7_2": {
+          "median": 0.004563186802306874,
+          "mad": 0.0025951679770110743
+        },
+        "dominant_freq_hz": {
+          "median": 0.1171875,
+          "mad": 0.078125
+        },
+        "util_slope_w_per_pct": {
+          "median": 1.5629469358292707,
+          "mad": 1.0023915635628378
+        },
+        "util_residual_mad_w": {
+          "median": 1.9191830289515899,
+          "mad": 1.473003527979042
+        },
+        "spectral_entropy": {
+          "median": 0.3946585089059197,
+          "mad": 0.08330150240978146
+        }
+      }
+    }
+  }
+}

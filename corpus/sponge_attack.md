@@ -1,19 +1,24 @@
 ---
 threat_id: T-SPONGE-001
-category: attack
-synthetic_source_labels: ["cryptojacking"]
-swing_ratio: [0.0224, 0.0288]
-periodicity_strength: [0.7386, 0.8337]
-duty_regularity: [0.0, 0.1624]
-mean_power_level: elevated
-ramp_level: low
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [16.9784, 22.6389]
-high_load_fraction: [1.0, 1.0]
-longest_high_seconds: [20.0, 20.0]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: feature_range_match
+    necessity: supporting
+    description: "train split에서 적합된 feature range와 근접"
+  - name: context_inconsistency
+    necessity: supporting
+    description: "선언 컨텍스트와 관측 evidence가 불일치"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # 에너지·지연 증폭 공격 (Sponge / Energy-Latency Attack)
 
 ## 관측 요약

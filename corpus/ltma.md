@@ -1,19 +1,24 @@
 ---
 threat_id: T-LTMA-001
-category: attack
-synthetic_source_labels: ["ltma"]
-swing_ratio: [1.2543, 1.8122]
-periodicity_strength: [0.8626, 0.9248]
-duty_regularity: [0.1255, 0.8879]
-mean_power_level: normal
-ramp_level: mid
-multi_gpu_sync: not_applicable
-min_duration_s: null
-ramp_max_w_per_s: [1192.9153, 1431.6287]
-high_load_fraction: [0.0, 0.1775]
-longest_high_seconds: [0.0, 1.0]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: util_residual_anomaly
+    necessity: supporting
+    description: "전력-사용률 결합 잔차가 코호트 기준에서 이탈"
+  - name: period_mismatch
+    necessity: supporting
+    description: "학습 step 구조로 설명되지 않는 변조 주기"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # LTMA (LLM Training Modulation Attack)
 
 ## 출처

@@ -1,56 +1,86 @@
 {
   "normal_baseline": {
-    "mean_w": 120.18818,
-    "swing_ratio": 0.11075,
-    "duty_regularity": 0.0,
-    "periodicity_strength": 0.77794
+    "mean_w": 119.98813,
+    "swing_ratio": 0.05924,
+    "duty_regularity": 0.27713,
+    "periodicity_strength": 0.93614
   },
   "normal_distributed_training": {
-    "mean_w": 178.14067,
-    "swing_ratio": 0.48566,
-    "duty_regularity": 0.06772,
-    "periodicity_strength": 0.92037
+    "mean_w": 175.85239,
+    "swing_ratio": 0.42358,
+    "duty_regularity": 0.39354,
+    "periodicity_strength": 0.98212
   },
   "normal_hpo_search": {
-    "mean_w": 166.92619,
-    "swing_ratio": 1.41775,
-    "duty_regularity": 0.24366,
-    "periodicity_strength": 0.89378
+    "mean_w": 166.57216,
+    "swing_ratio": 1.36702,
+    "duty_regularity": 0.32138,
+    "periodicity_strength": 0.97696
   },
   "normal_checkpoint": {
-    "mean_w": 181.19125,
-    "swing_ratio": 0.90255,
-    "duty_regularity": 0.05211,
-    "periodicity_strength": 0.83825
+    "mean_w": 180.71435,
+    "swing_ratio": 0.79151,
+    "duty_regularity": 0.04995,
+    "periodicity_strength": 0.9678
   },
   "normal_dataloader_stall": {
-    "mean_w": 135.52928,
-    "swing_ratio": 1.23321,
-    "duty_regularity": 0.0,
-    "periodicity_strength": 0.89805
+    "mean_w": 141.35038,
+    "swing_ratio": 1.04665,
+    "duty_regularity": 0.21982,
+    "periodicity_strength": 0.97417
   },
   "normal_eval_train_switch": {
-    "mean_w": 153.40731,
-    "swing_ratio": 0.78025,
-    "duty_regularity": 0.69701,
-    "periodicity_strength": 0.96724
+    "mean_w": 162.97392,
+    "swing_ratio": 0.69935,
+    "duty_regularity": 0.56814,
+    "periodicity_strength": 0.99062
+  },
+  "normal_sync_ddp": {
+    "mean_w": 323.79062,
+    "swing_ratio": 0.62145,
+    "duty_regularity": 0.40627,
+    "periodicity_strength": 0.94899
+  },
+  "normal_fsdp_deep_trough": {
+    "mean_w": 297.86553,
+    "swing_ratio": 0.61568,
+    "duty_regularity": 0.7192,
+    "periodicity_strength": 0.95565
+  },
+  "normal_flat_pretrain": {
+    "mean_w": 439.33847,
+    "swing_ratio": 0.0144,
+    "duty_regularity": 0.2429,
+    "periodicity_strength": 0.92662
+  },
+  "normal_inference_bursty": {
+    "mean_w": 171.52538,
+    "swing_ratio": 1.96077,
+    "duty_regularity": 0.07483,
+    "periodicity_strength": 0.95976
+  },
+  "normal_mixed_tenants": {
+    "mean_w": 286.57772,
+    "swing_ratio": 1.2234,
+    "duty_regularity": 0.33538,
+    "periodicity_strength": 0.96185
   },
   "swma": {
-    "mean_w": 183.87614,
-    "swing_ratio": 1.69539,
-    "duty_regularity": 1.0,
-    "periodicity_strength": 0.98309
+    "mean_w": 185.08068,
+    "swing_ratio": 1.60022,
+    "duty_regularity": 0.91801,
+    "periodicity_strength": 0.96771
   },
   "ltma": {
-    "mean_w": 120.10556,
-    "swing_ratio": 1.60752,
-    "duty_regularity": 0.33348,
-    "periodicity_strength": 0.91113
+    "mean_w": 120.68068,
+    "swing_ratio": 1.49539,
+    "duty_regularity": 0.34921,
+    "periodicity_strength": 0.98584
   },
   "cryptojacking": {
-    "mean_w": 284.86656,
-    "swing_ratio": 0.03138,
-    "duty_regularity": 0.0,
-    "periodicity_strength": 0.8164
+    "mean_w": 285.05205,
+    "swing_ratio": 0.0237,
+    "duty_regularity": 0.06741,
+    "periodicity_strength": 0.95073
   }
 }

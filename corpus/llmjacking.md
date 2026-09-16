@@ -1,19 +1,24 @@
 ---
 threat_id: T-LLMJACKING-001
-category: attack
-synthetic_source_labels: ["normal_hpo_search"]
-swing_ratio: [0.988, 1.5494]
-periodicity_strength: [0.7616, 0.9225]
-duty_regularity: [0.0, 0.4442]
-mean_power_level: any
-ramp_level: high
-multi_gpu_sync: optional
-min_duration_s: null
-ramp_max_w_per_s: [1636.246, 2252.9626]
-high_load_fraction: [0.0725, 0.6925]
-longest_high_seconds: [1.45, 11.35]
+category: cyber_physical_attack
+mitre_technique: null
+evidence:
+  - name: feature_range_match
+    necessity: supporting
+    description: "train split에서 적합된 feature range와 근접"
+  - name: context_inconsistency
+    necessity: supporting
+    description: "선언 컨텍스트와 관측 evidence가 불일치"
+benign_lookalikes: []
+grid_relevance:
+  mechanism: unsupported
+  tier: unsupported
+  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+observability:
+  min_sample_hz: 1
+  notes: "NVML 1초 평균을 전제로 해석"
+thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ---
-
 # LLM 서비스 탈취 (LLMJacking)
 
 ## 관측 요약

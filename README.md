@@ -43,8 +43,10 @@ source .venv/bin/activate
 
 # 파이프라인 실행 (수집된 텔레메트리 CSV 대상)
 python pipeline/run_pipeline.py \
-    --telemetry dataset/synthetic/all_v2.csv \
+    --telemetry dataset/synthetic/all_v3.csv \
     --baseline-mean 120 \
+    --stage1 v2 \
+    --stage2 v2 \
     --rag-backend tfidf \
     --llm-backend ollama \
     --llm-model gemma3:12b
@@ -55,13 +57,19 @@ python pipeline/run_pipeline.py \
 
 ```bash
 python dataset/build_synthetic.py
-python pipeline/eval_retrieval.py
-python pipeline/eval_detection.py
+python pipeline/fit_corpus_ranges.py
+python pipeline/fit_stage1_v2.py
+python pipeline/eval_retrieval.py --telemetry dataset/synthetic/all_v3.csv \
+  --split-manifest dataset/synthetic/split_manifest.json --split test
+python pipeline/eval_stage1.py
+python pipeline/eval_stage2.py --backend stub
 pytest -q
 ```
 
 합성 데이터는 `session_id + gpu_id` 단위로 처리하므로 서로 다른 클래스의
 경계가 하나의 분석 윈도우에 섞이지 않는다.
+`all_v2.csv`는 하위 호환용 산출물이며 공식 재현 대상은 `all_v3.csv`와
+`split_manifest.json`이다.
 
 ### 실측 텔레메트리
 
@@ -102,6 +110,9 @@ SWMA 코드는 Bit2Watt persistent kernel의 동일 재현이 아니라, PyTorch
 | `pipeline/features.py` | 1·2단계: 텔레메트리 → 통계 피처 → 정성적 자연어 설명 |
 | `pipeline/rag_analyzer.py` | 3단계: RAG 검색(sbert/tfidf) + LLM 판정(ollama/stub) |
 | `pipeline/run_pipeline.py` | 전체 오케스트레이션 (+ 선택 `--physics-validate` 이벤트 트리거) |
+| `pipeline/fit_corpus_ranges.py` | Part A: train split only로 corpus feature range 산출 |
+| `pipeline/fit_stage1_v2.py`, `pipeline/eval_stage1.py` | Part B: cohort baseline/conformal calibration 및 Stage1 v2 평가 |
+| `pipeline/stage2_evidence.py`, `pipeline/stage2_llm.py`, `pipeline/eval_stage2.py` | Part C: structured evidence bundle과 Stage2 v2 평가 |
 | `pipeline/physics_correlation.py` | **§8 실험 전용**: 고정 시나리오 Physics CSV와 cyber JSON을 `attack_id`로 사후 결합(운영 트리거 아님) |
 | `dataset/` | 공통 스키마, 합성 데이터, 캡처·평가 도구 |
 | `bit2watt_impl/physics/` | 공개 Kundur/WECC 동적 응답 + WECC IBR(교체) 침투율 스윕 |
@@ -116,13 +127,41 @@ SWMA 코드는 Bit2Watt persistent kernel의 동일 재현이 아니라, PyTorch
 → LLM 없이 `--rag-backend tfidf --llm-backend stub`으로 먼저 파이프라인 전체를
    검증하고, 그다음 sbert + ollama로 성능을 올리는 순서를 권장.
 
+## 데이터 누설 방지와 평가 상태
+
+Part A 변경으로 추론 입력에서는 `gt_label`, `gt_attack_id`, `attack_id`,
+`waveform_*`, `power_phys_w`, legacy `label`을 제거한다. `declared_job_type`과
+`declared_job_family`는 scheduler가 제공하는 선언 context로만 사용되며, 공격명과
+같은 oracle 문자열을 넣지 않는다. 예전 `top1_accuracy=1.0` 주장은 문서 질의와
+라벨 context를 함께 쓰던 **누설 포함 상한**으로만 취급한다. 공식 Retrieval 평가는
+`--query-context off`에 해당하는 no-context/test-split 결과만 README나 보고서 수치로
+사용한다.
+
+## Stage 1 v2 설계 근거 (R1-R10)
+
+- R1: `all_v3.csv`는 `declared_*`와 `gt_*`를 분리해 inference와 evaluation 경계를 명시한다.
+- R2: `strip_ground_truth()`가 정답/파형/oracle 컬럼을 제거해 파이프라인 추론 경로 누설을 차단한다.
+- R3: 합성 데이터는 NVML 1초 trailing average를 에뮬레이션해 100ms polling과 센서 smoothing 차이를 반영한다.
+- R4: 정상 hard-negative는 DDP/FSDP trough, flat pretraining, bursty inference, mixed tenants를 포함한다.
+- R5: 공격 variant는 shallow, jitter, piggyback, mimicry, coordinated multi-GPU를 포함해 evasive case를 만든다.
+- R6: feature v2는 PSD band power, spectral entropy, Theil-Sen power-util residual, CUSUM changepoint를 포함한다.
+- R7: baseline은 `declared_job_family + gpu_model` cohort의 robust median/MAD에서 시작하고 부족하면 family/global로 fallback한다.
+- R8: threshold는 calibration split conformal p-value로 산출하며 test split을 tuning에 쓰지 않는다.
+- R9: progress log의 step/checkpoint/eval/request event가 주기와 변화점을 설명하면 오탐을 낮춘다.
+- R10: 높은 grid impact지만 conformal p-value가 후보 기준을 넘지 않으면 `grid_watch`로 남겨 운영 관찰 대상으로 분리한다.
+
+## Corpus v2와 Stage 2 v2 (R11, R12)
+
+- R11: `corpus/*.md` front-matter는 evidence checklist schema를 사용한다. 숫자 range는 문서에 박지 않고 `pipeline/fit_corpus_ranges.py`가 train split에서 `dataset/eval/corpus_feature_ranges.json`으로 산출한다.
+- R12: Stage2 v2는 raw time series나 ANDES 로그를 LLM에 넣지 않고 `stage2_evidence.py`가 만든 structured evidence bundle만 전달한다. LLM 출력은 `known|partial|unknown`, matched/contradicting evidence, fallback 여부를 포함하는 JSON schema로 검증한다.
+
 ## 검증 상태
 
 - ✅ features.py: 규칙적 사각파(SWMA류) vs 평평한 고부하(크립토재킹류)를 정성적으로 정확히 구분
-- ✅ rag_analyzer.py: SWMA류 설명 → `swma` 문서 1순위 매칭 (tfidf 기준)
-- ✅ 합성 3개 공격 + 6개 정상 세션을 세션 경계 없이 생성
-- ✅ Stage1 다중 필터: 합성 공격 윈도우 후보 recall 1.0
-- ✅ TF-IDF retrieval top-1 및 정상 hard-negative 기각률 1.0 (합성셋 기준)
+- ✅ 합성 v3: 3개 기본 공격 + evasive SWMA 변종 + 6개 기존 정상 + AI datacenter 정상 hard-negative를 세션 경계 없이 생성
+- ✅ Stage1 v2: train/cal만 사용해 cohort baseline과 conformal calibration 산출
+- ✅ Retrieval: 공식 수치는 no-context/test split 기준으로 보고하며, 구 `top1_accuracy=1.0`은 누설 포함 상한으로만 표기
+- ✅ Stage2 v2: corpus v2 evidence checklist, structured evidence bundle, deterministic stub/fallback 평가 경로 추가
 - ✅ NVML idle smoke capture와 observability summary 검증
 - ✅ Ollama `gemma3:12b`로 실측 SWMA multi-GPU 후보에 대해 설명형 판정 검증 (`_backend: ollama:gemma3:12b`)
 - (선택) `--rag-backend sbert`로 임베딩 검색 품질 추가 향상 가능
@@ -157,7 +196,7 @@ Stage 1이 후보로 잡은 **바로 그 윈도우**의 관측 `power(t)`를 공
 ```bash
 source .venv-physics/bin/activate
 python pipeline/run_pipeline.py \
-  --telemetry dataset/synthetic/all_v2.csv --baseline-mean 120 \
+  --telemetry dataset/synthetic/all_v3.csv --baseline-mean 120 \
   --rag-backend tfidf --llm-backend stub \
   --physics-validate --physics-timeout-s 60 \
   --out dataset/eval/cyber_physics_ops.json
@@ -221,7 +260,7 @@ Cyber 결과와 결합 (**§8 실험 모드만**; 운영은 `--physics-validate`
 source .venv/bin/activate
 python dataset/build_synthetic.py
 python pipeline/run_pipeline.py \
-  --telemetry dataset/synthetic/all_v2.csv --baseline-mean 120 \
+  --telemetry dataset/synthetic/all_v3.csv --baseline-mean 120 \
   --rag-backend tfidf --llm-backend stub \
   --out dataset/eval/cyber_pipeline_results.json
 

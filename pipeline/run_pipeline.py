@@ -32,35 +32,22 @@ if str(ROOT) not in sys.path:
 sys.path.insert(0, str(Path(__file__).parent))
 from features import compute_window_features, features_to_description
 from rag_analyzer import SignatureRetriever, analyze_with_llm
+from dataset.schema import strip_ground_truth
 
 WINDOW = 200
 STRIDE = 100
 
 
 def context_to_query(context: dict[str, str]) -> str:
-    """스케줄러/실험 하네스 맥락을 RAG 검색 가능한 설명으로 바꾼다."""
-    job_type = context.get("job_type", "").lower()
-    if job_type.startswith("normal_"):
-        return (
-            "정상 워크로드 프로파일이며 오탐 방지용 기준에 해당함. "
-            "변동 원인이 예정된 작업 종류와 사용자 맥락으로 설명되고 과거 패턴과 일치함."
-        )
-    if "hash" in job_type:
-        return (
-            "등록되지 않은 GPU 크립토재킹 의심 해시 연산. "
-            "지속적으로 높은 GPU 사용률과 평평한 장시간 부하."
-        )
-    if "llm" in job_type and "train" in job_type:
-        return (
-            "LLM Training Modulation Attack LTMA 대조 대상. 실제 LLM 학습 파이프라인 "
-            "내부에서 평균을 유지하며 불규칙하게 변조된 부하."
-        )
-    if "unknown" in job_type:
-        return (
-            "Synthetic Workload Modulation Attack SWMA 대조 대상. "
-            "사용자 작업 맥락으로 설명되지 않는 별도 CUDA 커널의 규칙적 on/off."
-        )
-    return ""
+    """선언 컨텍스트를 공격명 없이 사실 문장으로만 바꾼다."""
+    parts = []
+    if context.get("declared_job_type"):
+        parts.append(f"선언 작업 유형: {context['declared_job_type']}.")
+    if context.get("declared_job_family"):
+        parts.append(f"선언 작업 계열: {context['declared_job_family']}.")
+    if context.get("declared_gres"):
+        parts.append(f"선언 GPU 요청: {context['declared_gres']}.")
+    return " ".join(parts)
 
 
 def infer_sample_hz(df: pd.DataFrame, fallback: float = 1.0) -> float:
@@ -107,7 +94,7 @@ def anomaly_score(components: dict[str, float]) -> float:
     return float(max(components.values(), default=0.0))
 
 
-def stage1_screen(
+def stage1_screen_legacy(
     df: pd.DataFrame,
     z_threshold: float = 2.5,
     *,
@@ -179,6 +166,9 @@ def stage1_screen(
     return wdf
 
 
+stage1_screen = stage1_screen_legacy
+
+
 def run(args):
     df = pd.read_csv(args.telemetry)
     print(f"[입력] {args.telemetry}: {len(df)}행")
@@ -189,35 +179,73 @@ def run(args):
         df["session_id"] = "legacy-session"
     if "gpu_id" not in df:
         df["gpu_id"] = 0
+    df_infer = strip_ground_truth(df)
+    if "session_id" not in df_infer:
+        df_infer["session_id"] = df["session_id"]
+    if "gpu_id" not in df_infer:
+        df_infer["gpu_id"] = df["gpu_id"]
 
     baseline = args.baseline_mean
-    if baseline is None and "label" in df:
-        normal = df[df["label"].astype(str).str.startswith("normal")]
-        if len(normal):
-            baseline = float(pd.to_numeric(normal["power_w"], errors="coerce").median())
-            print(f"[기준선] normal 라벨 중앙값으로 자동 추정: {baseline:.2f}W")
+    stage1_mode = getattr(args, "stage1", "legacy")
+    if baseline is None and stage1_mode == "legacy":
+        baseline = 120.0
+        print("[기준선] legacy 모드 기본값 120W 사용")
 
     screened: list[pd.DataFrame] = []
     grouped_frames: dict[tuple[str, object], pd.DataFrame] = {}
-    for (session_id, gpu_id), group in df.groupby(["session_id", "gpu_id"], sort=False):
-        group = group.sort_values("timestamp") if "timestamp" in group else group
-        group = group.reset_index(drop=True)
-        hz = args.sample_hz or infer_sample_hz(group)
-        current = stage1_screen(
-            group,
-            z_threshold=args.z_threshold,
-            baseline_mean_w=baseline,
-            sample_hz=hz,
-            window=args.window,
-            stride=args.stride,
+    original_groups = {
+        (str(session_id), gpu_id): group.sort_values("timestamp").reset_index(drop=True)
+        if "timestamp" in group else group.reset_index(drop=True)
+        for (session_id, gpu_id), group in df.groupby(["session_id", "gpu_id"], sort=False)
+    }
+    if stage1_mode == "v2":
+        from pipeline.baseline import CohortBaseline
+        from pipeline.stage1_v2 import build_windows, load_config, score_window
+
+        config = load_config(getattr(args, "stage1_config", None))
+        baseline_model = CohortBaseline.load(getattr(args, "baseline_model", "dataset/eval/cohort_baseline_v2.json"))
+        calibration_path = Path(getattr(args, "calibration", "dataset/eval/stage1_v2_calibration.json"))
+        calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+        current = build_windows(
+            df_infer,
+            window_s=float(getattr(args, "window_s", 30.0)),
+            stride_s=float(getattr(args, "stride_s", 15.0)),
+            progress_log_dir=getattr(args, "progress_log_dir", None),
+            config=config,
         )
-        if current.empty:
-            continue
-        current["session_id"] = str(session_id)
-        current["gpu_id"] = gpu_id
-        current["sample_hz"] = hz
-        screened.append(current)
-        grouped_frames[(str(session_id), gpu_id)] = group
+        if not current.empty:
+            scores = [score_window(row.to_dict(), baseline_model, calibration, config) for _, row in current.iterrows()]
+            for key in ("u_score", "p_value", "baseline_level", "impact_level", "grid_watch"):
+                current[key] = [item[key] for item in scores]
+            current["is_candidate"] = [item["is_candidate"] for item in scores]
+            current["candidate_reasons"] = [",".join(item["candidate_reasons"]) for item in scores]
+            current["impact_components"] = [item["impact_components"] for item in scores]
+            current["robust_z"] = [item["robust_z"] for item in scores]
+            current["stage1_version"] = "v2"
+            screened.append(current)
+        for (session_id, gpu_id), group in df_infer.groupby(["session_id", "gpu_id"], sort=False):
+            grouped_frames[(str(session_id), gpu_id)] = group.sort_values("timestamp").reset_index(drop=True)
+    else:
+        for (session_id, gpu_id), group in df_infer.groupby(["session_id", "gpu_id"], sort=False):
+            group = group.sort_values("timestamp") if "timestamp" in group else group
+            group = group.reset_index(drop=True)
+            hz = args.sample_hz or infer_sample_hz(group)
+            current = stage1_screen_legacy(
+                group,
+                z_threshold=args.z_threshold,
+                baseline_mean_w=baseline,
+                sample_hz=hz,
+                window=args.window,
+                stride=args.stride,
+            )
+            if current.empty:
+                continue
+            current["session_id"] = str(session_id)
+            current["gpu_id"] = gpu_id
+            current["sample_hz"] = hz
+            current["stage1_version"] = "legacy"
+            screened.append(current)
+            grouped_frames[(str(session_id), gpu_id)] = group
 
     wdf = pd.concat(screened, ignore_index=True) if screened else pd.DataFrame()
     candidates = wdf[wdf["is_candidate"]] if not wdf.empty else wdf
@@ -245,13 +273,21 @@ def run(args):
         # 2단계: 특성 분석
         feats = compute_window_features(power, util, sample_hz=float(cand["sample_hz"]))
         desc = features_to_description(feats, baseline_mean_w=baseline)
+        z_like_score = float(cand.get("z_score", cand.get("u_score", 0.0)))
 
         context = {}
-        for c in ("id_user", "job_type", "gres_req", "pid", "process_name"):
+        for c in (
+            "declared_user",
+            "declared_job_type",
+            "declared_job_family",
+            "declared_gres",
+            "declared_process_name",
+            "pid",
+        ):
             if c in w.columns:
                 context[c] = str(w[c].iloc[0])
         # 3단계: RAG + LLM
-        context_query = context_to_query(context)
+        context_query = context_to_query(context) if getattr(args, "query_context", "off") == "declared" else ""
         query = f"{desc} {context_query}".strip()
         retrieved = retriever.search(query, top_k=3, features=feats)
         verdict = analyze_with_llm(desc, retrieved, context=context,
@@ -267,7 +303,17 @@ def run(args):
                     f"매칭되어 경보를 억제합니다. {verdict.get('reason', '')}"
                 ).strip(),
             }
-        raw_attack_id = w["attack_id"].iloc[0] if "attack_id" in w.columns else None
+        original = original_groups[key].iloc[start:end]
+        raw_attack_id = (
+            original["gt_attack_id"].iloc[0] if "gt_attack_id" in original.columns
+            else original["attack_id"].iloc[0] if "attack_id" in original.columns
+            else None
+        )
+        raw_label = (
+            original["gt_label"].iloc[0] if "gt_label" in original.columns
+            else original["label"].iloc[0] if "label" in original.columns
+            else None
+        )
         attack_id = (
             str(raw_attack_id)
             if raw_attack_id is not None and not pd.isna(raw_attack_id) and str(raw_attack_id)
@@ -275,7 +321,7 @@ def run(args):
         )
         components = anomaly_score_components(
             feats,
-            z_score=float(cand["z_score"]),
+            z_score=z_like_score,
             baseline_mean_w=baseline,
         )
 
@@ -288,9 +334,9 @@ def run(args):
             "gpu_id": int(cand["gpu_id"]),
             "window_start": start,
             "window_end": end,
-            "ground_truth": cand.get("label"),
+            "ground_truth": raw_label,
             "swing_ratio": round(float(cand["swing_ratio"]), 3),
-            "z_score": round(float(cand["z_score"]), 3),
+            "z_score": round(z_like_score, 3),
             "candidate_reasons": str(cand["candidate_reasons"]).split(","),
             "features": {k: round(float(v), 5) for k, v in feats.items()},
             "description": desc,
@@ -303,9 +349,21 @@ def run(args):
             "threat_id": verdict.get("closest_match"),
             "anomaly_score": round(anomaly_score(components), 5),
             "score_components": {key: round(value, 5) for key, value in components.items()},
-            "score_version": "cyber-stage1-or-v1",
+            "score_version": "cyber-stage1-v2" if stage1_mode == "v2" else "cyber-stage1-or-v1",
+            "stage1_version": cand.get("stage1_version", stage1_mode),
             "verdict": verdict,
         }
+        if stage1_mode == "v2":
+            row.update({
+                "impact_level": cand.get("impact_level"),
+                "impact_components": cand.get("impact_components", {}),
+                "u_score": round(float(cand.get("u_score", 0.0)), 6),
+                "p_value": round(float(cand.get("p_value", 1.0)), 6),
+                "baseline_level": cand.get("baseline_level"),
+                "evidence": cand.get("evidence", {}),
+                "grid_watch": bool(cand.get("grid_watch", False)),
+                "robust_z": cand.get("robust_z", {}),
+            })
 
         # Ops mode: event-triggered physics validation on Stage-1 candidates only.
         if getattr(args, "physics_validate", False):
@@ -332,6 +390,41 @@ def run(args):
                 f"  [physics] {row['window_id']} converged={row['physics_converged']} "
                 f"osc_std={row['physics_osc_std']} rocof={row['physics_rocof_hz_s']}"
             )
+
+        if getattr(args, "stage2", "legacy") == "v2":
+            from pipeline.corpus_schema import parse_corpus_v2
+            from pipeline.rag_analyzer import CORPUS_DIR
+            from pipeline.stage2_evidence import build_evidence_bundle
+            from pipeline.stage2_llm import judge
+
+            docs = []
+            for result in retrieved:
+                path = CORPUS_DIR / f"{result.name}.md"
+                if path.exists():
+                    docs.append(parse_corpus_v2(path))
+            bundle = build_evidence_bundle(row)
+            stage2 = judge(
+                bundle,
+                docs,
+                backend=args.llm_backend,
+                model=args.llm_model,
+                fallback="legacy",
+            )
+            row["stage2_version"] = "v2"
+            row["stage2_evidence_bundle"] = bundle
+            row["verdict"] = {
+                "risk": "의심" if stage2.verdict == "known" else "주의",
+                "closest_match": stage2.closest_match or "unknown",
+                "reason": stage2.explanation,
+                "verdict": stage2.verdict,
+                "confidence": stage2.confidence,
+                "matched_evidence": stage2.matched_evidence,
+                "contradicting_evidence": stage2.contradicting_evidence,
+                "fallback_used": stage2.fallback_used,
+            }
+            row["threat_id"] = row["verdict"]["closest_match"]
+        else:
+            row["stage2_version"] = "legacy"
 
         results.append(row)
 
@@ -362,6 +455,15 @@ def main():
     ap.add_argument("--window", type=int, default=WINDOW, help="윈도우 크기(행)")
     ap.add_argument("--stride", type=int, default=STRIDE, help="윈도우 이동 간격(행)")
     ap.add_argument("--z-threshold", type=float, default=2.5)
+    ap.add_argument("--stage1", choices=["legacy", "v2"], default="legacy")
+    ap.add_argument("--stage2", choices=["legacy", "v2"], default="legacy")
+    ap.add_argument("--baseline-model", default="dataset/eval/cohort_baseline_v2.json")
+    ap.add_argument("--stage1-config", default="config/stage1_v2.yaml")
+    ap.add_argument("--calibration", default="dataset/eval/stage1_v2_calibration.json")
+    ap.add_argument("--window-s", type=float, default=30.0)
+    ap.add_argument("--stride-s", type=float, default=15.0)
+    ap.add_argument("--progress-log-dir", default="dataset/synthetic/steps")
+    ap.add_argument("--query-context", choices=["off", "declared"], default="off")
     ap.add_argument("--rag-backend", choices=["sbert", "tfidf"], default="sbert")
     ap.add_argument("--llm-backend", choices=["ollama", "stub"], default="stub")
     ap.add_argument("--llm-model", default="gemma3:12b",
