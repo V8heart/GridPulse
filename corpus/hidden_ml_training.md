@@ -3,21 +3,27 @@ threat_id: T-HIDDEN-ML-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: feature_range_match
+  - name: hidden_context_break
+    necessity: required_any
+    description: "선언 코호트와 관측이 어긋나거나 정상 progress log가 없음"
+    any_of:
+      - declared_family_mismatch
+      - progress_log_missing
+  - name: period_match
+    necessity: exclusion
+    description: "공식 학습 로그와 주기가 맞으면 숨은 학습으로 보기 어려움"
+  - name: period_mismatch
     necessity: supporting
-    description: "train split에서 적합된 feature range와 근접"
-  - name: context_inconsistency
-    necessity: supporting
-    description: "선언 컨텍스트와 관측 evidence가 불일치"
+    description: "숨은 커널이 별도 주기를 만들면 mismatch로 관측"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: none
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 스케줄러 선언과 불일치하는 비인가 학습"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 비인가 은닉 ML 학습 (Hidden / Unauthorized ML Training)
 
@@ -50,3 +56,6 @@ NVML 9종 카운터(사용률·메모리·전력·온도·클럭·PCIe)를 1Hz�
 텔레메트리만으로 탐지 가능하다는 점이 본 파이프라인의 관측 조건과 일치한다.
 (arXiv:2606.19262, Detecting Hidden ML Training With Zero-Overhead Telemetry)
 MITRE ATT&CK T1496.001 Compute Hijacking과도 연결된다.
+
+## Evidence 근거 (초안)
+스케줄러 선언과 불일치하는 비인가 학습

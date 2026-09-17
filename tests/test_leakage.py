@@ -38,6 +38,15 @@ def test_split_disjoint_sessions(tmp_path):
     assert not (splits[0] & splits[1] or splits[0] & splits[2] or splits[1] & splits[2])
 
 
+def test_unseen_holdout_is_test_only(tmp_path):
+    build(tmp_path / "synthetic", rows=120, sessions_per_class=4)
+    manifest = json.loads((tmp_path / "synthetic/split_manifest.json").read_text())
+    holdout = set(manifest["unseen_param_holdout"]["swma_period_2_8_3_2"])
+    assert holdout
+    assert holdout.isdisjoint(set(manifest["train"]) | set(manifest["cal"]))
+    assert holdout.issubset(set(manifest["test"]))
+
+
 def test_corpus_ranges_fit_on_train_only(tmp_path):
     build(tmp_path / "synthetic", rows=320, sessions_per_class=3)
     report = fit_ranges(tmp_path / "synthetic/all_v3.csv", tmp_path / "synthetic/split_manifest.json")

@@ -15,10 +15,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from dataset.schema import SessionManifest, validate_frame, write_manifest
-from dataset.synth_attacks import ATTACK_GENERATORS
+from dataset.synth_attacks import ATTACK_GENERATORS, swma
 from dataset.synth_common import write_csv
 from dataset.synth_normal_patterns import NORMAL_GENERATORS
 from pipeline.features import compute_window_features
+
+HOLDOUT_PERIOD_S = (2.8, 3.2)
 
 
 def _manifest(df: pd.DataFrame, source: str, seed: int, progress_log_path: str | None = None,
@@ -54,6 +56,37 @@ def _split_sessions(sessions: dict[str, list[str]], seed: int, ratios: tuple[flo
         split["cal"].extend(ids[n_train:n_train + n_cal])
         split["test"].extend(ids[n_train + n_cal:])
     return split
+
+
+def _period_s_from_frame(frame: pd.DataFrame) -> float | None:
+    if "waveform_frequency_hz" in frame.columns:
+        freq = pd.to_numeric(frame["waveform_frequency_hz"], errors="coerce").dropna()
+        if len(freq) and float(freq.iloc[0]) > 0:
+            return 1.0 / float(freq.iloc[0])
+    if "gt_params_json" in frame.columns:
+        raw = frame["gt_params_json"].iloc[0]
+        if isinstance(raw, str) and raw.strip():
+            try:
+                params = json.loads(raw)
+            except json.JSONDecodeError:
+                params = {}
+            if "period_s" in params:
+                return float(params["period_s"])
+            if "frequency_hz" in params and float(params["frequency_hz"]) > 0:
+                return 1.0 / float(params["frequency_hz"])
+            if "base_period_s" in params:
+                return float(params["base_period_s"])
+    return None
+
+
+def _apply_holdout(splits: dict[str, list[str]], holdout_ids: list[str]) -> dict[str, list[str]]:
+    holdout = set(holdout_ids)
+    cleaned = {
+        name: [session_id for session_id in values if session_id not in holdout]
+        for name, values in splits.items()
+    }
+    cleaned["test"] = sorted(set(cleaned["test"]) | holdout)
+    return cleaned
 
 
 def _write_progress(output_dir: Path, session_id: str, events: list[dict]) -> str | None:
@@ -108,6 +141,42 @@ def build(
             pending_manifests.append((frame, gen_seed, progress))
             sessions_by_label.setdefault(label, []).append(session_id)
 
+    # Unseen-period SWMA holdout: always generated and forced into test only.
+    holdout_ids: list[str] = []
+    n_holdout = max(2, max(1, sessions_per_class // 4))
+    holdout_rng = np.random.default_rng(seed + 999)
+    for repeat in range(n_holdout):
+        period_s = float(holdout_rng.uniform(*HOLDOUT_PERIOD_S))
+        gen_seed = seed * 10000 + 299 * 100 + repeat
+        frame = swma(
+            n=rows,
+            sample_hz=sample_hz,
+            seed=gen_seed,
+            frequency_hz=1.0 / period_s,
+            duty_cycle=0.5,
+            nvml_avg_window_s=nvml_avg_window_s,
+            variant="swma_holdout",
+        )
+        session_id = str(frame["session_id"].iloc[0])
+        if write_session_csvs:
+            write_csv(frame, output_dir / "attacks" / f"{session_id}.csv")
+        progress = _write_progress(output_dir, session_id, frame.attrs.get("progress_events", []))
+        frames.append(frame)
+        pending_manifests.append((frame, gen_seed, progress))
+        holdout_ids.append(session_id)
+
+    # Also treat any accidentally in-range SWMA periods as holdout.
+    for frame, _, _ in pending_manifests:
+        session_id = str(frame["session_id"].iloc[0])
+        if session_id in holdout_ids:
+            continue
+        label = str(frame["gt_label"].iloc[0] if "gt_label" in frame else frame["label"].iloc[0])
+        if not str(label).startswith("swma"):
+            continue
+        period_s = _period_s_from_frame(frame)
+        if period_s is not None and HOLDOUT_PERIOD_S[0] <= period_s <= HOLDOUT_PERIOD_S[1]:
+            holdout_ids.append(session_id)
+
     combined = pd.concat(frames, ignore_index=True)
     validate_frame(combined)
     legacy = output_dir / "all_v2.csv"
@@ -117,6 +186,7 @@ def build(
     if sessions_per_class == 1:
         write_csv(combined, output_dir / "all_v2.csv")
     splits = _split_sessions(sessions_by_label, seed, split_ratios)
+    splits = _apply_holdout(splits, holdout_ids)
     session_to_split = {session_id: name for name, values in splits.items() for session_id in values}
     manifests = [
         _manifest(frame, "synthetic", gen_seed, progress, session_to_split.get(str(frame["session_id"].iloc[0])))
@@ -130,7 +200,10 @@ def build(
         "train": splits["train"],
         "cal": splits["cal"],
         "test": splits["test"],
-        "unseen_param_holdout": {"swma": {"period_s": [2.8, 3.2]}},
+        "unseen_param_holdout": {
+            "swma_period_2_8_3_2": sorted(set(holdout_ids)),
+            "period_s": list(HOLDOUT_PERIOD_S),
+        },
     }
     (output_dir / "split_manifest.json").write_text(
         json.dumps(split_manifest, ensure_ascii=False, indent=2), encoding="utf-8"

@@ -4,23 +4,26 @@ category: cyber_physical_attack
 mitre_technique: null
 evidence:
   - name: period_mismatch
-    necessity: supporting
-    description: "전력 지배 주파수가 선언된 학습 진행 로그와 불일치"
-  - name: feature_range_match
-    necessity: supporting
-    description: "train split에서 적합된 SWMA feature range에 근접"
-  - name: progress_log_present_training
+    necessity: required
+    description: "전력 지배 주기가 진행 로그 step 주기와 불일치"
+  - name: strong_peak
+    necessity: required
+    description: "규칙적 on/off가 스펙트럼에 뚜렷한 peak로 남음"
+  - name: period_match
     necessity: exclusion
-    description: "정상 학습 진행 로그가 전력 주기를 설명하면 배제 방향"
+    description: "로그 주기와 일치하면 정상 학습 위상으로 배제"
+  - name: progress_log_missing
+    necessity: supporting
+    description: "위장 커널은 training progress log가 빈약한 경우가 많음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
-  tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  mechanism: electromechanical_oscillation
+  tier: B
+  notes: "DRAFT pending human approval. Bit2Watt SWMA: 별도 CUDA 커널의 규칙적 active/passive 전환 → 저주파 전기기계 외란 후보"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # SWMA (Synthetic Workload Modulation Attack)
 
@@ -48,3 +51,6 @@ unified-memory control flag로 두 모드를 정밀한 스케줄에 따라 전�
 - 정상 대규모 학습도 compute/communication 위상 전환으로 전력이 출렁이지만, 그 주기는
   배치 처리·동기화에 종속되어 불규칙하고 맥락(모델 크기, 배치)으로 설명 가능하다.
 - SWMA는 "기계적으로 규칙적인 on/off"가 핵심 차별점.
+
+## Evidence 근거 (초안)
+Bit2Watt SWMA: 별도 CUDA 커널의 규칙적 active/passive 전환

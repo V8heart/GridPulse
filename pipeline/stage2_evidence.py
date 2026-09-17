@@ -10,6 +10,8 @@ RAW_FORBIDDEN = {"power_w", "util_gpu_pct", "power", "util", "timeseries", "ande
 
 def build_evidence_bundle(row: dict) -> dict:
     """Create an LLM-safe evidence bundle without raw telemetry arrays."""
+    from pipeline.evidence_vocab import to_bool_evidence
+
     physics = None
     if any(str(key).startswith("physics_") for key in row):
         physics = {
@@ -20,6 +22,11 @@ def build_evidence_bundle(row: dict) -> dict:
             "dominant_freq_hz": row.get("physics_dominant_freq_hz"),
             "note": row.get("physics_failure_reason") or "event-triggered public test-system replay",
         }
+    raw_evidence = row.get("evidence_bool") or row.get("evidence", {})
+    if raw_evidence and not all(isinstance(v, bool) for v in raw_evidence.values() if v is not None):
+        bool_evidence = to_bool_evidence({**row, **dict(raw_evidence)})
+    else:
+        bool_evidence = dict(raw_evidence) if raw_evidence else to_bool_evidence(row)
     bundle = {
         "window_id": row.get("window_id"),
         "declared_context": {
@@ -34,7 +41,7 @@ def build_evidence_bundle(row: dict) -> dict:
         "unexplainedness": {
             "u_score": row.get("u_score"),
             "p_value": row.get("p_value"),
-            "evidence": row.get("evidence", {}),
+            "evidence": bool_evidence,
         },
         "physics": physics,
     }

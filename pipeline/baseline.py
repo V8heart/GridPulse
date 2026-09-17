@@ -89,6 +89,44 @@ class CohortBaseline:
             return self.stats[family_key], "family"
         return self.stats.get("global", {"features": {}}), "global"
 
+    def mean_abs_robust_z(self, row: pd.Series | dict, level_key: str) -> float | None:
+        stat = self.stats.get(level_key, {}).get("features", {})
+        if not stat:
+            return None
+        values = []
+        for feature, summary in stat.items():
+            if feature not in row or pd.isna(row[feature]):
+                continue
+            denom = max(1.4826 * float(summary["mad"]), 1e-6)
+            values.append(abs((float(row[feature]) - float(summary["median"])) / denom))
+        if not values:
+            return None
+        return float(np.mean(values))
+
+    def family_distances(self, row: pd.Series | dict) -> dict[str, float]:
+        """Mean |robust-z| to each family:* cohort that exists."""
+        out = {}
+        for key in self.stats:
+            if not key.startswith("family:"):
+                continue
+            family = key.split(":", 1)[1]
+            dist = self.mean_abs_robust_z(row, key)
+            if dist is not None:
+                out[family] = dist
+        return out
+
+    def declared_family_mismatch_stats(self, row: pd.Series | dict) -> dict[str, float | None]:
+        family_key = self.cohort_keys[0] if self.cohort_keys else "declared_job_family"
+        declared = str(row.get(family_key, ""))
+        distances = self.family_distances(row)
+        declared_z = distances.get(declared)
+        others = {k: v for k, v in distances.items() if k != declared}
+        best_other = min(others.values()) if others else None
+        return {
+            "declared_family_mean_abs_z": declared_z,
+            "best_other_family_mean_abs_z": best_other,
+        }
+
     def save(self, path: str | Path) -> None:
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)

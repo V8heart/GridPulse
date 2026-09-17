@@ -3,21 +3,27 @@ threat_id: T-LTMA-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: util_residual_anomaly
-    necessity: supporting
-    description: "전력-사용률 결합 잔차가 코호트 기준에서 이탈"
-  - name: period_mismatch
-    necessity: supporting
-    description: "학습 step 구조로 설명되지 않는 변조 주기"
+  - name: util_power_decoupled
+    necessity: required
+    description: "전력-사용률 Theil-Sen 잔차가 코호트 대비 큼"
+  - name: ltma_period_or_mismatch
+    necessity: required_any
+    description: "step 구조와 어긋난 주기 또는 로그 미설명 변화점"
+    any_of:
+      - period_mismatch
+      - unexplained_changepoint
+  - name: flat_power
+    necessity: exclusion
+    description: "완전 평탄 고부하는 cryptojacking류에 가깝다"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
-  tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  mechanism: electromechanical_oscillation
+  tier: B
+  notes: "DRAFT pending human approval. Bit2Watt LTMA: 학습 파이프라인 내부의 평균 유지형 부하 변조"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # LTMA (LLM Training Modulation Attack)
 
@@ -49,3 +55,6 @@ Bit2Watt (Ji, Pan, Xu, arXiv:2607.05993, 2026), 4.2.1절. 논문은 GPT-2 학습
 - 정상 학습과 거의 구분이 안 되는 것이 특징이므로, 신호만으로는 부족.
 - 반드시 맥락(이 사용자의 과거 학습 패턴, job_type, 예정된 작업 여부)을 결합해야 판정 가능.
 - "정상처럼 보이는데 이 사용자·이 시점에는 낯선 패턴"이라는 맥락적 불일치가 핵심 단서.
+
+## Evidence 근거 (초안)
+Bit2Watt LTMA: 실제 LLM 학습 안에서의 평균 유지형 부하 변조

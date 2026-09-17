@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from pipeline.features import compute_window_features, features_to_description
+from pipeline.label_to_doc import expected_document
 from pipeline.rag_analyzer import SignatureRetriever
 from pipeline.run_pipeline import context_to_query, infer_sample_hz
 
@@ -137,16 +138,14 @@ DOC_SANITY_CASES = [
 ]
 
 
-def expected_document(label: str) -> str:
-    if label.startswith("normal"):
-        return "normal_workloads"
-    if label.startswith("swma"):
-        return "swma"
-    return label
-
-
-def build_cases(telemetry: Path, session_ids: set[str] | None = None, *, include_doc_sanity: bool = True) -> list[dict]:
-    df = pd.read_csv(telemetry)
+def build_cases(
+    telemetry: Path,
+    session_ids: set[str] | None = None,
+    *,
+    include_doc_sanity: bool = True,
+    context_mode: str = "no_context",
+) -> list[dict]:
+    df = pd.read_csv(telemetry, low_memory=False)
     if session_ids is not None:
         df = df[df["session_id"].astype(str).isin(session_ids)]
     cases = []
@@ -158,21 +157,28 @@ def build_cases(telemetry: Path, session_ids: set[str] | None = None, *, include
             sample_hz=hz,
         )
         description = features_to_description(feats, baseline_mean_w=120)
-        context = {
-            key: str(group[key].iloc[0])
-            for key in ("id_user", "job_type", "gres_req")
-            if key in group
-        }
         label_col = "gt_label" if "gt_label" in group else "label"
         label = str(group[label_col].iloc[0])
+        if context_mode == "declared":
+            context = {
+                key: str(group[key].iloc[0])
+                for key in ("declared_user", "declared_job_type", "declared_job_family", "declared_gres")
+                if key in group
+            }
+            query = f"{description} {context_to_query(context)}".strip()
+        elif context_mode == "oracle_label":
+            query = f"{description} ground_truth_label={label} attack_class={label}".strip()
+        else:
+            query = description
         cases.append({
             "case_id": f"{session_id}-gpu{gpu_id}",
             "kind": "positive",
             "label": label,
             "expected_document": expected_document(label),
             "description": description,
-            "query": f"{description} {context_to_query(context)}".strip(),
+            "query": query,
             "features": feats,
+            "context_mode": context_mode,
         })
 
     rng = np.random.default_rng(999)
@@ -192,6 +198,7 @@ def build_cases(telemetry: Path, session_ids: set[str] | None = None, *, include
             "description": description,
             "query": description,
             "features": feats,
+            "context_mode": context_mode,
         })
     return cases + (DOC_SANITY_CASES if include_doc_sanity else [])
 
@@ -201,8 +208,9 @@ def evaluate(
     backend: str = "tfidf",
     unknown_threshold: float = 0.28,
     include_docs: set[str] | None = None,
+    retriever: SignatureRetriever | None = None,
 ) -> dict:
-    retriever = SignatureRetriever(backend=backend, include_docs=include_docs)
+    retriever = retriever or SignatureRetriever(backend=backend, include_docs=include_docs)
     positive = correct = 0
     legacy_positive = legacy_correct = 0
     unknown_scores = []
@@ -293,9 +301,12 @@ def write_token_stats(corpus_dir: Path, output: Path, model_name: str = "all-Min
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v2.csv")
-    parser.add_argument("--split-manifest", type=Path, default=None)
+    parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v3.csv")
+    parser.add_argument("--split-manifest", type=Path, default=ROOT / "dataset/synthetic/split_manifest.json")
     parser.add_argument("--split", choices=["train", "cal", "test", "all"], default="test")
+    parser.add_argument("--context-mode", choices=["no_context", "declared", "oracle_label"], default="no_context")
+    parser.add_argument("--write-leakage-table", action="store_true")
+    parser.add_argument("--leakage-out", type=Path, default=ROOT / "dataset/eval/leakage_before_after.json")
     parser.add_argument("--cases-out", type=Path, default=ROOT / "dataset/eval/retrieval_eval.jsonl")
     parser.add_argument("--report-out", type=Path, default=ROOT / "dataset/eval/retrieval_report.json")
     parser.add_argument("--scaling-out", type=Path, default=ROOT / "dataset/eval/retrieval_scaling.json")
@@ -308,7 +319,87 @@ def main() -> None:
     if args.split_manifest and args.split != "all":
         manifest = json.loads(args.split_manifest.read_text(encoding="utf-8"))
         session_ids = set(map(str, manifest[args.split]))
-    cases = build_cases(args.telemetry, session_ids=session_ids, include_doc_sanity=True)
+
+    if args.write_leakage_table:
+        from pipeline.fit_corpus_ranges import fit_ranges
+
+        modes = {}
+        for mode in ("no_context", "declared", "oracle_label"):
+            cases = build_cases(args.telemetry, session_ids=session_ids, include_doc_sanity=False, context_mode=mode)
+            report = evaluate(cases, args.backend, args.unknown_threshold)
+            scaling = evaluate_scaling(cases, args.backend, args.unknown_threshold)
+            entry = {
+                "top1_accuracy": report["top1_accuracy"],
+                "legacy_4_docs": scaling["legacy_4_docs"],
+                "expanded_10_docs": scaling["expanded_10_docs"],
+            }
+            if mode == "oracle_label":
+                entry["label"] = "누설 포함 상한"
+            modes[mode] = entry
+
+        # legacy_full_leak: oracle + hard ranges fitted on TEST (intentional upper bound)
+        leak_ranges = ROOT / "dataset/eval/corpus_feature_ranges_testfit_leak.json"
+        manifest = json.loads(args.split_manifest.read_text(encoding="utf-8"))
+        leak_split = {
+            "seed": manifest.get("seed"),
+            "split_ratios": manifest.get("split_ratios"),
+            "data": manifest.get("data"),
+            "train": list(manifest["test"]),
+            "cal": [],
+            "test": list(manifest["test"]),
+            "unseen_param_holdout": manifest.get("unseen_param_holdout", {}),
+        }
+        leak_manifest_path = ROOT / "dataset/eval/_tmp_testfit_split.json"
+        leak_manifest_path.write_text(json.dumps(leak_split, ensure_ascii=False, indent=2), encoding="utf-8")
+        report_leak_fit = fit_ranges(args.telemetry, leak_manifest_path)
+        report_leak_fit["fit_split"] = "test_intentional_leak"
+        leak_ranges.write_text(json.dumps(report_leak_fit, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        leak_cases = build_cases(
+            args.telemetry, session_ids=session_ids, include_doc_sanity=False, context_mode="oracle_label"
+        )
+        leak_retriever = SignatureRetriever(
+            backend=args.backend,
+            range_path=leak_ranges,
+            range_filter="hard",
+        )
+        leak_eval = evaluate(leak_cases, args.backend, args.unknown_threshold, retriever=leak_retriever)
+        modes["legacy_full_leak"] = {
+            "label": "누설 포함 상한 (oracle_label + test-fit hard range)",
+            "top1_accuracy": leak_eval["top1_accuracy"],
+            "positive_cases": leak_eval["positive_cases"],
+            "note": "Ranges fitted on test split intentionally; not for official claims.",
+        }
+
+        table = {
+            "split": args.split,
+            "backend": args.backend,
+            "modes": modes,
+            "note": "oracle_label / legacy_full_leak은 공식 수치로 사용하지 않음",
+        }
+        args.leakage_out.parent.mkdir(parents=True, exist_ok=True)
+        args.leakage_out.write_text(json.dumps(table, ensure_ascii=False, indent=2), encoding="utf-8")
+        # markdown companion
+        md_lines = [
+            "# Leakage before/after",
+            "",
+            "| mode | top1 | note |",
+            "|------|------|------|",
+        ]
+        for key, val in modes.items():
+            md_lines.append(
+                f"| {key} | {val.get('top1_accuracy')} | {val.get('label') or val.get('note') or ''} |"
+            )
+        args.leakage_out.with_suffix(".md").write_text("\n".join(md_lines) + "\n", encoding="utf-8")
+        print(json.dumps(table, ensure_ascii=False, indent=2))
+        return
+
+    cases = build_cases(
+        args.telemetry,
+        session_ids=session_ids,
+        include_doc_sanity=True,
+        context_mode=args.context_mode,
+    )
     args.cases_out.parent.mkdir(parents=True, exist_ok=True)
     args.cases_out.write_text(
         "\n".join(json.dumps(case, ensure_ascii=False) for case in cases) + "\n",
@@ -330,4 +421,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

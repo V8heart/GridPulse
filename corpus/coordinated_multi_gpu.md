@@ -3,21 +3,24 @@ threat_id: T-COORD-GPU-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: feature_range_match
+  - name: cross_job_sync
+    necessity: required
+    description: "서로 다른 선언 job 사이 GPU 위상 동기화"
+  - name: period_match
+    necessity: exclusion
+    description: "단일 job 내부 step만으로 설명되면 협조 공격이 아님"
+  - name: period_mismatch
     necessity: supporting
-    description: "train split에서 적합된 feature range와 근접"
-  - name: context_inconsistency
-    necessity: supporting
-    description: "선언 컨텍스트와 관측 evidence가 불일치"
+    description: "각 GPU 변조가 로컬 로그와 불일치할 수 있음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
-  tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  mechanism: electromechanical_oscillation
+  tier: B
+  notes: "DRAFT pending human approval. 다중 GPU 협조 변조로 주입 진폭을 키우는 시나리오"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 다중 GPU 협조 부하 변조 (Coordinated Multi-GPU Modulation)
 
@@ -52,3 +55,6 @@ Load-Altering Attack 연구는 인터넷 연결 부하를 조직적으로 조작
 영향을 줄 수 있음을 보였고, BlackIoT(MadIoT)는 다수 고전력 기기의 동시 조작으로
 이를 구체화했다. Bit2Watt는 이 개념을 GPU workload 수준으로 확장했으며 대표
 결과를 다수 GPU·고DER 조건에서 제시했다.
+
+## Evidence 근거 (초안)
+다중 GPU 협조 변조로 주입 진폭을 키우는 시나리오

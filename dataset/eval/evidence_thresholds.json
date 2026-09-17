@@ -1,0 +1,28 @@
+{
+  "fit_split": "train+cal",
+  "n_normal_windows": 1176,
+  "n_sessions": 266,
+  "evidence_thresholds": {
+    "tau_peak": 8.0,
+    "tau_sync": 0.8,
+    "sustained_high_load": {
+      "high_load_fraction_min": 1.0,
+      "longest_high_seconds_min": 30.0
+    },
+    "flat_power": {
+      "swing_abs_w_max": 58.66561173417077,
+      "mean_w_min": 313.4146364720961
+    },
+    "high_ramp": {
+      "ramp_p95_w_per_s_min": 500.0
+    },
+    "util_power_decoupled": {
+      "util_residual_mad_w_min": 15.0
+    },
+    "declared_family_mismatch": {
+      "declared_mean_abs_z_min": 3.0,
+      "other_family_margin": 0.5
+    }
+  },
+  "note": "Thresholds fit on train/cal normals only; test was not used."
+}

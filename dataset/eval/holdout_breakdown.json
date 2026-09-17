@@ -1,0 +1,131 @@
+{
+  "holdout_sessions": [
+    "syn-attack-swma_holdout-99900",
+    "syn-attack-swma_holdout-99901",
+    "syn-attack-swma_holdout-99902",
+    "syn-attack-swma_holdout-99903",
+    "syn-attack-swma_holdout-99904",
+    "syn-attack-swma_jitter-90216",
+    "syn-attack-swma_mimicry-90415",
+    "syn-attack-swma_mimicry-90418",
+    "syn-attack-swma_piggyback-90306",
+    "syn-attack-swma_piggyback-90309"
+  ],
+  "n_holdout": 10,
+  "n_scored_sessions": 10,
+  "sessions": [
+    {
+      "session_id": "syn-attack-swma_holdout-99900",
+      "declared_job_family": "inference",
+      "progress_log": "missing",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_holdout-99901",
+      "declared_job_family": "inference",
+      "progress_log": "missing",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_holdout-99902",
+      "declared_job_family": "inference",
+      "progress_log": "missing",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_holdout-99903",
+      "declared_job_family": "inference",
+      "progress_log": "missing",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_holdout-99904",
+      "declared_job_family": "training",
+      "progress_log": "missing",
+      "grid_watch": true,
+      "is_candidate_any": false,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_jitter-90216",
+      "declared_job_family": "training",
+      "progress_log": "missing",
+      "grid_watch": true,
+      "is_candidate_any": false,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_mimicry-90415",
+      "declared_job_family": "inference",
+      "progress_log": "present",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_mimicry-90418",
+      "declared_job_family": "inference",
+      "progress_log": "present",
+      "grid_watch": false,
+      "is_candidate_any": true,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_piggyback-90306",
+      "declared_job_family": "evaluation",
+      "progress_log": "present",
+      "grid_watch": true,
+      "is_candidate_any": false,
+      "n_windows": 7
+    },
+    {
+      "session_id": "syn-attack-swma_piggyback-90309",
+      "declared_job_family": "training",
+      "progress_log": "present",
+      "grid_watch": true,
+      "is_candidate_any": false,
+      "n_windows": 7
+    }
+  ],
+  "breakdown": [
+    {
+      "declared_job_family": "evaluation",
+      "progress_log": "present",
+      "grid_watch": true,
+      "n_sessions": 1
+    },
+    {
+      "declared_job_family": "inference",
+      "progress_log": "missing",
+      "grid_watch": false,
+      "n_sessions": 4
+    },
+    {
+      "declared_job_family": "inference",
+      "progress_log": "present",
+      "grid_watch": false,
+      "n_sessions": 2
+    },
+    {
+      "declared_job_family": "training",
+      "progress_log": "missing",
+      "grid_watch": true,
+      "n_sessions": 2
+    },
+    {
+      "declared_job_family": "training",
+      "progress_log": "present",
+      "grid_watch": true,
+      "n_sessions": 1
+    }
+  ],
+  "note": "Descriptive breakdown only; not used to retune corpus."
+}

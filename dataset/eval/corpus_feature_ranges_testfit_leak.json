@@ -1,7 +1,7 @@
 {
-  "fit_split": "train",
-  "n_sessions": 190,
-  "n_windows": 1470,
+  "fit_split": "test_intentional_leak",
+  "n_sessions": 119,
+  "n_windows": 917,
   "quantiles": [
     5,
     95
@@ -21,31 +21,31 @@
         "normal_sync_ddp",
         "normal_fsdp_deep_trough"
       ],
-      "n_windows": 490,
+      "n_windows": 294,
       "ranges": {
         "swing_ratio": [
-          0.369533,
-          1.301525
+          0.375485,
+          1.298048
         ],
         "periodicity_strength": [
-          0.888747,
-          0.987175
+          0.885879,
+          0.98801
         ],
         "duty_regularity": [
           0.0,
-          0.893914
+          0.885913
         ],
         "ramp_max_w_per_s": [
-          68.673504,
-          288.117615
+          68.347565,
+          301.728541
         ],
         "high_load_fraction": [
           0.0,
-          0.745167
+          0.701167
         ],
         "longest_high_seconds": [
           0.0,
-          13.34
+          13.47
         ]
       }
     },
@@ -57,31 +57,31 @@
         "normal_dataloader_stall",
         "normal_hpo_search"
       ],
-      "n_windows": 210,
+      "n_windows": 126,
       "ranges": {
         "swing_ratio": [
-          0.760651,
-          1.391269
+          0.727063,
+          1.446361
         ],
         "periodicity_strength": [
-          0.927884,
-          0.977742
+          0.933292,
+          0.978243
         ],
         "duty_regularity": [
           0.0,
-          0.647633
+          0.567108
         ],
         "ramp_max_w_per_s": [
-          143.072199,
-          222.66434
+          140.795825,
+          225.435243
         ],
         "high_load_fraction": [
           0.0,
-          0.629833
+          0.545833
         ],
         "longest_high_seconds": [
           0.0,
-          10.3
+          9.775
         ]
       }
     },
@@ -92,31 +92,31 @@
         "swma",
         "normal_mixed_tenants"
       ],
-      "n_windows": 630,
+      "n_windows": 413,
       "ranges": {
         "swing_ratio": [
-          0.151593,
-          1.659361
+          0.126914,
+          1.651888
         ],
         "periodicity_strength": [
-          0.650963,
-          0.948774
+          0.756757,
+          0.94806
         ],
         "duty_regularity": [
-          0.0,
-          0.935673
+          0.065327,
+          0.943907
         ],
         "ramp_max_w_per_s": [
-          77.768865,
-          347.307258
+          88.109225,
+          344.434807
         ],
         "high_load_fraction": [
           0.0,
-          0.931833
+          0.808
         ],
         "longest_high_seconds": [
           0.0,
-          10.1
+          8.24
         ]
       }
     },
@@ -126,23 +126,23 @@
       "source_labels": [
         "cryptojacking"
       ],
-      "n_windows": 70,
+      "n_windows": 42,
       "ranges": {
         "swing_ratio": [
-          0.015194,
-          0.024139
+          0.016163,
+          0.023943
         ],
         "periodicity_strength": [
-          0.911956,
-          0.956872
+          0.912326,
+          0.962694
         ],
         "duty_regularity": [
-          0.0,
-          0.510875
+          6.4e-05,
+          0.491274
         ],
         "ramp_max_w_per_s": [
-          4.500034,
-          7.057168
+          4.152557,
+          6.868852
         ],
         "high_load_fraction": [
           1.0,
@@ -162,30 +162,30 @@
         "normal_flat_pretrain",
         "normal_hpo_search"
       ],
-      "n_windows": 210,
+      "n_windows": 126,
       "ranges": {
         "swing_ratio": [
-          0.010526,
-          1.386039
+          0.01003,
+          1.446361
         ],
         "periodicity_strength": [
-          0.885981,
-          0.975881
+          0.606632,
+          0.973982
         ],
         "duty_regularity": [
-          0.028118,
-          0.890568
+          0.107914,
+          0.811949
         ],
         "ramp_max_w_per_s": [
-          5.398814,
-          242.0205
+          5.390782,
+          234.721087
         ],
         "high_load_fraction": [
-          0.110833,
+          0.124167,
           1.0
         ],
         "longest_high_seconds": [
-          1.2,
+          1.7,
           30.0
         ]
       }
@@ -197,31 +197,31 @@
         "normal_inference_bursty",
         "normal_hpo_search"
       ],
-      "n_windows": 140,
+      "n_windows": 84,
       "ranges": {
         "swing_ratio": [
-          1.104678,
-          2.744249
+          1.108579,
+          2.985625
         ],
         "periodicity_strength": [
-          0.921756,
-          0.978463
+          0.926307,
+          0.975443
         ],
         "duty_regularity": [
           0.0,
-          0.581848
+          0.549128
         ],
         "ramp_max_w_per_s": [
-          177.042206,
-          353.041788
+          175.713113,
+          351.763962
         ],
         "high_load_fraction": [
-          0.0,
-          0.717
+          0.0305,
+          0.6685
         ],
         "longest_high_seconds": [
-          0.0,
-          10.91
+          0.915,
+          9.885
         ]
       }
     },
@@ -231,31 +231,31 @@
       "source_labels": [
         "ltma"
       ],
-      "n_windows": 70,
+      "n_windows": 42,
       "ranges": {
         "swing_ratio": [
-          1.159251,
-          1.730632
+          0.969727,
+          1.656841
         ],
         "periodicity_strength": [
-          0.960412,
-          0.986384
+          0.965758,
+          0.986806
         ],
         "duty_regularity": [
-          0.047116,
-          0.82249
+          0.233903,
+          0.863721
         ],
         "ramp_max_w_per_s": [
-          136.766485,
-          178.130084
+          129.400579,
+          179.55225
         ],
         "high_load_fraction": [
           0.0,
-          0.1785
+          0.09
         ],
         "longest_high_seconds": [
           0.0,
-          3.1
+          2.7
         ]
       }
     },
@@ -275,23 +275,23 @@
         "normal_inference_bursty",
         "normal_mixed_tenants"
       ],
-      "n_windows": 840,
+      "n_windows": 504,
       "ranges": {
         "swing_ratio": [
-          0.012663,
-          1.7397
+          0.012449,
+          1.954583
         ],
         "periodicity_strength": [
-          0.889918,
-          0.984768
+          0.890922,
+          0.98581
         ],
         "duty_regularity": [
           0.0,
-          0.822756
+          0.849548
         ],
         "ramp_max_w_per_s": [
-          6.094296,
-          348.852915
+          5.839975,
+          346.434792
         ],
         "high_load_fraction": [
           0.0,
@@ -310,23 +310,23 @@
         "cryptojacking",
         "normal_flat_pretrain"
       ],
-      "n_windows": 140,
+      "n_windows": 84,
       "ranges": {
         "swing_ratio": [
-          0.010206,
-          0.02273
+          0.009839,
+          0.023214
         ],
         "periodicity_strength": [
-          0.900669,
-          0.95488
+          0.906303,
+          0.96141
         ],
         "duty_regularity": [
-          0.0,
-          0.503944
+          0.000191,
+          0.476648
         ],
         "ramp_max_w_per_s": [
-          4.679814,
-          7.468991
+          4.485757,
+          7.008635
         ],
         "high_load_fraction": [
           1.0,
@@ -344,31 +344,31 @@
       "source_labels": [
         "swma"
       ],
-      "n_windows": 490,
+      "n_windows": 329,
       "ranges": {
         "swing_ratio": [
-          0.121787,
-          1.610457
+          0.123314,
+          1.615993
         ],
         "periodicity_strength": [
-          0.625181,
-          0.933826
+          0.74287,
+          0.933763
         ],
         "duty_regularity": [
           0.0,
-          0.935673
+          0.946248
         ],
         "ramp_max_w_per_s": [
-          62.613348,
-          306.391193
+          86.101173,
+          306.446011
         ],
         "high_load_fraction": [
           0.0,
-          0.946667
+          0.819333
         ],
         "longest_high_seconds": [
           0.0,
-          12.05
+          10.08
         ]
       }
     }

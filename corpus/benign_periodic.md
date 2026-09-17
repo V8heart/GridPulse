@@ -5,19 +5,22 @@ mitre_technique: null
 evidence:
   - name: period_match
     necessity: required
-    description: "강한 주기성이 정상 job 진행 로그로 설명됨"
-  - name: declared_context_consistent
+    description: "규칙적 전력이 정상 step/동기화 주기로 설명됨"
+  - name: period_mismatch
+    necessity: exclusion
+    description: "주기 불일치가 있으면 정상이 아니다"
+  - name: progress_log_available
     necessity: supporting
-    description: "선언 작업과 관측 패턴이 일치"
+    description: "DDP/체크포인트 등 정상 주기성의 설명 로그"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: none
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 정상 분산학습의 규칙적 출렁임"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 정상이지만 공격과 유사한 주기적 워크로드 (Benign Periodic Workload)
 
@@ -50,3 +53,6 @@ hard negative 기준 문서이다.
 주기성이 존재한다는 사실만으로 공격을 단정해서는 안 된다. 공격 판정은 주기성에
 더해 맥락적 불일치(설명되지 않는 스케줄러 관계, 비인가 사용자, 독립적이어야 할
 job 간 위상 일치)가 함께 확인될 때만 이루어진다.
+
+## Evidence 근거 (초안)
+정상 분산학습의 규칙적 출렁임

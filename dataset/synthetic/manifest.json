@@ -6498,5 +6498,90 @@
     "split": "test",
     "progress_log_path": null,
     "gt_variant": "cryptojacking"
+  },
+  {
+    "session_id": "syn-attack-swma_holdout-99900",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 99900,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_holdout-f0.34-d0.50-s99900",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_holdout"
+  },
+  {
+    "session_id": "syn-attack-swma_holdout-99901",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 99901,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_holdout-f0.33-d0.50-s99901",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_holdout"
+  },
+  {
+    "session_id": "syn-attack-swma_holdout-99902",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 99902,
+    "workload": "online_inference",
+    "notes": null,
+    "attack_id": "swma_holdout-f0.34-d0.50-s99902",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_holdout"
+  },
+  {
+    "session_id": "syn-attack-swma_holdout-99903",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 99903,
+    "workload": "batch_inference",
+    "notes": null,
+    "attack_id": "swma_holdout-f0.35-d0.50-s99903",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_holdout"
+  },
+  {
+    "session_id": "syn-attack-swma_holdout-99904",
+    "label": "swma",
+    "source": "synthetic",
+    "sample_hz": 10.0,
+    "gpu_ids": [
+      0
+    ],
+    "rows": 1200,
+    "seed": 99904,
+    "workload": "llm_finetune",
+    "notes": null,
+    "attack_id": "swma_holdout-f0.32-d0.50-s99904",
+    "split": "test",
+    "progress_log_path": null,
+    "gt_variant": "swma_holdout"
   }
 ]

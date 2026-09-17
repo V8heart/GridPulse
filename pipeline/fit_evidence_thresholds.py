@@ -1,0 +1,108 @@
+"""Fit evidence bool thresholds on train/cal normals only."""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from pipeline.evidence_vocab import merge_thresholds
+from pipeline.stage1_v2 import build_windows, load_config
+
+
+def fit_thresholds(
+    telemetry: Path,
+    split_manifest: Path,
+    *,
+    config_path: Path,
+    progress_log_dir: Path,
+    window_s: float,
+    stride_s: float,
+    out: Path,
+) -> dict:
+    df = pd.read_csv(telemetry, low_memory=False)
+    manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
+    config = load_config(config_path)
+    fit_sessions = set(map(str, manifest["train"])) | set(map(str, manifest["cal"]))
+    subset = df[df["session_id"].astype(str).isin(fit_sessions)]
+    windows = build_windows(
+        subset,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        config=config,
+    )
+    normals = windows[windows["gt_label"].astype(str).str.startswith("normal")]
+    if normals.empty:
+        raise ValueError("no normal windows in train/cal for evidence threshold fitting")
+
+    # Target: keep ~95% of normal windows below attack-like flags.
+    swing = normals["swing_abs_w"].dropna() if "swing_abs_w" in normals else pd.Series(dtype=float)
+    mean_w = normals["mean_w"].dropna() if "mean_w" in normals else pd.Series(dtype=float)
+    high_frac = normals["high_load_fraction"].dropna() if "high_load_fraction" in normals else pd.Series(dtype=float)
+    longest = normals["longest_high_seconds"].dropna() if "longest_high_seconds" in normals else pd.Series(dtype=float)
+    ramp = normals["ramp_p95_w_per_s"].dropna() if "ramp_p95_w_per_s" in normals else pd.Series(dtype=float)
+
+    fitted = merge_thresholds(config)
+    if len(high_frac):
+        fitted["sustained_high_load"]["high_load_fraction_min"] = float(max(0.85, high_frac.quantile(0.95)))
+    if len(longest):
+        fitted["sustained_high_load"]["longest_high_seconds_min"] = float(max(5.0, longest.quantile(0.95)))
+    if len(swing):
+        fitted["flat_power"]["swing_abs_w_max"] = float(max(20.0, swing.quantile(0.20)))
+    if len(mean_w):
+        fitted["flat_power"]["mean_w_min"] = float(max(200.0, mean_w.quantile(0.80)))
+    if len(ramp):
+        fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(max(500.0, ramp.quantile(0.95)))
+    util_mad = normals["util_residual_mad_w"].dropna() if "util_residual_mad_w" in normals else pd.Series(dtype=float)
+    if len(util_mad):
+        fitted["util_power_decoupled"]["util_residual_mad_w_min"] = float(max(15.0, util_mad.quantile(0.95)))
+    # declared_family_mismatch thresholds stay config defaults unless enough family cohorts exist
+    fitted.setdefault("declared_family_mismatch", {
+        "declared_mean_abs_z_min": 3.0,
+        "other_family_margin": 0.5,
+    })
+
+    report = {
+        "fit_split": "train+cal",
+        "n_normal_windows": int(len(normals)),
+        "n_sessions": len(fit_sessions),
+        "evidence_thresholds": fitted,
+        "note": "Thresholds fit on train/cal normals only; test was not used.",
+    }
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v3.csv")
+    parser.add_argument("--split-manifest", type=Path, default=ROOT / "dataset/synthetic/split_manifest.json")
+    parser.add_argument("--stage1-config", type=Path, default=ROOT / "config/stage1_v2.yaml")
+    parser.add_argument("--progress-log-dir", type=Path, default=ROOT / "dataset/synthetic/steps")
+    parser.add_argument("--window-s", type=float, default=30.0)
+    parser.add_argument("--stride-s", type=float, default=15.0)
+    parser.add_argument("--out", type=Path, default=ROOT / "dataset/eval/evidence_thresholds.json")
+    args = parser.parse_args()
+    report = fit_thresholds(
+        args.telemetry,
+        args.split_manifest,
+        config_path=args.stage1_config,
+        progress_log_dir=args.progress_log_dir,
+        window_s=args.window_s,
+        stride_s=args.stride_s,
+        out=args.out,
+    )
+    print(json.dumps({k: v for k, v in report.items() if k != "evidence_thresholds"}, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

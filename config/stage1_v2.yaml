@@ -1,15 +1,40 @@
-alpha: 0.05
-alpha_high_impact: 0.10
+alpha: 0.10
+alpha_high_impact: 0.20
 score_mode: max_plus_evidence
 tdp_w: 450.0
 nvml_avg_window_s: 1.0
 tau_peak: 8.0
 tau_sync: 0.8
+alpha_selection:
+  selected_on: cal
+  rule: "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha"
+  note: "Chosen from {0.05,0.10,0.20} after cal u_score AUC report; test not used for selection."
 evidence_weights:
   period_mismatch: 1.0
   unexplained_changepoint: 0.8
   cross_job_sync: 1.0
   progress_log_missing: 0.25
+  sustained_high_load: 1.0
+  flat_power: 0.8
+  high_ramp: 0.8
+  util_power_decoupled: 1.0
+  declared_family_mismatch: 1.0
+evidence_thresholds:
+  tau_peak: 8.0
+  tau_sync: 0.8
+  sustained_high_load:
+    high_load_fraction_min: 1.0
+    longest_high_seconds_min: 30.0
+  flat_power:
+    swing_abs_w_max: 58.66561173417077
+    mean_w_min: 313.4146364720961
+  high_ramp:
+    ramp_p95_w_per_s_min: 500.0
+  util_power_decoupled:
+    util_residual_mad_w_min: 15.0  # train+cal normal q95 floor; see evidence_thresholds.json
+  declared_family_mismatch:
+    declared_mean_abs_z_min: 3.0
+    other_family_margin: 0.5
 grid_weights:
   "0.05_0.1": 0.5
   "0.1_0.7": 1.0

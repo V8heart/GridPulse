@@ -1,0 +1,89 @@
+{
+  "split": "test",
+  "backend": "tfidf",
+  "modes": {
+    "no_context": {
+      "top1_accuracy": 0.29770992366412213,
+      "legacy_4_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.5190839694656488,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.5190839694656488,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.16562192536651935,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      },
+      "expanded_10_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.29770992366412213,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.29770992366412213,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.15943515689058754,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      }
+    },
+    "declared": {
+      "top1_accuracy": 0.0916030534351145,
+      "legacy_4_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.48091603053435117,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.48091603053435117,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.16562192536651935,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      },
+      "expanded_10_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.0916030534351145,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.0916030534351145,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.15943515689058754,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      }
+    },
+    "oracle_label": {
+      "top1_accuracy": 0.4351145038167939,
+      "legacy_4_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.5190839694656488,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.5190839694656488,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.16562192536651935,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      },
+      "expanded_10_docs": {
+        "backend": "tfidf",
+        "positive_cases": 131,
+        "top1_accuracy": 0.4351145038167939,
+        "legacy_positive_cases": 131,
+        "legacy_top1_accuracy": 0.4351145038167939,
+        "unknown_cases": 3,
+        "unknown_max_similarity": 0.15943515689058754,
+        "unknown_threshold": 0.28,
+        "unknown_rejection_rate": 1.0
+      },
+      "label": "누설 포함 상한"
+    },
+    "legacy_full_leak": {
+      "label": "누설 포함 상한 (oracle_label + test-fit hard range)",
+      "top1_accuracy": 0.4351145038167939,
+      "positive_cases": 131,
+      "note": "Ranges fitted on test split intentionally; not for official claims."
+    }
+  },
+  "note": "oracle_label / legacy_full_leak은 공식 수치로 사용하지 않음"
+}

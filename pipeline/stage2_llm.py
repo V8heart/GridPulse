@@ -5,7 +5,7 @@ import json
 import urllib.request
 from dataclasses import asdict, dataclass
 
-from pipeline.corpus_schema import CorpusDoc
+from pipeline.corpus_schema import CorpusDoc, checklist_satisfied
 
 VALID_VERDICTS = {"known", "partial", "unknown"}
 
@@ -38,11 +38,11 @@ def _validate(data: dict) -> Stage2Verdict:
     )
 
 
-def fallback_verdict(candidate_docs: list[CorpusDoc], reason: str = "fallback") -> Stage2Verdict:
-    doc = candidate_docs[0] if candidate_docs else None
+def fallback_verdict(*, top1_name: str | None, reason: str = "fallback") -> Stage2Verdict:
+    """Legacy fallback uses retriever top-1 name, never alphabet-first corpus doc."""
     return Stage2Verdict(
-        verdict="partial" if doc else "unknown",
-        closest_match=doc.name if doc else None,
+        verdict="partial" if top1_name else "unknown",
+        closest_match=top1_name,
         confidence=0.0,
         matched_evidence=[],
         contradicting_evidence=[],
@@ -58,14 +58,23 @@ def judge(
     backend: str = "stub",
     model: str = "gemma3:12b",
     fallback: str = "legacy",
+    retriever_top1: str | None = None,
 ) -> Stage2Verdict:
+    top1 = retriever_top1 or (candidate_docs[0].name if candidate_docs else None)
     if backend == "stub":
         evidence = evidence_bundle.get("unexplainedness", {}).get("evidence", {})
         for doc in candidate_docs:
-            required = [item.name for item in doc.evidence if item.necessity == "required"]
-            if required and all(evidence.get(name) for name in required):
-                return Stage2Verdict("known", doc.name, 0.8, required, [], f"required evidence matched: {', '.join(required)}")
-        return fallback_verdict(candidate_docs, "stub_no_required_match")
+            ok, matched, contradicting = checklist_satisfied(doc, evidence)
+            if ok:
+                return Stage2Verdict(
+                    "known",
+                    doc.name,
+                    0.8,
+                    matched,
+                    contradicting,
+                    f"required checklist matched: {', '.join(matched)}",
+                )
+        return fallback_verdict(top1_name=top1, reason="stub_no_required_match")
 
     prompt = {
         "instruction": "Judge only from the structured evidence names and corpus checklist.",
@@ -92,7 +101,15 @@ def judge(
     try:
         req = urllib.request.Request(
             "http://localhost:11434/api/generate",
-            data=json.dumps({"model": model, "prompt": json.dumps(prompt, ensure_ascii=False), "stream": False, "format": "json", "options": {"temperature": 0}}).encode(),
+            data=json.dumps(
+                {
+                    "model": model,
+                    "prompt": json.dumps(prompt, ensure_ascii=False),
+                    "stream": False,
+                    "format": "json",
+                    "options": {"temperature": 0},
+                }
+            ).encode(),
             headers={"Content-Type": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=120) as resp:
@@ -100,5 +117,5 @@ def judge(
         return _validate(json.loads(out["response"]))
     except Exception as exc:
         if fallback == "legacy":
-            return fallback_verdict(candidate_docs, str(exc))
+            return fallback_verdict(top1_name=top1, reason=str(exc))
         raise

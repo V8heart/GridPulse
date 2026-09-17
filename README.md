@@ -154,6 +154,11 @@ Part A 변경으로 추론 입력에서는 `gt_label`, `gt_attack_id`, `attack_i
 
 - R11: `corpus/*.md` front-matter는 evidence checklist schema를 사용한다. 숫자 range는 문서에 박지 않고 `pipeline/fit_corpus_ranges.py`가 train split에서 `dataset/eval/corpus_feature_ranges.json`으로 산출한다.
 - R12: Stage2 v2는 raw time series나 ANDES 로그를 LLM에 넣지 않고 `stage2_evidence.py`가 만든 structured evidence bundle만 전달한다. LLM 출력은 `known|partial|unknown`, matched/contradicting evidence, fallback 여부를 포함하는 JSON schema로 검증한다.
+- Evidence 이름은 `pipeline/evidence_vocab.py`에 고정되어 있으며 (`feature_range_match` 금지), bool 임계값은 train/cal만으로 `fit_evidence_thresholds.py`가 맞춘다.
+- Corpus evidence 초안 검토표: `dataset/eval/corpus_evidence_draft_review.md` (**사람 승인 전 공식 Stage2 수치로 주장하지 말 것**).
+- Stage2 평가는 `split_manifest`의 test 세션만 사용하고, fallback은 retriever top-1을 쓰며 정상→`benign_periodic` 자동정답 특례는 없다.
+- 누설 전/후 표: `dataset/eval/leakage_before_after.json` (`oracle_label` = 누설 포함 상한).
+- Stage1 cal AUC / alpha 스윕: `stage1_cal_score_auc.json`, `stage1_alpha_sweep.json` (test는 선택 후 1회).
 
 ## 검증 상태
 

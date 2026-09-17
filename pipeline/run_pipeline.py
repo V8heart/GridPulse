@@ -399,9 +399,13 @@ def run(args):
 
             docs = []
             for result in retrieved:
-                path = CORPUS_DIR / f"{result.name}.md"
+                name = result.name if hasattr(result, "name") else result[0]
+                path = CORPUS_DIR / f"{name}.md"
                 if path.exists():
                     docs.append(parse_corpus_v2(path))
+            top1_name = None
+            if retrieved:
+                top1_name = retrieved[0].name if hasattr(retrieved[0], "name") else retrieved[0][0]
             bundle = build_evidence_bundle(row)
             stage2 = judge(
                 bundle,
@@ -409,6 +413,7 @@ def run(args):
                 backend=args.llm_backend,
                 model=args.llm_model,
                 fallback="legacy",
+                retriever_top1=top1_name,
             )
             row["stage2_version"] = "v2"
             row["stage2_evidence_bundle"] = bundle

@@ -3,21 +3,27 @@ threat_id: T-CRYPTO-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: persistent_high_load
-    necessity: supporting
-    description: "평탄하고 높은 부하가 장시간 지속"
-  - name: progress_log_present_training
+  - name: crypto_high_or_flat
+    necessity: required_any
+    description: "장시간 고부하 지속 또는 고전력·저변동 평탄 프로파일"
+    any_of:
+      - sustained_high_load
+      - flat_power
+  - name: period_match
     necessity: exclusion
-    description: "정상 학습 로그가 지속 고부하를 설명하면 배제 방향"
+    description: "정상 step 주기와 맞으면 채굴형으로 보기 어려움"
+  - name: progress_log_missing
+    necessity: supporting
+    description: "등록되지 않은 해시 작업은 학습 progress log가 없음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: none
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 자원 남용형 지속 고부하 — 계통 공진 메커니즘이 본질이 아님"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # GPU 크립토재킹 (Cryptojacking)
 
@@ -43,3 +49,6 @@ GPU 텔레메트리 기반 크립토재킹 탐지 선행연구 다수 (nvidia-sm
 - SWMA/LTMA와의 결정적 차이: 크립토재킹은 변동성이 낮고 평균이 지속적으로 높음.
   반면 SWMA/LTMA는 변동성이 크고(특히 SWMA), 평균은 정상일 수도 있음(특히 LTMA).
 - 정상 대규모 학습과는 평균 전력만으로는 구분이 어려울 수 있어, 지속시간·작업 유형·사용자 맥락 결합 필요.
+
+## Evidence 근거 (초안)
+지속 고부하·저변동 — 계통 공진 주장보다 자원 남용이 본질

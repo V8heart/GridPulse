@@ -3,21 +3,24 @@ threat_id: T-SPONGE-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: feature_range_match
+  - name: sustained_high_load
+    necessity: required
+    description: "비정상적으로 비싼 입력으로 고부하 지속"
+  - name: period_match
+    necessity: exclusion
+    description: "정상 step 주기 설명이면 sponge보다 정상/학습 쪽"
+  - name: flat_power
     necessity: supporting
-    description: "train split에서 적합된 feature range와 근접"
-  - name: context_inconsistency
-    necessity: supporting
-    description: "선언 컨텍스트와 관측 evidence가 불일치"
+    description: "고비용 입력이 변동을 줄인 채 고전력을 유지할 수 있음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: frequency_response_stress
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 에너지/지연을 노린 sponge 입력 — 지속 부하 스트레스"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 에너지·지연 증폭 공격 (Sponge / Energy-Latency Attack)
 
@@ -50,3 +53,6 @@ Shumailov 등은 에너지 소비와 지연을 최대화하도록 설계한 입�
 번역 서비스에서 응답시간이 크게 늘어난 사례도 보고되었다. 저자들은 NVML로
 에너지를 측정했으며, 이는 본 파이프라인의 관측 수단과 동일하다.
 (Sponge Examples: Energy-Latency Attacks on Neural Networks, IEEE EuroS&P 2021, arXiv:2006.03463)
+
+## Evidence 근거 (초안)
+에너지/지연을 노린 sponge 입력

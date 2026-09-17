@@ -66,10 +66,10 @@
     "periodicity_strength": 0.96185
   },
   "swma": {
-    "mean_w": 185.08068,
-    "swing_ratio": 1.60022,
-    "duty_regularity": 0.91801,
-    "periodicity_strength": 0.96771
+    "mean_w": 185.30721,
+    "swing_ratio": 1.60075,
+    "duty_regularity": 0.94547,
+    "periodicity_strength": 0.95481
   },
   "ltma": {
     "mean_w": 120.68068,

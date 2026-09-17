@@ -3,21 +3,24 @@ threat_id: T-BURST-RAMP-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: feature_range_match
+  - name: high_ramp
+    necessity: required
+    description: "급격한 전력 램프(p95 ramp)"
+  - name: flat_power
+    necessity: exclusion
+    description: "평탄 고부하는 burst-ramp와 반대"
+  - name: unexplained_changepoint
     necessity: supporting
-    description: "train split에서 적합된 feature range와 근접"
-  - name: context_inconsistency
-    necessity: supporting
-    description: "선언 컨텍스트와 관측 evidence가 불일치"
+    description: "급변이 로그로 설명되지 않으면 더 의심"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
-  tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  mechanism: frequency_response_stress
+  tier: B
+  notes: "DRAFT pending human approval. 급격한 부하 램프가 주파수 응답 스트레스로 이어질 수 있는 가설"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 급격 부하 변동 공격 (Burst / Ramp Load Attack)
 
@@ -51,3 +54,6 @@ thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 보고되었으며, 계통 운영기관은 이를 신뢰도 현안으로 다루고 있다. 데이터센터의
 보호 설계(UPS·발전기 이중화)가 오히려 단기 전압 강하에 민감하게 반응하도록
 만든다는 분석이 함께 제시되었다.
+
+## Evidence 근거 (초안)
+급격한 부하 램프가 관성/주파수 응답에 충격을 주는 가설(시뮬 tier unsupported)

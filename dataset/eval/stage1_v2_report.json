@@ -1,10 +1,10 @@
 {
   "scope": "test_split_only",
-  "test_sessions": 114,
+  "test_sessions": 119,
   "legacy": {
-    "windows": 882,
+    "windows": 917,
     "normal_candidate_rate": 0.6111111111111112,
-    "attack_recall": 0.8597883597883598,
+    "attack_recall": 0.8716707021791767,
     "grid_watch_rate": 0.0,
     "by_label": {
       "cryptojacking": {
@@ -60,16 +60,16 @@
         "candidate_rate": 1.0
       },
       "swma": {
-        "windows": 294,
-        "candidate_rate": 0.8435374149659864
+        "windows": 329,
+        "candidate_rate": 0.8601823708206687
       }
     }
   },
   "v2": {
-    "windows": 882,
-    "normal_candidate_rate": 0.07738095238095238,
-    "attack_recall": 0.36507936507936506,
-    "grid_watch_rate": 0.13151927437641722,
+    "windows": 917,
+    "normal_candidate_rate": 0.08134920634920635,
+    "attack_recall": 0.3341404358353511,
+    "grid_watch_rate": 0.16466739367502725,
     "by_label": {
       "cryptojacking": {
         "windows": 42,
@@ -101,7 +101,7 @@
       },
       "normal_flat_pretrain": {
         "windows": 42,
-        "candidate_rate": 0.19047619047619047
+        "candidate_rate": 0.23809523809523808
       },
       "normal_fsdp_deep_trough": {
         "windows": 42,
@@ -124,16 +124,294 @@
         "candidate_rate": 0.16666666666666666
       },
       "swma": {
-        "windows": 294,
-        "candidate_rate": 0.3197278911564626
+        "windows": 329,
+        "candidate_rate": 0.2857142857142857
       }
     }
   },
   "ablation": {
-    "no_progress_log": "not_run_in_default_eval",
-    "no_cohort": "not_run_in_default_eval",
-    "no_evidence": "not_run_in_default_eval",
-    "nvml_avg_0": "run by regenerating all_v3 with --nvml-avg-window-s 0"
+    "full": {
+      "windows": 917,
+      "normal_candidate_rate": 0.08134920634920635,
+      "attack_recall": 0.3341404358353511,
+      "grid_watch_rate": 0.16466739367502725,
+      "by_label": {
+        "cryptojacking": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "ltma": {
+          "windows": 42,
+          "candidate_rate": 0.7142857142857143
+        },
+        "normal_baseline": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_checkpoint": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_dataloader_stall": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_distributed_training": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_eval_train_switch": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_flat_pretrain": {
+          "windows": 42,
+          "candidate_rate": 0.23809523809523808
+        },
+        "normal_fsdp_deep_trough": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "normal_hpo_search": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_inference_bursty": {
+          "windows": 42,
+          "candidate_rate": 0.07142857142857142
+        },
+        "normal_mixed_tenants": {
+          "windows": 84,
+          "candidate_rate": 0.08333333333333333
+        },
+        "normal_sync_ddp": {
+          "windows": 42,
+          "candidate_rate": 0.16666666666666666
+        },
+        "swma": {
+          "windows": 329,
+          "candidate_rate": 0.2857142857142857
+        }
+      }
+    },
+    "no_progress_log": {
+      "windows": 917,
+      "normal_candidate_rate": 0.08134920634920635,
+      "attack_recall": 0.3341404358353511,
+      "grid_watch_rate": 0.16466739367502725,
+      "by_label": {
+        "cryptojacking": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "ltma": {
+          "windows": 42,
+          "candidate_rate": 0.7142857142857143
+        },
+        "normal_baseline": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_checkpoint": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_dataloader_stall": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_distributed_training": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_eval_train_switch": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_flat_pretrain": {
+          "windows": 42,
+          "candidate_rate": 0.23809523809523808
+        },
+        "normal_fsdp_deep_trough": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "normal_hpo_search": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_inference_bursty": {
+          "windows": 42,
+          "candidate_rate": 0.07142857142857142
+        },
+        "normal_mixed_tenants": {
+          "windows": 84,
+          "candidate_rate": 0.08333333333333333
+        },
+        "normal_sync_ddp": {
+          "windows": 42,
+          "candidate_rate": 0.16666666666666666
+        },
+        "swma": {
+          "windows": 329,
+          "candidate_rate": 0.2857142857142857
+        }
+      }
+    },
+    "no_evidence": {
+      "windows": 917,
+      "normal_candidate_rate": 0.07539682539682539,
+      "attack_recall": 0.324455205811138,
+      "grid_watch_rate": 0.16466739367502725,
+      "by_label": {
+        "cryptojacking": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "ltma": {
+          "windows": 42,
+          "candidate_rate": 0.6666666666666666
+        },
+        "normal_baseline": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_checkpoint": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_dataloader_stall": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_distributed_training": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_eval_train_switch": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_flat_pretrain": {
+          "windows": 42,
+          "candidate_rate": 0.19047619047619047
+        },
+        "normal_fsdp_deep_trough": {
+          "windows": 42,
+          "candidate_rate": 0.3333333333333333
+        },
+        "normal_hpo_search": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_inference_bursty": {
+          "windows": 42,
+          "candidate_rate": 0.047619047619047616
+        },
+        "normal_mixed_tenants": {
+          "windows": 84,
+          "candidate_rate": 0.08333333333333333
+        },
+        "normal_sync_ddp": {
+          "windows": 42,
+          "candidate_rate": 0.16666666666666666
+        },
+        "swma": {
+          "windows": 329,
+          "candidate_rate": 0.2796352583586626
+        }
+      }
+    },
+    "no_cohort": {
+      "windows": 917,
+      "normal_candidate_rate": 0.031746031746031744,
+      "attack_recall": 0.1089588377723971,
+      "grid_watch_rate": 0.17557251908396945,
+      "by_label": {
+        "cryptojacking": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "ltma": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_baseline": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_checkpoint": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_dataloader_stall": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_distributed_training": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_eval_train_switch": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_flat_pretrain": {
+          "windows": 42,
+          "candidate_rate": 0.023809523809523808
+        },
+        "normal_fsdp_deep_trough": {
+          "windows": 42,
+          "candidate_rate": 0.19047619047619047
+        },
+        "normal_hpo_search": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_inference_bursty": {
+          "windows": 42,
+          "candidate_rate": 0.0
+        },
+        "normal_mixed_tenants": {
+          "windows": 84,
+          "candidate_rate": 0.0
+        },
+        "normal_sync_ddp": {
+          "windows": 42,
+          "candidate_rate": 0.16666666666666666
+        },
+        "swma": {
+          "windows": 329,
+          "candidate_rate": 0.13677811550151975
+        }
+      }
+    }
+  },
+  "holdout": {
+    "sessions": [
+      "syn-attack-swma_holdout-99900",
+      "syn-attack-swma_holdout-99901",
+      "syn-attack-swma_holdout-99902",
+      "syn-attack-swma_holdout-99903",
+      "syn-attack-swma_holdout-99904",
+      "syn-attack-swma_jitter-90216",
+      "syn-attack-swma_mimicry-90415",
+      "syn-attack-swma_mimicry-90418",
+      "syn-attack-swma_piggyback-90306",
+      "syn-attack-swma_piggyback-90309"
+    ],
+    "metrics": {
+      "windows": 70,
+      "normal_candidate_rate": null,
+      "attack_recall": 0.0,
+      "grid_watch_rate": 0.9,
+      "by_label": {
+        "swma": {
+          "windows": 70,
+          "candidate_rate": 0.0
+        }
+      }
+    }
   },
   "notes": "Parameters are fit on train/cal only; test split is not used for tuning."
 }

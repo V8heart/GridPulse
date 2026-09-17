@@ -4,20 +4,23 @@ category: benign
 mitre_technique: null
 evidence:
   - name: period_match
+    necessity: required
+    description: "전력 주기가 진행/요청 로그와 대체로 일치"
+  - name: period_mismatch
+    necessity: exclusion
+    description: "강한 주기 불일치는 정상 문서 배제 근거"
+  - name: progress_log_available
     necessity: supporting
-    description: "전력 주기가 정상 진행 로그와 일치"
-  - name: explained_changepoint
-    necessity: supporting
-    description: "변화점이 체크포인트/평가/요청 이벤트로 설명됨"
+    description: "정상 워크로드는 progress/request 로그가 있는 경우가 많음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: none
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 오탐 방지용 정상 프로파일 집합"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # 정상 워크로드 프로파일 (오탐 방지용 기준)
 
@@ -43,3 +46,6 @@ thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 ## 유지보수·운영성 변동 (정상)
 - 드라이버 업데이트, 정기 유지보수, 벤치마크 실행 등은 일시적 전력 변동을 유발하나
   운영 일정과 대조하면 정상으로 확인 가능.
+
+## Evidence 근거 (초안)
+오탐 방지용 정상 프로파일 집합

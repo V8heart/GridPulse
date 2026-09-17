@@ -3,21 +3,27 @@ threat_id: T-LLMJACKING-001
 category: cyber_physical_attack
 mitre_technique: null
 evidence:
-  - name: feature_range_match
+  - name: high_ramp
+    necessity: required
+    description: "요청 버스트성 전력 램프"
+  - name: flat_power
+    necessity: exclusion
+    description: "항상 평탄한 고부하는 온라인 추론 버스트와 다름"
+  - name: declared_family_mismatch
     necessity: supporting
-    description: "train split에서 적합된 feature range와 근접"
-  - name: context_inconsistency
+    description: "선언 계열과 다른 관측이면 탈취/위장 정황"
+  - name: progress_log_missing
     necessity: supporting
-    description: "선언 컨텍스트와 관측 evidence가 불일치"
+    description: "정상 training step log가 없음"
 benign_lookalikes: []
 grid_relevance:
-  mechanism: unsupported
+  mechanism: none
   tier: unsupported
-  notes: "# TODO(review): public test-system evidence only; do not overstate real-grid impact"
+  notes: "DRAFT pending human approval. 무단 LLM API/엔드포인트 남용 — 추론 버스트 패턴"
 observability:
   min_sample_hz: 1
   notes: "NVML 1초 평균을 전제로 해석"
-thresholds_provenance: dataset/eval/corpus_feature_ranges.json
+thresholds_provenance: dataset/eval/evidence_thresholds.json
 ---
 # LLM 서비스 탈취 (LLMJacking)
 
@@ -48,3 +54,6 @@ thresholds_provenance: dataset/eval/corpus_feature_ranges.json
 MITRE ATT&CK T1496.004 Cloud Service Hijacking에 해당한다. 리버스 프록시로
 클라우드 호스팅 AI 모델의 연산 자원을 탈취하는 공격이 실제로 보고되었다.
 정상 요청과 동일한 실행 경로를 사용하므로 권한 상승이 필요하지 않다.
+
+## Evidence 근거 (초안)
+무단 LLM API/엔드포인트 남용 — 추론 버스트 패턴

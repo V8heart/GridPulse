@@ -1,0 +1,187 @@
+"""Cal-only Stage1 score AUC and alpha sweep (test sealed until selection)."""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from pipeline.baseline import CohortBaseline
+from pipeline.stage1_v2 import build_windows, load_config, score_window
+
+
+def _auc(scores: np.ndarray, labels: np.ndarray) -> float | None:
+    pos = scores[labels == 1]
+    neg = scores[labels == 0]
+    if len(pos) == 0 or len(neg) == 0:
+        return None
+    # Mann-Whitney / ROC-AUC
+    correct = 0.0
+    for p in pos:
+        correct += np.sum(p > neg) + 0.5 * np.sum(p == neg)
+    return float(correct / (len(pos) * len(neg)))
+
+
+def run(
+    telemetry: Path,
+    split_manifest: Path,
+    *,
+    baseline_model: Path,
+    calibration_path: Path,
+    config_path: Path,
+    progress_log_dir: Path,
+    window_s: float,
+    stride_s: float,
+    alphas: list[float],
+) -> dict:
+    df = pd.read_csv(telemetry, low_memory=False)
+    manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
+    cal_ids = set(map(str, manifest["cal"]))
+    cal = df[df["session_id"].astype(str).isin(cal_ids)]
+    config = load_config(config_path)
+    baseline = CohortBaseline.load(baseline_model)
+    calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+    windows = build_windows(cal, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config)
+
+    scored = []
+    for _, row in windows.iterrows():
+        out = score_window(row.to_dict(), baseline, calibration, config)
+        scored.append({
+            "gt_label": str(row["gt_label"]),
+            "u_score": out["u_score"],
+            "p_value": out["p_value"],
+            "is_attack": not str(row["gt_label"]).startswith("normal"),
+        })
+    frame = pd.DataFrame(scored)
+    y = frame["is_attack"].astype(int).to_numpy()
+    auc_overall = _auc(frame["u_score"].to_numpy(), y)
+    by_label = {}
+    for label, group in frame.groupby("gt_label"):
+        if str(label).startswith("normal"):
+            continue
+        # one-vs-normals AUC
+        normals = frame[~frame["is_attack"]]
+        subset = pd.concat([group, normals], ignore_index=True)
+        auc = _auc(subset["u_score"].to_numpy(), subset["is_attack"].astype(int).to_numpy())
+        by_label[str(label)] = {
+            "auc": auc,
+            "n": int(len(group)),
+            "root_cause": "feature_or_evidence" if (auc is not None and auc < 0.6) else "alpha_may_help",
+        }
+
+    sweep = []
+    for alpha in alphas:
+        cfg = dict(config)
+        cfg["alpha"] = alpha
+        cfg["alpha_high_impact"] = min(1.0, alpha * 2)
+        rows = []
+        for _, row in windows.iterrows():
+            rows.append(score_window(row.to_dict(), baseline, calibration, cfg))
+        labels = frame["gt_label"].tolist()
+        normal_rate = np.mean([
+            r["is_candidate"] for r, lab in zip(rows, labels) if str(lab).startswith("normal")
+        ]) if any(str(lab).startswith("normal") for lab in labels) else None
+        attack_recall = np.mean([
+            r["is_candidate"] for r, lab in zip(rows, labels) if not str(lab).startswith("normal")
+        ]) if any(not str(lab).startswith("normal") for lab in labels) else None
+        sweep.append({
+            "alpha": alpha,
+            "cal_normal_candidate_rate": float(normal_rate) if normal_rate is not None else None,
+            "cal_attack_recall": float(attack_recall) if attack_recall is not None else None,
+        })
+
+    eligible = [s for s in sweep if s["cal_normal_candidate_rate"] is not None and s["cal_normal_candidate_rate"] <= 0.10]
+    if eligible:
+        selected = max(eligible, key=lambda s: (s["cal_attack_recall"], -s["alpha"]))
+    else:
+        selected = min(sweep, key=lambda s: s["cal_normal_candidate_rate"] or 1.0)
+
+    return {
+        "fit_split": "cal",
+        "u_score_auc_overall": auc_overall,
+        "u_score_auc_by_label": by_label,
+        "alpha_sweep": sweep,
+        "selection_rule": "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha",
+        "selected_alpha": selected,
+        "limitation": "Under conformal scoring, FPR often tracks alpha; low-AUC classes need feature/evidence work, not alpha alone.",
+        "test_sealed": True,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v3.csv")
+    parser.add_argument("--split-manifest", type=Path, default=ROOT / "dataset/synthetic/split_manifest.json")
+    parser.add_argument("--baseline-model", type=Path, default=ROOT / "dataset/eval/cohort_baseline_v2.json")
+    parser.add_argument("--calibration", type=Path, default=ROOT / "dataset/eval/stage1_v2_calibration.json")
+    parser.add_argument("--stage1-config", type=Path, default=ROOT / "config/stage1_v2.yaml")
+    parser.add_argument("--progress-log-dir", type=Path, default=ROOT / "dataset/synthetic/steps")
+    parser.add_argument("--window-s", type=float, default=30.0)
+    parser.add_argument("--stride-s", type=float, default=15.0)
+    parser.add_argument("--alphas", nargs="+", type=float, default=[0.05, 0.10, 0.20])
+    parser.add_argument("--auc-out", type=Path, default=ROOT / "dataset/eval/stage1_cal_score_auc.json")
+    parser.add_argument("--sweep-out", type=Path, default=ROOT / "dataset/eval/stage1_alpha_sweep.json")
+    args = parser.parse_args()
+    report = run(
+        args.telemetry,
+        args.split_manifest,
+        baseline_model=args.baseline_model,
+        calibration_path=args.calibration,
+        config_path=args.stage1_config,
+        progress_log_dir=args.progress_log_dir,
+        window_s=args.window_s,
+        stride_s=args.stride_s,
+        alphas=list(args.alphas),
+    )
+    args.auc_out.write_text(json.dumps({
+        "u_score_auc_overall": report["u_score_auc_overall"],
+        "u_score_auc_by_label": report["u_score_auc_by_label"],
+        "limitation": report["limitation"],
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    args.sweep_out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    md_path = args.sweep_out.with_suffix(".md")
+    md = [
+        "# Stage1 alpha sweep (cal only)",
+        "",
+        f"cal u_score AUC overall: **{report['u_score_auc_overall']}**",
+        "",
+        f"selected: `{report['selected_alpha']}`",
+        "",
+        "| alpha | cal_normal_candidate_rate | cal_attack_recall |",
+        "|-------|---------------------------|-------------------|",
+    ]
+    for row in report["alpha_sweep"]:
+        md.append(
+            f"| {row['alpha']} | {row['cal_normal_candidate_rate']} | {row['cal_attack_recall']} |"
+        )
+    md.extend(
+        [
+            "",
+            "## cal u_score AUC by attack label",
+            "",
+            "| label | auc | n | root_cause |",
+            "|-------|-----|---|------------|",
+        ]
+    )
+    for label, info in sorted(report["u_score_auc_by_label"].items()):
+        md.append(f"| {label} | {info.get('auc')} | {info.get('n')} | {info.get('root_cause')} |")
+    md.append("")
+    md.append(f"Note: {report['limitation']}")
+    md_path.write_text("\n".join(md) + "\n", encoding="utf-8")
+    print(json.dumps({
+        "auc_overall": report["u_score_auc_overall"],
+        "selected_alpha": report["selected_alpha"],
+        "n_low_auc_labels": sum(1 for v in report["u_score_auc_by_label"].values() if v.get("root_cause") == "feature_or_evidence"),
+        "md": str(md_path),
+    }, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

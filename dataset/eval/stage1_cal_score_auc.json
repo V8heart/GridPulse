@@ -1,0 +1,21 @@
+{
+  "u_score_auc_overall": 0.8406852324263039,
+  "u_score_auc_by_label": {
+    "cryptojacking": {
+      "auc": 0.8306760204081632,
+      "n": 28,
+      "root_cause": "alpha_may_help"
+    },
+    "ltma": {
+      "auc": 0.9130527210884354,
+      "n": 28,
+      "root_cause": "alpha_may_help"
+    },
+    "swma": {
+      "auc": 0.831776907191448,
+      "n": 196,
+      "root_cause": "alpha_may_help"
+    }
+  },
+  "limitation": "Under conformal scoring, FPR often tracks alpha; low-AUC classes need feature/evidence work, not alpha alone."
+}
