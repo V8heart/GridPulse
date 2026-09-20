@@ -146,6 +146,22 @@ def main() -> None:
         "limitation": report["limitation"],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     args.sweep_out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    # Persist selected alpha into stage1 config (same cal rule; no test tuning).
+    try:
+        import yaml
+
+        cfg_path = args.stage1_config
+        data = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+        selected = report["selected_alpha"]
+        data["alpha"] = float(selected["alpha"])
+        data["alpha_high_impact"] = float(min(1.0, selected["alpha"] * 2))
+        data.setdefault("alpha_selection", {})
+        data["alpha_selection"]["selected_on"] = "cal"
+        data["alpha_selection"]["rule"] = report["selection_rule"]
+        data["alpha_selection"]["selected"] = selected
+        cfg_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    except Exception as exc:
+        print(f"warning: could not update yaml alpha: {exc}")
     md_path = args.sweep_out.with_suffix(".md")
     md = [
         "# Stage1 alpha sweep (cal only)",

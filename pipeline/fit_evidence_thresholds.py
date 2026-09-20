@@ -1,4 +1,4 @@
-"""Fit evidence bool thresholds on train/cal normals only."""
+"""Fit evidence bool thresholds on train/cal normals only (no hardcoded floors)."""
 from __future__ import annotations
 
 import argparse
@@ -6,7 +6,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,6 +14,18 @@ if str(ROOT) not in sys.path:
 
 from pipeline.evidence_vocab import merge_thresholds
 from pipeline.stage1_v2 import build_windows, load_config
+
+
+def _update_yaml_thresholds(config_path: Path, thresholds: dict) -> None:
+    text = config_path.read_text(encoding="utf-8")
+    try:
+        import yaml
+    except ImportError:
+        return
+    data = yaml.safe_load(text) or {}
+    data["evidence_thresholds"] = thresholds
+    # Preserve comments poorly — rewrite structured yaml
+    config_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
 def fit_thresholds(
@@ -26,6 +37,7 @@ def fit_thresholds(
     window_s: float,
     stride_s: float,
     out: Path,
+    update_yaml: bool = True,
 ) -> dict:
     df = pd.read_csv(telemetry, low_memory=False)
     manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
@@ -43,42 +55,64 @@ def fit_thresholds(
     if normals.empty:
         raise ValueError("no normal windows in train/cal for evidence threshold fitting")
 
-    # Target: keep ~95% of normal windows below attack-like flags.
+    # Target: ~5% normal firing at q95 (or q20 for upper-bound flat swing). No hardcoded floors.
     swing = normals["swing_abs_w"].dropna() if "swing_abs_w" in normals else pd.Series(dtype=float)
     mean_w = normals["mean_w"].dropna() if "mean_w" in normals else pd.Series(dtype=float)
     high_frac = normals["high_load_fraction"].dropna() if "high_load_fraction" in normals else pd.Series(dtype=float)
     longest = normals["longest_high_seconds"].dropna() if "longest_high_seconds" in normals else pd.Series(dtype=float)
     ramp = normals["ramp_p95_w_per_s"].dropna() if "ramp_p95_w_per_s" in normals else pd.Series(dtype=float)
+    util_mad = normals["util_residual_mad_w"].dropna() if "util_residual_mad_w" in normals else pd.Series(dtype=float)
 
     fitted = merge_thresholds(config)
     if len(high_frac):
-        fitted["sustained_high_load"]["high_load_fraction_min"] = float(max(0.85, high_frac.quantile(0.95)))
+        fitted["sustained_high_load"]["high_load_fraction_min"] = float(high_frac.quantile(0.95))
     if len(longest):
-        fitted["sustained_high_load"]["longest_high_seconds_min"] = float(max(5.0, longest.quantile(0.95)))
+        fitted["sustained_high_load"]["longest_high_seconds_min"] = float(longest.quantile(0.95))
     if len(swing):
-        fitted["flat_power"]["swing_abs_w_max"] = float(max(20.0, swing.quantile(0.20)))
+        # flat = low swing: upper bound at normal q20
+        fitted["flat_power"]["swing_abs_w_max"] = float(swing.quantile(0.20))
     if len(mean_w):
-        fitted["flat_power"]["mean_w_min"] = float(max(200.0, mean_w.quantile(0.80)))
+        fitted["flat_power"]["mean_w_min"] = float(mean_w.quantile(0.80))
     if len(ramp):
-        fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(max(500.0, ramp.quantile(0.95)))
-    util_mad = normals["util_residual_mad_w"].dropna() if "util_residual_mad_w" in normals else pd.Series(dtype=float)
+        fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(ramp.quantile(0.95))
     if len(util_mad):
-        fitted["util_power_decoupled"]["util_residual_mad_w_min"] = float(max(15.0, util_mad.quantile(0.95)))
-    # declared_family_mismatch thresholds stay config defaults unless enough family cohorts exist
-    fitted.setdefault("declared_family_mismatch", {
-        "declared_mean_abs_z_min": 3.0,
-        "other_family_margin": 0.5,
-    })
+        fitted["util_power_decoupled"]["util_residual_mad_w_min"] = float(util_mad.quantile(0.95))
+
+    # Family mismatch: fit declared z threshold on train+cal normals (no floor).
+    from pipeline.baseline import CohortBaseline
+
+    baseline_path = ROOT / "dataset/eval/cohort_baseline_v2.json"
+    if baseline_path.exists():
+        baseline = CohortBaseline.load(baseline_path)
+        declared_z = []
+        for _, row in normals.iterrows():
+            stats = baseline.declared_family_mismatch_stats(row.to_dict())
+            z = stats.get("declared_family_mean_abs_z")
+            if z is not None:
+                declared_z.append(float(z))
+        if declared_z:
+            fitted.setdefault("declared_family_mismatch", {})
+            fitted["declared_family_mismatch"]["declared_mean_abs_z_min"] = float(
+                pd.Series(declared_z).quantile(0.95)
+            )
+            fitted["declared_family_mismatch"].setdefault("other_family_margin", 0.5)
+    else:
+        fitted.setdefault(
+            "declared_family_mismatch",
+            {"declared_mean_abs_z_min": 3.0, "other_family_margin": 0.5},
+        )
 
     report = {
         "fit_split": "train+cal",
         "n_normal_windows": int(len(normals)),
         "n_sessions": len(fit_sessions),
         "evidence_thresholds": fitted,
-        "note": "Thresholds fit on train/cal normals only; test was not used.",
+        "note": "Quantile-only fit on train/cal normals; hardcoded floors removed. Test not used.",
     }
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    if update_yaml:
+        _update_yaml_thresholds(config_path, fitted)
     return report
 
 
@@ -91,6 +125,7 @@ def main() -> None:
     parser.add_argument("--window-s", type=float, default=30.0)
     parser.add_argument("--stride-s", type=float, default=15.0)
     parser.add_argument("--out", type=Path, default=ROOT / "dataset/eval/evidence_thresholds.json")
+    parser.add_argument("--no-update-yaml", action="store_true")
     args = parser.parse_args()
     report = fit_thresholds(
         args.telemetry,
@@ -100,8 +135,9 @@ def main() -> None:
         window_s=args.window_s,
         stride_s=args.stride_s,
         out=args.out,
+        update_yaml=not args.no_update_yaml,
     )
-    print(json.dumps({k: v for k, v in report.items() if k != "evidence_thresholds"}, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

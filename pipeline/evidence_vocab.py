@@ -37,6 +37,8 @@ FORBIDDEN_EVIDENCE_NAMES: frozenset[str] = frozenset(
 )
 
 DEFAULT_EVIDENCE_THRESHOLDS: dict[str, Any] = {
+    # Fallback only when config/stage1_v2.yaml is missing keys.
+    # Authoritative values live in yaml (fitted on train/cal normals, no floors).
     "tau_peak": 8.0,
     "tau_sync": 0.8,
     "sustained_high_load": {
@@ -48,10 +50,10 @@ DEFAULT_EVIDENCE_THRESHOLDS: dict[str, Any] = {
         "mean_w_min": 250.0,
     },
     "high_ramp": {
-        "ramp_p95_w_per_s_min": 800.0,
+        "ramp_p95_w_per_s_min": 100.0,
     },
     "util_power_decoupled": {
-        "util_residual_mad_w_min": 25.0,
+        "util_residual_mad_w_min": 10.0,
     },
     "declared_family_mismatch": {
         "declared_mean_abs_z_min": 3.0,

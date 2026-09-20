@@ -14,15 +14,15 @@
       "mean_w_min": 313.4146364720961
     },
     "high_ramp": {
-      "ramp_p95_w_per_s_min": 500.0
+      "ramp_p95_w_per_s_min": 330.77933735782045
     },
     "util_power_decoupled": {
-      "util_residual_mad_w_min": 15.0
+      "util_residual_mad_w_min": 6.8192332869201735
     },
     "declared_family_mismatch": {
-      "declared_mean_abs_z_min": 3.0,
+      "declared_mean_abs_z_min": 2.509415901064057,
       "other_family_margin": 0.5
     }
   },
-  "note": "Thresholds fit on train/cal normals only; test was not used."
+  "note": "Quantile-only fit on train/cal normals; hardcoded floors removed. Test not used."
 }

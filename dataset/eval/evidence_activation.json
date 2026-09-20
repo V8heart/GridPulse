@@ -1,0 +1,96 @@
+{
+  "n_windows": 2058,
+  "rates": {
+    "cross_job_sync": {
+      "count": 0,
+      "normal_rate": 0.0,
+      "attack_rate": 0.0
+    },
+    "declared_family_mismatch": {
+      "count": 0,
+      "normal_rate": 0.0,
+      "attack_rate": 0.0
+    },
+    "flat_power": {
+      "count": 111,
+      "normal_rate": 0.09438775510204081,
+      "attack_rate": 0.0
+    },
+    "high_ramp": {
+      "count": 59,
+      "normal_rate": 0.050170068027210885,
+      "attack_rate": 0.0
+    },
+    "period_match": {
+      "count": 522,
+      "normal_rate": 0.28316326530612246,
+      "attack_rate": 0.21428571428571427
+    },
+    "period_mismatch": {
+      "count": 262,
+      "normal_rate": 0.13350340136054423,
+      "attack_rate": 0.11904761904761904
+    },
+    "progress_log_available": {
+      "count": 1078,
+      "normal_rate": 0.6666666666666666,
+      "attack_rate": 0.3333333333333333
+    },
+    "progress_log_missing": {
+      "count": 980,
+      "normal_rate": 0.3333333333333333,
+      "attack_rate": 0.6666666666666666
+    },
+    "strong_peak": {
+      "count": 2058,
+      "normal_rate": 1.0,
+      "attack_rate": 1.0
+    },
+    "sustained_high_load": {
+      "count": 224,
+      "normal_rate": 0.09523809523809523,
+      "attack_rate": 0.12698412698412698
+    },
+    "unexplained_changepoint": {
+      "count": 1452,
+      "normal_rate": 0.7610544217687075,
+      "attack_rate": 0.6315192743764172
+    },
+    "util_power_decoupled": {
+      "count": 157,
+      "normal_rate": 0.050170068027210885,
+      "attack_rate": 0.1111111111111111
+    }
+  },
+  "newly_disabled": [
+    "period_mismatch",
+    "unexplained_changepoint",
+    "declared_family_mismatch"
+  ],
+  "active": [
+    "progress_log_missing"
+  ],
+  "n_active": 1,
+  "gate_active_ge_4": false,
+  "stop_before_e3": true,
+  "note": "If n_active < 4, E2 does not claim success for Stage2 matching; need new discriminative axes / real capture + step logs.",
+  "disabled": [
+    "cross_job_sync",
+    "declared_family_mismatch",
+    "flat_power",
+    "high_ramp",
+    "period_mismatch",
+    "sustained_high_load",
+    "unexplained_changepoint",
+    "util_power_decoupled"
+  ],
+  "prior": {
+    "active": [
+      "declared_family_mismatch",
+      "period_mismatch",
+      "progress_log_missing",
+      "unexplained_changepoint"
+    ],
+    "n_active": 4
+  }
+}

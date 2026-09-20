@@ -1,19 +1,19 @@
 {
   "fit_split": "cal",
-  "u_score_auc_overall": 0.8406852324263039,
+  "u_score_auc_overall": 0.8496728552532123,
   "u_score_auc_by_label": {
     "cryptojacking": {
-      "auc": 0.8306760204081632,
+      "auc": 0.7596726190476191,
       "n": 28,
       "root_cause": "alpha_may_help"
     },
     "ltma": {
-      "auc": 0.9130527210884354,
+      "auc": 0.9140093537414966,
       "n": 28,
       "root_cause": "alpha_may_help"
     },
     "swma": {
-      "auc": 0.831776907191448,
+      "auc": 0.8533391034985423,
       "n": 196,
       "root_cause": "alpha_may_help"
     }
@@ -22,24 +22,24 @@
     {
       "alpha": 0.05,
       "cal_normal_candidate_rate": 0.044642857142857144,
-      "cal_attack_recall": 0.3531746031746032
+      "cal_attack_recall": 0.3492063492063492
     },
     {
       "alpha": 0.1,
       "cal_normal_candidate_rate": 0.09523809523809523,
-      "cal_attack_recall": 0.4246031746031746
+      "cal_attack_recall": 0.4126984126984127
     },
     {
       "alpha": 0.2,
-      "cal_normal_candidate_rate": 0.20238095238095238,
-      "cal_attack_recall": 0.7261904761904762
+      "cal_normal_candidate_rate": 0.19940476190476192,
+      "cal_attack_recall": 0.7738095238095238
     }
   ],
   "selection_rule": "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha",
   "selected_alpha": {
     "alpha": 0.1,
     "cal_normal_candidate_rate": 0.09523809523809523,
-    "cal_attack_recall": 0.4246031746031746
+    "cal_attack_recall": 0.4126984126984127
   },
   "limitation": "Under conformal scoring, FPR often tracks alpha; low-AUC classes need feature/evidence work, not alpha alone.",
   "test_sealed": true

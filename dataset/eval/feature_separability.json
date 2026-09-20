@@ -1,0 +1,427 @@
+{
+  "fit_split": "train+cal",
+  "n_windows": 2058,
+  "n_normal_windows": 1176,
+  "n_attack_windows": 882,
+  "class_stats": [
+    {
+      "label": "cryptojacking",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "ltma",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_baseline",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_checkpoint",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_dataloader_stall",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_distributed_training",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_eval_train_switch",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_flat_pretrain",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_fsdp_deep_trough",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_hpo_search",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_inference_bursty",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_mixed_tenants",
+      "n_sessions": 14,
+      "n_windows": 196,
+      "verdict": "ok"
+    },
+    {
+      "label": "normal_sync_ddp",
+      "n_sessions": 14,
+      "n_windows": 98,
+      "verdict": "ok"
+    },
+    {
+      "label": "swma",
+      "n_sessions": 84,
+      "n_windows": 686,
+      "verdict": "ok"
+    }
+  ],
+  "features": [
+    {
+      "feature": "high_load_fraction",
+      "normal_q50": 0.45,
+      "normal_q95": 1.0,
+      "auc_overall": 0.5577185239175035,
+      "nunique": 276,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 1.0,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.9523809523809523,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 0.005,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.20237661391087047,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 0.45,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.5521013069951013,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "longest_high_seconds",
+      "normal_q50": 3.3,
+      "normal_q95": 30.0,
+      "auc_overall": 0.41661460502568376,
+      "nunique": 147,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 30.0,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.9523809523809523,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 0.15000000000000002,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.2318348257670415,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 0.9,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.36647366672616566,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "swing_abs_w",
+      "normal_q50": 136.55442285724698,
+      "normal_q95": 307.4428727032688,
+      "auc_overall": 0.5179516250944822,
+      "nunique": 1999,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 3.8814727827593742,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.06274295432458697,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 146.12806956965102,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.5358791475773983,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 238.69291635046702,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.5804203605640507,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "mean_w",
+      "normal_q50": 182.91977214726163,
+      "normal_q95": 413.0546933756743,
+      "auc_overall": 0.4656007527727644,
+      "nunique": 2002,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 285.0878733172219,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.6776516729140636,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 120.33718686790522,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.07853498542274052,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 184.1224326944178,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.4906028738025823,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "ramp_p95_w_per_s",
+      "normal_q50": 141.10039737344158,
+      "normal_q95": 330.77933735782045,
+      "auc_overall": 0.5730608002838323,
+      "nunique": 1956,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 3.79206981461408,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.027453838678328474,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 125.06780427494263,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.3773514507843954,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 297.5632930264997,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.678963130441681,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "util_residual_mad_w",
+      "normal_q50": 1.9312288914827818,
+      "normal_q95": 6.8192332869201735,
+      "auc_overall": 0.2716441451864192,
+      "nunique": 1921,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 0.7843751380254105,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.2431452172705817,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 14.084769669089336,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.9999652922393447,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 0.6702605785423934,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.17166954245254953,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "dominant_peak_prominence",
+      "normal_q50": 64307.13829747442,
+      "normal_q95": 485074.03553837846,
+      "auc_overall": 0.5550628981751431,
+      "nunique": 2002,
+      "decision": "disable_auc_lt_0.6",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 71710.6845848275,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.5215188116062751,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 156327.6962778925,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.7438306955435235,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 58848.5789684334,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.5328880823466413,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "cross_job_sync_index",
+      "normal_q50": 0.0,
+      "normal_q95": 0.0,
+      "auc_overall": null,
+      "nunique": 1,
+      "decision": "exclude_constant",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 0.0,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": null,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 0.0,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": null,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 0.0,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": null,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "declared_family_mean_abs_z",
+      "normal_q50": 0.8187566796720384,
+      "normal_q95": 2.509415901064057,
+      "auc_overall": 0.8967559813040863,
+      "nunique": 2002,
+      "decision": "keep",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 1.3664429415025432,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.779701166180758,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 3.7216356389813288,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.9290573372206026,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 3.4049022205730184,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.9088636183336308,
+          "verdict": "ok"
+        }
+      }
+    },
+    {
+      "feature": "best_other_family_mean_abs_z",
+      "normal_q50": 1.2277532071690502,
+      "normal_q95": 3.517267981994097,
+      "auc_overall": 0.7219802320020979,
+      "nunique": 2002,
+      "decision": "keep",
+      "deferred_classes": [],
+      "by_class": {
+        "cryptojacking": {
+          "q50": 1.4471908356194936,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.5222303206997084,
+          "verdict": "ok"
+        },
+        "ltma": {
+          "q50": 1.5674646989168957,
+          "n_sessions": 14,
+          "n_windows": 98,
+          "auc": 0.7384076079411357,
+          "verdict": "ok"
+        },
+        "swma": {
+          "q50": 1.8644728928304508,
+          "n_sessions": 84,
+          "n_windows": 686,
+          "auc": 0.7481691656254339,
+          "verdict": "ok"
+        }
+      }
+    }
+  ],
+  "decisions": {
+    "high_load_fraction": "disable_auc_lt_0.6",
+    "longest_high_seconds": "disable_auc_lt_0.6",
+    "swing_abs_w": "disable_auc_lt_0.6",
+    "mean_w": "disable_auc_lt_0.6",
+    "ramp_p95_w_per_s": "disable_auc_lt_0.6",
+    "util_residual_mad_w": "disable_auc_lt_0.6",
+    "dominant_peak_prominence": "disable_auc_lt_0.6",
+    "cross_job_sync_index": "exclude_constant",
+    "declared_family_mean_abs_z": "keep",
+    "best_other_family_mean_abs_z": "keep"
+  },
+  "note": "AUC on small session counts is unstable; classes with <3 sessions are deferred."
+}
