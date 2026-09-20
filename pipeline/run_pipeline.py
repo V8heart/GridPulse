@@ -30,12 +30,48 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).parent))
-from features import compute_window_features, features_to_description
+from features import compute_window_features, compute_window_features_v2, features_to_description
 from rag_analyzer import SignatureRetriever, analyze_with_llm
 from dataset.schema import strip_ground_truth
 
 WINDOW = 200
 STRIDE = 100
+STAGE1_CONFIG_DEFAULT = ROOT / "config" / "stage1_v2.yaml"
+
+
+def merge_window_features(
+    power,
+    util=None,
+    *,
+    sample_hz: float = 1.0,
+    tdp_w: float = 450.0,
+    nvml_avg_window_s: float | None = 1.0,
+) -> dict:
+    """Compute v1 and v2 features; on key collision prefer v2. Flatten nested band dicts."""
+    from pipeline.stage1_v2 import flatten_features
+
+    v1 = compute_window_features(power, util, sample_hz=sample_hz) or {}
+    v2 = compute_window_features_v2(
+        power,
+        util,
+        sample_hz=sample_hz,
+        tdp_w=tdp_w,
+        nvml_avg_window_s=nvml_avg_window_s,
+    ) or {}
+    merged = {**v1, **v2}
+    return flatten_features(merged)
+
+
+def _serialize_features(feats: dict) -> dict:
+    out = {}
+    for key, value in feats.items():
+        if isinstance(value, (bool, str)):
+            out[key] = value
+        elif isinstance(value, (int, float, np.integer, np.floating)):
+            out[key] = round(float(value), 5)
+        elif value is None:
+            out[key] = None
+    return out
 
 
 def context_to_query(context: dict[str, str]) -> str:
@@ -102,6 +138,8 @@ def stage1_screen_legacy(
     sample_hz: float = 1.0,
     window: int = WINDOW,
     stride: int = STRIDE,
+    tdp_w: float = 450.0,
+    nvml_avg_window_s: float | None = 1.0,
 ):
     """범용 필터들로 한 세션의 의심 윈도우를 선별한다."""
     windows = []
@@ -109,7 +147,13 @@ def stage1_screen_legacy(
         w = df.iloc[start:start + window]
         power = w["power_w"].values
         util = w["util_gpu_pct"].values if "util_gpu_pct" in w else None
-        feats = compute_window_features(power, util, sample_hz=sample_hz)
+        feats = merge_window_features(
+            power,
+            util,
+            sample_hz=sample_hz,
+            tdp_w=tdp_w,
+            nvml_avg_window_s=nvml_avg_window_s,
+        )
         if not feats:
             continue
         label = str(w["label"].mode().iloc[0]) if "label" in w and not w["label"].mode().empty else None
@@ -187,6 +231,11 @@ def run(args):
 
     baseline = args.baseline_mean
     stage1_mode = getattr(args, "stage1", "legacy")
+    from pipeline.stage1_v2 import load_config
+
+    stage1_config = load_config(getattr(args, "stage1_config", STAGE1_CONFIG_DEFAULT))
+    tdp_w = float(stage1_config.get("tdp_w", 450.0))
+    nvml_avg_window_s = stage1_config.get("nvml_avg_window_s", 1.0)
     if baseline is None and stage1_mode == "legacy":
         baseline = 120.0
         print("[기준선] legacy 모드 기본값 120W 사용")
@@ -200,9 +249,9 @@ def run(args):
     }
     if stage1_mode == "v2":
         from pipeline.baseline import CohortBaseline
-        from pipeline.stage1_v2 import build_windows, load_config, score_window
+        from pipeline.stage1_v2 import build_windows, score_window
 
-        config = load_config(getattr(args, "stage1_config", None))
+        config = stage1_config
         baseline_model = CohortBaseline.load(getattr(args, "baseline_model", "dataset/eval/cohort_baseline_v2.json"))
         calibration_path = Path(getattr(args, "calibration", "dataset/eval/stage1_v2_calibration.json"))
         calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
@@ -237,6 +286,8 @@ def run(args):
                 sample_hz=hz,
                 window=args.window,
                 stride=args.stride,
+                tdp_w=tdp_w,
+                nvml_avg_window_s=nvml_avg_window_s,
             )
             if current.empty:
                 continue
@@ -270,8 +321,17 @@ def run(args):
         power = w["power_w"].values
         util = w["util_gpu_pct"].values if "util_gpu_pct" in w else None
 
-        # 2단계: 특성 분석
-        feats = compute_window_features(power, util, sample_hz=float(cand["sample_hz"]))
+        # 2단계: 특성 분석 (v1+v2 병합)
+        sample_hz = float(cand["sample_hz"]) if "sample_hz" in cand and pd.notna(cand.get("sample_hz")) else float(
+            infer_sample_hz(group)
+        )
+        feats = merge_window_features(
+            power,
+            util,
+            sample_hz=sample_hz,
+            tdp_w=tdp_w,
+            nvml_avg_window_s=nvml_avg_window_s,
+        )
         desc = features_to_description(feats, baseline_mean_w=baseline)
         z_like_score = float(cand.get("z_score", cand.get("u_score", 0.0)))
 
@@ -286,6 +346,11 @@ def run(args):
         ):
             if c in w.columns:
                 context[c] = str(w[c].iloc[0])
+        declared_context = {
+            "job_type": context.get("declared_job_type"),
+            "job_family": context.get("declared_job_family"),
+            "user": context.get("declared_user"),
+        }
         # 3단계: RAG + LLM
         context_query = context_to_query(context) if getattr(args, "query_context", "off") == "declared" else ""
         query = f"{desc} {context_query}".strip()
@@ -338,7 +403,12 @@ def run(args):
             "swing_ratio": round(float(cand["swing_ratio"]), 3),
             "z_score": round(z_like_score, 3),
             "candidate_reasons": str(cand["candidate_reasons"]).split(","),
-            "features": {k: round(float(v), 5) for k, v in feats.items()},
+            "features": _serialize_features(feats),
+            "features_version": "v1+v2",
+            "declared_context": declared_context,
+            "declared_job_type": declared_context.get("job_type"),
+            "declared_job_family": declared_context.get("job_family"),
+            "declared_user": declared_context.get("user"),
             "description": desc,
             "rag_top": [(n, round(s, 3)) for n, s, _ in retrieved],
             "rag_filter_excluded": {

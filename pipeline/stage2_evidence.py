@@ -22,17 +22,25 @@ def build_evidence_bundle(row: dict) -> dict:
             "dominant_freq_hz": row.get("physics_dominant_freq_hz"),
             "note": row.get("physics_failure_reason") or "event-triggered public test-system replay",
         }
+
+    features = dict(row.get("features") or {})
     raw_evidence = row.get("evidence_bool") or row.get("evidence", {})
+    # Prefer merged features + row fields so v2 keys reach to_bool_evidence.
+    merged_for_bool = {**features, **row}
     if raw_evidence and not all(isinstance(v, bool) for v in raw_evidence.values() if v is not None):
-        bool_evidence = to_bool_evidence({**row, **dict(raw_evidence)})
+        bool_evidence = to_bool_evidence({**merged_for_bool, **dict(raw_evidence)})
+    elif raw_evidence and all(isinstance(v, bool) for v in raw_evidence.values() if v is not None):
+        bool_evidence = dict(raw_evidence)
     else:
-        bool_evidence = dict(raw_evidence) if raw_evidence else to_bool_evidence(row)
+        bool_evidence = to_bool_evidence(merged_for_bool)
+
+    declared = row.get("declared_context") if isinstance(row.get("declared_context"), dict) else {}
     bundle = {
         "window_id": row.get("window_id"),
         "declared_context": {
-            "job_type": row.get("declared_job_type"),
-            "job_family": row.get("declared_job_family"),
-            "user": row.get("declared_user"),
+            "job_type": declared.get("job_type", row.get("declared_job_type")),
+            "job_family": declared.get("job_family", row.get("declared_job_family")),
+            "user": declared.get("user", row.get("declared_user")),
         },
         "impact": {
             "level": row.get("impact_level"),
