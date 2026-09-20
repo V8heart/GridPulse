@@ -10,7 +10,11 @@ import pandas as pd
 from pipeline.baseline import CohortBaseline, FEATURES_V2
 from pipeline.changepoint import cusum_changepoints
 from pipeline.context_evidence import explained_changepoints, period_match, read_progress_log, step_period_from_log
-from pipeline.evidence_vocab import to_bool_evidence
+from pipeline.evidence_vocab import (
+    BUILD_DEFERRED_BOOL_KEYS,
+    strip_recompute_bools,
+    to_bool_evidence,
+)
 from pipeline.features import compute_window_features_v2
 
 DEFAULT_CONFIG = {
@@ -18,13 +22,13 @@ DEFAULT_CONFIG = {
     "alpha_high_impact": 0.10,
     "tdp_w": 450.0,
     "nvml_avg_window_s": 1.0,
-    "tau_peak": 8.0,
+    "tau_peak": 4.0,
     "tau_sync": 0.8,
     "evidence_weights": {
         "period_mismatch": 1.0,
         "unexplained_changepoint": 0.8,
-        "cross_job_sync": 1.0,
-        "progress_log_missing": 0.25,
+        "cross_job_sync": 0.0,
+        "progress_log_missing": 0.4,
         "sustained_high_load": 1.0,
         "flat_power": 0.8,
         "high_ramp": 0.8,
@@ -32,6 +36,11 @@ DEFAULT_CONFIG = {
         "declared_family_mismatch": 1.0,
     },
     "evidence_thresholds": {},
+    "evidence_gate": {
+        "prune_auc_min": 0.60,
+        "activate_attack_rate_min": 0.20,
+        "activate_rate_ratio_min": 2.0,
+    },
     "grid_weights": {"0.05_0.1": 0.5, "0.1_0.7": 1.0, "0.7_2": 0.7, "2_nyq": 0.2},
 }
 
@@ -97,10 +106,12 @@ def score_window(row: dict, baseline: CohortBaseline, calibration: dict, config:
     raw_evidence = dict(row.get("evidence", {}))
     family_stats = baseline.declared_family_mismatch_stats(row)
     raw_evidence.update({k: v for k, v in family_stats.items() if v is not None})
-    bool_evidence = to_bool_evidence({**row, **raw_evidence}, config)
+    # Drop sticky bools so threshold/baseline evidence always recomputes.
+    merged = strip_recompute_bools({**row, **raw_evidence})
+    bool_evidence = to_bool_evidence(merged, config)
     weights = config.get("evidence_weights", {})
     evidence_score = 0.0
-    for key in (
+    scored_keys = [
         "period_mismatch",
         "unexplained_changepoint",
         "cross_job_sync",
@@ -110,11 +121,22 @@ def score_window(row: dict, baseline: CohortBaseline, calibration: dict, config:
         "high_ramp",
         "util_power_decoupled",
         "declared_family_mismatch",
-    ):
-        if bool_evidence.get(key):
-            if key == "progress_log_missing" and row.get("declared_job_family") != "training":
+    ]
+    other_active = any(
+        bool_evidence.get(k) and float(weights.get(k, 0.0)) > 0
+        for k in scored_keys
+        if k != "progress_log_missing"
+    )
+    for key in scored_keys:
+        if not bool_evidence.get(key):
+            continue
+        if float(weights.get(key, 0.0)) <= 0:
+            continue
+        if key == "progress_log_missing":
+            # Keep training-family gate; require co-fire with another active evidence.
+            if row.get("declared_job_family") != "training" or not other_active:
                 continue
-            evidence_score += float(weights.get(key, 0.5))
+        evidence_score += float(weights.get(key, 0.5))
     u_score = max(z_values.values(), default=0.0) + evidence_score
     p_value = conformal_pvalue(u_score, calibration.get("normal_u_scores", []))
     comps = impact_components(row, config)
@@ -172,7 +194,7 @@ def build_windows(
             explained = explained_changepoints([t0 + cp for cp in cps], events)
             raw_evidence = {
                 "period_match": matched,
-                "period_mismatch": matched is False and flat.get("dominant_peak_prominence", 0.0) >= config.get("tau_peak", 8.0),
+                # period_mismatch deferred: needs strong_peak after correct tau (SCORE_RECOMPUTE).
                 "step_period_s": step_period,
                 "step_count": n_steps,
                 "step_period_cv": step_cv,
@@ -182,6 +204,10 @@ def build_windows(
                 "progress_log_missing": not bool(events),
                 "cross_job_sync_index": flat.get("cross_job_sync_index", 0.0),
                 "dominant_peak_prominence": flat.get("dominant_peak_prominence", 0.0),
+                "dominant_peak_prominence_log": flat.get(
+                    "dominant_peak_prominence_log",
+                    float(np.log10(1.0 + max(float(flat.get("dominant_peak_prominence", 0.0) or 0.0), 0.0))),
+                ),
                 "high_load_fraction": flat.get("high_load_fraction", 0.0),
                 "longest_high_seconds": flat.get("longest_high_seconds", 0.0),
                 "swing_abs_w": flat.get("swing_abs_w", 0.0),
@@ -190,6 +216,7 @@ def build_windows(
                 "util_residual_mad_w": flat.get("util_residual_mad_w", 0.0),
             }
             bool_evidence = to_bool_evidence(raw_evidence, config)
+            bool_evidence = {k: v for k, v in bool_evidence.items() if k not in BUILD_DEFERRED_BOOL_KEYS}
             flat.update({
                 "session_id": str(session_id),
                 "gpu_id": int(gpu_id),

@@ -1,8 +1,14 @@
 {
   "fit_split": "train+cal",
+  "evidence_gate": {
+    "prune_auc_min": 0.6,
+    "activate_attack_rate_min": 0.2,
+    "activate_rate_ratio_min": 2.0
+  },
   "n_windows": 2058,
   "n_normal_windows": 1176,
   "n_attack_windows": 882,
+  "swma_attack_share": 0.7777777777777778,
   "class_stats": [
     {
       "label": "cryptojacking",
@@ -94,16 +100,22 @@
       "feature": "high_load_fraction",
       "normal_q50": 0.45,
       "normal_q95": 1.0,
-      "auc_overall": 0.5577185239175035,
+      "best_class": "cryptojacking",
+      "best_auc": 0.9523809523809523,
+      "best_auc_dir": 0.9523809523809523,
+      "direction": "higher_is_attack",
       "nunique": 276,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "sustained_high_load"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 1.0,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.9523809523809523,
+          "auc_dir": 0.9523809523809523,
           "verdict": "ok"
         },
         "ltma": {
@@ -111,6 +123,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.20237661391087047,
+          "auc_dir": 0.7976233860891295,
           "verdict": "ok"
         },
         "swma": {
@@ -118,6 +131,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.5521013069951013,
+          "auc_dir": 0.5521013069951013,
           "verdict": "ok"
         }
       }
@@ -126,16 +140,22 @@
       "feature": "longest_high_seconds",
       "normal_q50": 3.3,
       "normal_q95": 30.0,
-      "auc_overall": 0.41661460502568376,
+      "best_class": "cryptojacking",
+      "best_auc": 0.9523809523809523,
+      "best_auc_dir": 0.9523809523809523,
+      "direction": "higher_is_attack",
       "nunique": 147,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "sustained_high_load"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 30.0,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.9523809523809523,
+          "auc_dir": 0.9523809523809523,
           "verdict": "ok"
         },
         "ltma": {
@@ -143,6 +163,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.2318348257670415,
+          "auc_dir": 0.7681651742329585,
           "verdict": "ok"
         },
         "swma": {
@@ -150,6 +171,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.36647366672616566,
+          "auc_dir": 0.6335263332738343,
           "verdict": "ok"
         }
       }
@@ -158,16 +180,22 @@
       "feature": "swing_abs_w",
       "normal_q50": 136.55442285724698,
       "normal_q95": 307.4428727032688,
-      "auc_overall": 0.5179516250944822,
+      "best_class": "cryptojacking",
+      "best_auc": 0.06274295432458697,
+      "best_auc_dir": 0.937257045675413,
+      "direction": "lower_is_attack",
       "nunique": 1999,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "flat_power"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 3.8814727827593742,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.06274295432458697,
+          "auc_dir": 0.937257045675413,
           "verdict": "ok"
         },
         "ltma": {
@@ -175,6 +203,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.5358791475773983,
+          "auc_dir": 0.5358791475773983,
           "verdict": "ok"
         },
         "swma": {
@@ -182,6 +211,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.5804203605640507,
+          "auc_dir": 0.5804203605640507,
           "verdict": "ok"
         }
       }
@@ -190,16 +220,22 @@
       "feature": "mean_w",
       "normal_q50": 182.91977214726163,
       "normal_q95": 413.0546933756743,
-      "auc_overall": 0.4656007527727644,
+      "best_class": "ltma",
+      "best_auc": 0.07853498542274052,
+      "best_auc_dir": 0.9214650145772595,
+      "direction": "lower_is_attack",
       "nunique": 2002,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "flat_power"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 285.0878733172219,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.6776516729140636,
+          "auc_dir": 0.6776516729140636,
           "verdict": "ok"
         },
         "ltma": {
@@ -207,6 +243,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.07853498542274052,
+          "auc_dir": 0.9214650145772595,
           "verdict": "ok"
         },
         "swma": {
@@ -214,6 +251,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.4906028738025823,
+          "auc_dir": 0.5093971261974177,
           "verdict": "ok"
         }
       }
@@ -222,16 +260,23 @@
       "feature": "ramp_p95_w_per_s",
       "normal_q50": 141.10039737344158,
       "normal_q95": 330.77933735782045,
-      "auc_overall": 0.5730608002838323,
+      "best_class": "cryptojacking",
+      "best_auc": 0.027453838678328474,
+      "best_auc_dir": 0.9725461613216715,
+      "direction": "lower_is_attack",
       "nunique": 1956,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "flat_power",
+        "high_ramp"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 3.79206981461408,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.027453838678328474,
+          "auc_dir": 0.9725461613216715,
           "verdict": "ok"
         },
         "ltma": {
@@ -239,6 +284,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.3773514507843954,
+          "auc_dir": 0.6226485492156046,
           "verdict": "ok"
         },
         "swma": {
@@ -246,6 +292,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.678963130441681,
+          "auc_dir": 0.678963130441681,
           "verdict": "ok"
         }
       }
@@ -254,16 +301,22 @@
       "feature": "util_residual_mad_w",
       "normal_q50": 1.9312288914827818,
       "normal_q95": 6.8192332869201735,
-      "auc_overall": 0.2716441451864192,
+      "best_class": "ltma",
+      "best_auc": 0.9999652922393447,
+      "best_auc_dir": 0.9999652922393447,
+      "direction": "higher_is_attack",
       "nunique": 1921,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "util_power_decoupled"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 0.7843751380254105,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.2431452172705817,
+          "auc_dir": 0.7568547827294183,
           "verdict": "ok"
         },
         "ltma": {
@@ -271,6 +324,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.9999652922393447,
+          "auc_dir": 0.9999652922393447,
           "verdict": "ok"
         },
         "swma": {
@@ -278,38 +332,47 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.17166954245254953,
+          "auc_dir": 0.8283304575474505,
           "verdict": "ok"
         }
       }
     },
     {
-      "feature": "dominant_peak_prominence",
-      "normal_q50": 64307.13829747442,
-      "normal_q95": 485074.03553837846,
-      "auc_overall": 0.5550628981751431,
+      "feature": "dominant_peak_prominence_log",
+      "normal_q50": 4.808265704145494,
+      "normal_q95": 5.685808161764369,
+      "best_class": "ltma",
+      "best_auc": 0.7438306955435235,
+      "best_auc_dir": 0.7438306955435235,
+      "direction": "higher_is_attack",
       "nunique": 2002,
-      "decision": "disable_auc_lt_0.6",
-      "deferred_classes": [],
+      "decision": "keep",
+      "maps_to_evidence": [
+        "strong_peak"
+      ],
       "by_class": {
         "cryptojacking": {
-          "q50": 71710.6845848275,
+          "q50": 4.855587488725034,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.5215188116062751,
+          "auc_dir": 0.5215188116062751,
           "verdict": "ok"
         },
         "ltma": {
-          "q50": 156327.6962778925,
+          "q50": 5.194034494538261,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.7438306955435235,
+          "auc_dir": 0.7438306955435235,
           "verdict": "ok"
         },
         "swma": {
-          "q50": 58848.5789684334,
+          "q50": 4.769736379870804,
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.5328880823466413,
+          "auc_dir": 0.5328880823466413,
           "verdict": "ok"
         }
       }
@@ -318,31 +381,39 @@
       "feature": "cross_job_sync_index",
       "normal_q50": 0.0,
       "normal_q95": 0.0,
-      "auc_overall": null,
+      "best_class": null,
+      "best_auc": null,
+      "best_auc_dir": null,
+      "direction": null,
       "nunique": 1,
       "decision": "exclude_constant",
-      "deferred_classes": [],
+      "maps_to_evidence": [
+        "cross_job_sync"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 0.0,
           "n_sessions": 14,
           "n_windows": 98,
+          "verdict": "constant",
           "auc": null,
-          "verdict": "ok"
+          "auc_dir": null
         },
         "ltma": {
           "q50": 0.0,
           "n_sessions": 14,
           "n_windows": 98,
+          "verdict": "constant",
           "auc": null,
-          "verdict": "ok"
+          "auc_dir": null
         },
         "swma": {
           "q50": 0.0,
           "n_sessions": 84,
           "n_windows": 686,
+          "verdict": "constant",
           "auc": null,
-          "verdict": "ok"
+          "auc_dir": null
         }
       }
     },
@@ -350,16 +421,22 @@
       "feature": "declared_family_mean_abs_z",
       "normal_q50": 0.8187566796720384,
       "normal_q95": 2.509415901064057,
-      "auc_overall": 0.8967559813040863,
+      "best_class": "ltma",
+      "best_auc": 0.9290573372206026,
+      "best_auc_dir": 0.9290573372206026,
+      "direction": "higher_is_attack",
       "nunique": 2002,
       "decision": "keep",
-      "deferred_classes": [],
+      "maps_to_evidence": [
+        "declared_family_mismatch"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 1.3664429415025432,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.779701166180758,
+          "auc_dir": 0.779701166180758,
           "verdict": "ok"
         },
         "ltma": {
@@ -367,6 +444,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.9290573372206026,
+          "auc_dir": 0.9290573372206026,
           "verdict": "ok"
         },
         "swma": {
@@ -374,6 +452,7 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.9088636183336308,
+          "auc_dir": 0.9088636183336308,
           "verdict": "ok"
         }
       }
@@ -382,16 +461,22 @@
       "feature": "best_other_family_mean_abs_z",
       "normal_q50": 1.2277532071690502,
       "normal_q95": 3.517267981994097,
-      "auc_overall": 0.7219802320020979,
+      "best_class": "swma",
+      "best_auc": 0.7481691656254339,
+      "best_auc_dir": 0.7481691656254339,
+      "direction": "higher_is_attack",
       "nunique": 2002,
       "decision": "keep",
-      "deferred_classes": [],
+      "maps_to_evidence": [
+        "declared_family_mismatch"
+      ],
       "by_class": {
         "cryptojacking": {
           "q50": 1.4471908356194936,
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.5222303206997084,
+          "auc_dir": 0.5222303206997084,
           "verdict": "ok"
         },
         "ltma": {
@@ -399,6 +484,7 @@
           "n_sessions": 14,
           "n_windows": 98,
           "auc": 0.7384076079411357,
+          "auc_dir": 0.7384076079411357,
           "verdict": "ok"
         },
         "swma": {
@@ -406,22 +492,23 @@
           "n_sessions": 84,
           "n_windows": 686,
           "auc": 0.7481691656254339,
+          "auc_dir": 0.7481691656254339,
           "verdict": "ok"
         }
       }
     }
   ],
   "decisions": {
-    "high_load_fraction": "disable_auc_lt_0.6",
-    "longest_high_seconds": "disable_auc_lt_0.6",
-    "swing_abs_w": "disable_auc_lt_0.6",
-    "mean_w": "disable_auc_lt_0.6",
-    "ramp_p95_w_per_s": "disable_auc_lt_0.6",
-    "util_residual_mad_w": "disable_auc_lt_0.6",
-    "dominant_peak_prominence": "disable_auc_lt_0.6",
+    "high_load_fraction": "keep",
+    "longest_high_seconds": "keep",
+    "swing_abs_w": "keep",
+    "mean_w": "keep",
+    "ramp_p95_w_per_s": "keep",
+    "util_residual_mad_w": "keep",
+    "dominant_peak_prominence_log": "keep",
     "cross_job_sync_index": "exclude_constant",
     "declared_family_mean_abs_z": "keep",
     "best_other_family_mean_abs_z": "keep"
   },
-  "note": "AUC on small session counts is unstable; classes with <3 sessions are deferred."
+  "note": "Stage-1 prune uses class-wise max(auc,1-auc) vs evidence_gate.prune_auc_min (operating point)."
 }

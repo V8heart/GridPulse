@@ -217,6 +217,7 @@ def compute_window_features_v2(
         **base,
         "dominant_freq_hz": dominant_freq_hz,
         "dominant_peak_prominence": dominant_peak_prominence,
+        "dominant_peak_prominence_log": float(np.log10(1.0 + max(dominant_peak_prominence, 0.0))),
         "spectral_entropy": spectral_entropy,
         "band_power_w2": band_power,
         "band_frac": band_frac,

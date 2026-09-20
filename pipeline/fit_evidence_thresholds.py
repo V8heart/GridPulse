@@ -12,19 +12,19 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.evidence_vocab import merge_thresholds
+from pipeline.evidence_vocab import merge_thresholds, prominence_log
 from pipeline.stage1_v2 import build_windows, load_config
 
 
 def _update_yaml_thresholds(config_path: Path, thresholds: dict) -> None:
-    text = config_path.read_text(encoding="utf-8")
     try:
         import yaml
     except ImportError:
         return
-    data = yaml.safe_load(text) or {}
+    data = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     data["evidence_thresholds"] = thresholds
-    # Preserve comments poorly — rewrite structured yaml
+    if "tau_peak" in thresholds:
+        data["tau_peak"] = thresholds["tau_peak"]
     config_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
@@ -55,30 +55,35 @@ def fit_thresholds(
     if normals.empty:
         raise ValueError("no normal windows in train/cal for evidence threshold fitting")
 
-    # Target: ~5% normal firing at q95 (or q20 for upper-bound flat swing). No hardcoded floors.
     swing = normals["swing_abs_w"].dropna() if "swing_abs_w" in normals else pd.Series(dtype=float)
     mean_w = normals["mean_w"].dropna() if "mean_w" in normals else pd.Series(dtype=float)
     high_frac = normals["high_load_fraction"].dropna() if "high_load_fraction" in normals else pd.Series(dtype=float)
     longest = normals["longest_high_seconds"].dropna() if "longest_high_seconds" in normals else pd.Series(dtype=float)
     ramp = normals["ramp_p95_w_per_s"].dropna() if "ramp_p95_w_per_s" in normals else pd.Series(dtype=float)
     util_mad = normals["util_residual_mad_w"].dropna() if "util_residual_mad_w" in normals else pd.Series(dtype=float)
+    if "dominant_peak_prominence_log" in normals:
+        peak_log = normals["dominant_peak_prominence_log"].dropna()
+    else:
+        peak_log = normals["dominant_peak_prominence"].dropna().map(prominence_log) if "dominant_peak_prominence" in normals else pd.Series(dtype=float)
 
     fitted = merge_thresholds(config)
+    if len(peak_log):
+        fitted["tau_peak"] = float(peak_log.quantile(0.95))
     if len(high_frac):
         fitted["sustained_high_load"]["high_load_fraction_min"] = float(high_frac.quantile(0.95))
     if len(longest):
         fitted["sustained_high_load"]["longest_high_seconds_min"] = float(longest.quantile(0.95))
     if len(swing):
-        # flat = low swing: upper bound at normal q20
         fitted["flat_power"]["swing_abs_w_max"] = float(swing.quantile(0.20))
+    if len(ramp):
+        # flat: low ramp upper bound at normal q20; high_ramp lower bound at normal q95
+        fitted["flat_power"]["ramp_p95_w_per_s_max"] = float(ramp.quantile(0.20))
+        fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(ramp.quantile(0.95))
     if len(mean_w):
         fitted["flat_power"]["mean_w_min"] = float(mean_w.quantile(0.80))
-    if len(ramp):
-        fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(ramp.quantile(0.95))
     if len(util_mad):
         fitted["util_power_decoupled"]["util_residual_mad_w_min"] = float(util_mad.quantile(0.95))
 
-    # Family mismatch: fit declared z threshold on train+cal normals (no floor).
     from pipeline.baseline import CohortBaseline
 
     baseline_path = ROOT / "dataset/eval/cohort_baseline_v2.json"
@@ -107,7 +112,10 @@ def fit_thresholds(
         "n_normal_windows": int(len(normals)),
         "n_sessions": len(fit_sessions),
         "evidence_thresholds": fitted,
-        "note": "Quantile-only fit on train/cal normals; hardcoded floors removed. Test not used.",
+        "note": (
+            "Quantile-only fit on train/cal normals; no floors. "
+            "tau_peak fitted on log10(1+prominence). flat_power uses swing AND ramp upper + mean lower."
+        ),
     }
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

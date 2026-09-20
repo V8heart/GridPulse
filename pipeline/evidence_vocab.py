@@ -1,6 +1,7 @@
 """Single source of truth for Stage1/Stage2 evidence names."""
 from __future__ import annotations
 
+import math
 from typing import Any
 
 # Bool names allowed in corpus checklists and Stage2 matched_evidence.
@@ -36,10 +37,44 @@ FORBIDDEN_EVIDENCE_NAMES: frozenset[str] = frozenset(
     }
 )
 
+# Do not store these as bools in build_windows (need baseline and/or post-tau recompute).
+BUILD_DEFERRED_BOOL_KEYS: frozenset[str] = frozenset(
+    {
+        "declared_family_mismatch",
+        "period_mismatch",
+    }
+)
+
+# Strip before to_bool_evidence in score_window so threshold/baseline bools always recompute.
+SCORE_RECOMPUTE_BOOL_KEYS: frozenset[str] = frozenset(
+    {
+        "declared_family_mismatch",
+        "period_mismatch",
+        "strong_peak",
+        "sustained_high_load",
+        "flat_power",
+        "high_ramp",
+        "util_power_decoupled",
+        "cross_job_sync",
+    }
+)
+
+# Stop-gate: threshold-based evidence (not progress/period alone).
+THRESHOLD_BASED_EVIDENCE: frozenset[str] = frozenset(
+    {
+        "strong_peak",
+        "sustained_high_load",
+        "flat_power",
+        "high_ramp",
+        "util_power_decoupled",
+        "declared_family_mismatch",
+    }
+)
+
 DEFAULT_EVIDENCE_THRESHOLDS: dict[str, Any] = {
     # Fallback only when config/stage1_v2.yaml is missing keys.
-    # Authoritative values live in yaml (fitted on train/cal normals, no floors).
-    "tau_peak": 8.0,
+    # tau_peak applies to log10(1 + dominant_peak_prominence).
+    "tau_peak": 4.0,
     "tau_sync": 0.8,
     "sustained_high_load": {
         "high_load_fraction_min": 0.85,
@@ -47,6 +82,7 @@ DEFAULT_EVIDENCE_THRESHOLDS: dict[str, Any] = {
     },
     "flat_power": {
         "swing_abs_w_max": 40.0,
+        "ramp_p95_w_per_s_max": 50.0,
         "mean_w_min": 250.0,
     },
     "high_ramp": {
@@ -60,6 +96,16 @@ DEFAULT_EVIDENCE_THRESHOLDS: dict[str, Any] = {
         "other_family_margin": 0.5,
     },
 }
+
+DEFAULT_EVIDENCE_GATE: dict[str, float] = {
+    "prune_auc_min": 0.60,
+    "activate_attack_rate_min": 0.20,
+    "activate_rate_ratio_min": 2.0,
+}
+
+
+def prominence_log(raw_prominence: float) -> float:
+    return float(math.log10(1.0 + max(float(raw_prominence), 0.0)))
 
 
 def merge_thresholds(config: dict | None = None) -> dict[str, Any]:
@@ -80,6 +126,16 @@ def merge_thresholds(config: dict | None = None) -> dict[str, Any]:
     return out
 
 
+def merge_evidence_gate(config: dict | None = None) -> dict[str, float]:
+    out = dict(DEFAULT_EVIDENCE_GATE)
+    if not config:
+        return out
+    nested = config.get("evidence_gate") or {}
+    for key, value in nested.items():
+        out[key] = float(value)
+    return out
+
+
 def json_deepcopy(value: Any) -> Any:
     if isinstance(value, dict):
         return {k: json_deepcopy(v) for k, v in value.items()}
@@ -88,10 +144,25 @@ def json_deepcopy(value: Any) -> Any:
     return value
 
 
+def strip_recompute_bools(raw: dict) -> dict:
+    """Drop sticky bools so to_bool_evidence recomputes from primitives."""
+    return {k: v for k, v in raw.items() if k not in SCORE_RECOMPUTE_BOOL_KEYS}
+
+
 def to_bool_evidence(raw: dict, config: dict | None = None) -> dict[str, bool]:
-    """Convert Stage1 raw evidence/features into checklist bools."""
+    """Convert Stage1 raw evidence/features into checklist bools.
+
+    Sticky bool short-circuit for SCORE_RECOMPUTE_BOOL_KEYS is intentionally removed:
+    callers (score_window) must strip those keys first; build_windows must not store
+    BUILD_DEFERRED_BOOL_KEYS.
+    """
     thr = merge_thresholds(config)
-    peak = float(raw.get("dominant_peak_prominence", raw.get("strong_peak_score", 0.0)) or 0.0)
+    raw_peak = float(raw.get("dominant_peak_prominence", raw.get("strong_peak_score", 0.0)) or 0.0)
+    if "dominant_peak_prominence_log" in raw and raw.get("dominant_peak_prominence_log") is not None:
+        peak_log = float(raw["dominant_peak_prominence_log"])
+    else:
+        peak_log = prominence_log(raw_peak)
+
     period_match = raw.get("period_match")
     if period_match is not None and not isinstance(period_match, bool):
         period_match = bool(period_match)
@@ -122,19 +193,26 @@ def to_bool_evidence(raw: dict, config: dict | None = None) -> dict[str, bool]:
     tau_peak = float(thr["tau_peak"])
     tau_sync = float(thr["tau_sync"])
 
-    strong_peak = peak >= tau_peak
-    period_mismatch = bool(raw.get("period_mismatch")) if "period_mismatch" in raw else (
-        period_match is False and strong_peak
+    strong_peak = peak_log >= tau_peak
+    # Always derive period_mismatch (no sticky bool).
+    period_mismatch = period_match is False and strong_peak
+
+    declared_z = float(raw.get("declared_family_mean_abs_z", 0.0) or 0.0)
+    best_other = float(raw.get("best_other_family_mean_abs_z", 1e9) or 1e9)
+    family_mismatch = (
+        declared_z >= float(mismatch_thr["declared_mean_abs_z_min"])
+        and best_other + float(mismatch_thr["other_family_margin"]) < declared_z
     )
 
-    if "declared_family_mismatch" in raw and isinstance(raw.get("declared_family_mismatch"), bool):
-        family_mismatch = bool(raw["declared_family_mismatch"])
+    ramp_max = flat.get("ramp_p95_w_per_s_max")
+    if ramp_max is None:
+        # Backward compat: if only swing+mean present, do not require ramp bound.
+        flat_ok = swing_abs <= float(flat["swing_abs_w_max"]) and mean_w >= float(flat["mean_w_min"])
     else:
-        declared_z = float(raw.get("declared_family_mean_abs_z", 0.0) or 0.0)
-        best_other = float(raw.get("best_other_family_mean_abs_z", 1e9) or 1e9)
-        family_mismatch = (
-            declared_z >= float(mismatch_thr["declared_mean_abs_z_min"])
-            and best_other + float(mismatch_thr["other_family_margin"]) < declared_z
+        flat_ok = (
+            swing_abs <= float(flat["swing_abs_w_max"])
+            and ramp_p95 <= float(ramp_max)
+            and mean_w >= float(flat["mean_w_min"])
         )
 
     return {
@@ -149,9 +227,7 @@ def to_bool_evidence(raw: dict, config: dict | None = None) -> dict[str, bool]:
             high_frac >= float(sh["high_load_fraction_min"])
             and longest_high >= float(sh["longest_high_seconds_min"])
         ),
-        "flat_power": (
-            swing_abs <= float(flat["swing_abs_w_max"]) and mean_w >= float(flat["mean_w_min"])
-        ),
+        "flat_power": flat_ok,
         "high_ramp": ramp_p95 >= float(ramp["ramp_p95_w_per_s_min"]),
         "util_power_decoupled": util_mad >= float(decoupled["util_residual_mad_w_min"]),
         "declared_family_mismatch": family_mismatch,

@@ -31,20 +31,50 @@ def test_to_bool_evidence_uses_thresholds():
         "longest_high_seconds": 20.0,
         "swing_abs_w": 10.0,
         "mean_w": 300.0,
-        "ramp_p95_w_per_s": 1200.0,
+        "ramp_p95_w_per_s": 5.0,
         "unexplained_changepoint_count": 2,
         "cross_job_sync_index": 0.9,
         "progress_log_missing": True,
         "progress_log_available": False,
         "period_match": False,
-        "dominant_peak_prominence": 10.0,
+        "dominant_peak_prominence_log": 5.0,
         "util_residual_mad_w": 40.0,
         "declared_family_mean_abs_z": 4.0,
         "best_other_family_mean_abs_z": 1.0,
     }
-    out = to_bool_evidence(raw, {"tau_peak": 8.0, "tau_sync": 0.8})
+    out = to_bool_evidence(
+        raw,
+        {
+            "tau_peak": 4.0,
+            "tau_sync": 0.8,
+            "evidence_thresholds": {
+                "flat_power": {
+                    "swing_abs_w_max": 40.0,
+                    "ramp_p95_w_per_s_max": 50.0,
+                    "mean_w_min": 250.0,
+                }
+            },
+        },
+    )
     assert set(out) <= ALLOWED_EVIDENCE_NAMES
     assert out["util_power_decoupled"] is True
+    assert out["declared_family_mismatch"] is True
+    assert out["strong_peak"] is True
+    assert out["period_mismatch"] is True
+    assert out["flat_power"] is True
+
+
+def test_sticky_bool_does_not_block_family_mismatch():
+    from pipeline.evidence_vocab import strip_recompute_bools
+
+    raw = {
+        "declared_family_mismatch": False,  # stale sticky
+        "declared_family_mean_abs_z": 4.0,
+        "best_other_family_mean_abs_z": 1.0,
+        "period_match": True,
+        "dominant_peak_prominence_log": 1.0,
+    }
+    out = to_bool_evidence(strip_recompute_bools(raw), {"tau_peak": 4.0})
     assert out["declared_family_mismatch"] is True
 
 

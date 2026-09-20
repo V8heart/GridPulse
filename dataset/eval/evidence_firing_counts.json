@@ -80,15 +80,16 @@
   },
   "e1_n_windows": 2058,
   "e2_after_stage1_train_cal": {
-    "strong_peak": 2058,
     "unexplained_changepoint": 1452,
     "progress_log_missing": 980,
     "util_power_decoupled": 157,
+    "period_mismatch": 344,
+    "strong_peak": 354,
     "progress_log_available": 1078,
-    "flat_power": 111,
+    "declared_family_mismatch": 435,
     "period_match": 522,
     "sustained_high_load": 224,
-    "period_mismatch": 262,
+    "flat_power": 98,
     "high_ramp": 59
   },
   "e2_rates": {
@@ -98,13 +99,13 @@
       "attack_rate": 0.0
     },
     "declared_family_mismatch": {
-      "count": 0,
-      "normal_rate": 0.0,
-      "attack_rate": 0.0
+      "count": 435,
+      "normal_rate": 0.013605442176870748,
+      "attack_rate": 0.47505668934240364
     },
     "flat_power": {
-      "count": 111,
-      "normal_rate": 0.09438775510204081,
+      "count": 98,
+      "normal_rate": 0.08333333333333333,
       "attack_rate": 0.0
     },
     "high_ramp": {
@@ -118,9 +119,9 @@
       "attack_rate": 0.21428571428571427
     },
     "period_mismatch": {
-      "count": 262,
-      "normal_rate": 0.13350340136054423,
-      "attack_rate": 0.11904761904761904
+      "count": 344,
+      "normal_rate": 0.041666666666666664,
+      "attack_rate": 0.3344671201814059
     },
     "progress_log_available": {
       "count": 1078,
@@ -133,9 +134,9 @@
       "attack_rate": 0.6666666666666666
     },
     "strong_peak": {
-      "count": 2058,
-      "normal_rate": 1.0,
-      "attack_rate": 1.0
+      "count": 354,
+      "normal_rate": 0.050170068027210885,
+      "attack_rate": 0.3344671201814059
     },
     "sustained_high_load": {
       "count": 224,

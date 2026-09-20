@@ -3,36 +3,40 @@ alpha_high_impact: 0.2
 score_mode: max_plus_evidence
 tdp_w: 450.0
 nvml_avg_window_s: 1.0
-tau_peak: 8.0
+tau_peak: 5.685808161764369
 tau_sync: 0.8
 alpha_selection:
   selected_on: cal
   rule: cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller
     alpha
-  note: Chosen from {0.05,0.10,0.20} after cal u_score AUC report; test not used for
-    selection.
+  note: Chosen from {0.05,0.10,0.20} after cal u_score AUC; test not used.
   selected:
     alpha: 0.1
     cal_normal_candidate_rate: 0.09523809523809523
-    cal_attack_recall: 0.4126984126984127
+    cal_attack_recall: 0.4603174603174603
+evidence_gate:
+  prune_auc_min: 0.6
+  activate_attack_rate_min: 0.2
+  activate_rate_ratio_min: 2.0
 evidence_weights:
-  period_mismatch: 0.0
+  period_mismatch: 1.0
   unexplained_changepoint: 0.0
   cross_job_sync: 0.0
-  progress_log_missing: 0.25
-  sustained_high_load: 0.0
+  progress_log_missing: 0.4
+  sustained_high_load: 1.0
   flat_power: 0.0
   high_ramp: 0.0
-  util_power_decoupled: 0.0
-  declared_family_mismatch: 0.0
+  util_power_decoupled: 1.0
+  declared_family_mismatch: 1.0
 evidence_thresholds:
-  tau_peak: 8.0
+  tau_peak: 5.685808161764369
   tau_sync: 0.8
   sustained_high_load:
     high_load_fraction_min: 1.0
     longest_high_seconds_min: 30.0
   flat_power:
     swing_abs_w_max: 58.66561173417077
+    ramp_p95_w_per_s_max: 56.770004599061146
     mean_w_min: 313.4146364720961
   high_ramp:
     ramp_p95_w_per_s_min: 330.77933735782045
@@ -46,14 +50,3 @@ grid_weights:
   0.1_0.7: 1.0
   '0.7_2': 0.7
   2_nyq: 0.2
-evidence_notes:
-  flat_power: 'disabled: swing_abs_w and mean_w both AUC<0.6 on train+cal'
-  sustained_high_load: 'disabled: high_load_fraction and longest_high_seconds both
-    AUC<0.6'
-  cross_job_sync: 'disabled: cross_job_sync_index never computed (constant 0)'
-  period_mismatch: 'disabled: attack_rate=0.1190 <= normal_rate=0.1335 (no quantile
-    loosening)'
-  unexplained_changepoint: 'disabled: attack_rate=0.6315 <= normal_rate=0.7611 (no
-    quantile loosening)'
-  declared_family_mismatch: 'disabled: attack_rate=0.0000 <= normal_rate=0.0000 (no
-    quantile loosening)'

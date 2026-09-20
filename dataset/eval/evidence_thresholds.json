@@ -3,7 +3,7 @@
   "n_normal_windows": 1176,
   "n_sessions": 266,
   "evidence_thresholds": {
-    "tau_peak": 8.0,
+    "tau_peak": 5.685808161764369,
     "tau_sync": 0.8,
     "sustained_high_load": {
       "high_load_fraction_min": 1.0,
@@ -11,6 +11,7 @@
     },
     "flat_power": {
       "swing_abs_w_max": 58.66561173417077,
+      "ramp_p95_w_per_s_max": 56.770004599061146,
       "mean_w_min": 313.4146364720961
     },
     "high_ramp": {
@@ -24,5 +25,5 @@
       "other_family_margin": 0.5
     }
   },
-  "note": "Quantile-only fit on train/cal normals; hardcoded floors removed. Test not used."
+  "note": "Quantile-only fit on train/cal normals; no floors. tau_peak fitted on log10(1+prominence). flat_power uses swing AND ramp upper + mean lower."
 }

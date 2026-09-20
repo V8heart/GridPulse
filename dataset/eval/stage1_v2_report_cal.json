@@ -69,7 +69,7 @@
   "v2": {
     "windows": 588,
     "normal_candidate_rate": 0.09523809523809523,
-    "attack_recall": 0.4126984126984127,
+    "attack_recall": 0.45634920634920634,
     "grid_watch_rate": 0.0663265306122449,
     "by_label": {
       "cryptojacking": {
@@ -78,7 +78,7 @@
       },
       "ltma": {
         "windows": 28,
-        "candidate_rate": 0.2857142857142857
+        "candidate_rate": 0.39285714285714285
       },
       "normal_baseline": {
         "windows": 28,
@@ -126,7 +126,7 @@
       },
       "swma": {
         "windows": 196,
-        "candidate_rate": 0.41836734693877553
+        "candidate_rate": 0.45918367346938777
       }
     }
   },
@@ -134,7 +134,7 @@
     "full": {
       "windows": 588,
       "normal_candidate_rate": 0.09523809523809523,
-      "attack_recall": 0.4126984126984127,
+      "attack_recall": 0.45634920634920634,
       "grid_watch_rate": 0.0663265306122449,
       "by_label": {
         "cryptojacking": {
@@ -143,7 +143,7 @@
         },
         "ltma": {
           "windows": 28,
-          "candidate_rate": 0.2857142857142857
+          "candidate_rate": 0.39285714285714285
         },
         "normal_baseline": {
           "windows": 28,
@@ -191,14 +191,14 @@
         },
         "swma": {
           "windows": 196,
-          "candidate_rate": 0.41836734693877553
+          "candidate_rate": 0.45918367346938777
         }
       }
     },
     "no_progress_log": {
       "windows": 588,
       "normal_candidate_rate": 0.09523809523809523,
-      "attack_recall": 0.4126984126984127,
+      "attack_recall": 0.45634920634920634,
       "grid_watch_rate": 0.0663265306122449,
       "by_label": {
         "cryptojacking": {
@@ -207,7 +207,7 @@
         },
         "ltma": {
           "windows": 28,
-          "candidate_rate": 0.2857142857142857
+          "candidate_rate": 0.39285714285714285
         },
         "normal_baseline": {
           "windows": 28,
@@ -255,7 +255,7 @@
         },
         "swma": {
           "windows": 196,
-          "candidate_rate": 0.41836734693877553
+          "candidate_rate": 0.45918367346938777
         }
       }
     },
