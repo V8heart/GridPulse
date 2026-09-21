@@ -22,15 +22,20 @@ NORMAL_MODES = {
 }
 
 
-def commands(args, session_id: str) -> tuple[list[str], list[str], str, list[int], Path, str]:
+def commands(args, session_id: str) -> tuple[list[str], list[str], str, list[int], Path, str, Path | None, bool]:
+    progress_log: Path | None = None
+    native_progress = False
     if args.workload in NORMAL_MODES:
         label = NORMAL_MODES[args.workload]
+        native_progress = True
+        progress_log = ROOT / "dataset" / "real" / "steps" / f"{session_id}.jsonl"
         if args.workload == "distributed":
             gpu_ids = [0, 1]
             workload = [
                 "torchrun", "--standalone", "--nproc-per-node=2", "-m",
                 "workloads.normal_workloads", "--mode", "distributed",
                 "--max-seconds", str(args.duration),
+                "--progress-log", str(progress_log),
             ]
         else:
             gpu_ids = [args.gpu_id]
@@ -38,6 +43,7 @@ def commands(args, session_id: str) -> tuple[list[str], list[str], str, list[int
                 sys.executable, "-m", "workloads.normal_workloads",
                 "--mode", args.workload, "--gpu-id", str(args.gpu_id),
                 "--max-seconds", str(args.duration),
+                "--progress-log", str(progress_log),
             ]
     elif args.workload in ("swma", "swma_multi"):
         label = "swma"
@@ -58,9 +64,12 @@ def commands(args, session_id: str) -> tuple[list[str], list[str], str, list[int
             ]
     elif args.workload == "ltma":
         label, gpu_ids = "ltma", [args.gpu_id]
+        native_progress = True
+        progress_log = ROOT / "dataset" / "real" / "steps" / f"{session_id}.jsonl"
         workload = [
             sys.executable, "-m", "bit2watt_impl.ltma_inject",
             "--gpu-id", str(args.gpu_id), "--duration", str(args.duration),
+            "--progress-log", str(progress_log),
         ]
     elif args.workload == "cryptojacking":
         label, gpu_ids = "cryptojacking", [args.gpu_id]
@@ -91,7 +100,7 @@ def commands(args, session_id: str) -> tuple[list[str], list[str], str, list[int
         "--job-type", job_type,
         "--gres-req", gres_req,
     ]
-    return collector, workload, label, gpu_ids, output, job_type
+    return collector, workload, label, gpu_ids, output, job_type, progress_log, native_progress
 
 
 def write_session_metadata(
@@ -104,6 +113,8 @@ def write_session_metadata(
     workload_cmd: list[str],
     job_type: str,
     dry_run: bool,
+    progress_log_path: str | None,
+    native_progress_available: bool,
 ) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     metadata = {
@@ -115,6 +126,13 @@ def write_session_metadata(
         "collector": collector_cmd,
         "workload": workload_cmd,
         "dry_run": dry_run,
+        "progress_log_path": progress_log_path,
+        "native_progress_available": native_progress_available,
+        "progress_log_note": (
+            "Original progress log is preserved; evaluation masks are applied at read time only."
+            if native_progress_available
+            else "Workload has no native progress events."
+        ),
     }
     output.with_suffix(".session.json").write_text(
         json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -155,7 +173,16 @@ def main() -> None:
         parser.error("--pre-capture-s와 --post-capture-s는 음수일 수 없습니다.")
 
     session_id = args.session_id or f"real-{args.workload}-{uuid.uuid4().hex[:10]}"
-    collector_cmd, workload_cmd, label, gpu_ids, output, job_type = commands(args, session_id)
+    (
+        collector_cmd,
+        workload_cmd,
+        label,
+        gpu_ids,
+        output,
+        job_type,
+        progress_log,
+        native_progress,
+    ) = commands(args, session_id)
     summary = {
         "session_id": session_id,
         "label": label,
@@ -164,6 +191,8 @@ def main() -> None:
         "collector": collector_cmd,
         "workload": workload_cmd,
         "dry_run": args.dry_run,
+        "progress_log_path": str(progress_log) if progress_log else None,
+        "native_progress_available": native_progress,
     }
     if args.dry_run:
         print(json.dumps(summary, ensure_ascii=False, indent=2))
@@ -191,10 +220,11 @@ def main() -> None:
         workload_cmd=workload_cmd,
         job_type=job_type,
         dry_run=False,
+        progress_log_path=str(progress_log) if progress_log else None,
+        native_progress_available=native_progress,
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     main()
-

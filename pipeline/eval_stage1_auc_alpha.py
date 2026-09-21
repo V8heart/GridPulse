@@ -48,6 +48,14 @@ def run(
     config = load_config(config_path)
     baseline = CohortBaseline.load(baseline_model)
     calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+    if calibration.get("evidence_surprisal_weights"):
+        config = dict(config)
+        config["evidence_weights"] = {
+            **config.get("evidence_weights", {}),
+            **calibration["evidence_surprisal_weights"],
+        }
+    if calibration.get("evidence_thresholds"):
+        config["evidence_thresholds"] = calibration["evidence_thresholds"]
     windows = build_windows(cal, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config)
 
     scored = []

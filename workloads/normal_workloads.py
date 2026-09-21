@@ -49,6 +49,8 @@ def run(args) -> None:
     deadline = time.monotonic() + args.max_seconds
     step = 0
     events: list[dict] = []
+    t0_wall = time.time()
+    gpu_id = int(rank if distributed else args.gpu_id)
 
     while time.monotonic() < deadline:
         if args.mode == "hpo" and step and step % 25 == 0:
@@ -71,11 +73,35 @@ def run(args) -> None:
             with torch.no_grad():
                 model(x)
 
+        now = time.time()
+        rel_t = float(now - t0_wall)
+        if args.mode == "eval_train_switch" and not training and rank == 0 and step % 20 == 0:
+            events.append({
+                "t": rel_t,
+                "t_epoch": now,
+                "gpu_id": gpu_id,
+                "event": "eval_start",
+                "step": step,
+            })
         if args.mode == "checkpoint" and step and step % 30 == 0 and rank == 0:
             target_path = Path(args.checkpoint_dir) / "gridpulse-checkpoint.pt"
             target_path.parent.mkdir(parents=True, exist_ok=True)
             torch.save(model.state_dict(), target_path)
-            events.append({"step": step, "event": "checkpoint", "time": time.time()})
+            events.append({
+                "t": rel_t,
+                "t_epoch": now,
+                "gpu_id": gpu_id,
+                "event": "checkpoint_end",
+                "step": step,
+            })
+        if rank == 0 and step and step % 10 == 0:
+            events.append({
+                "t": rel_t,
+                "t_epoch": now,
+                "gpu_id": gpu_id,
+                "event": "step_end",
+                "step": step,
+            })
         step += 1
 
     torch.cuda.synchronize(device)
@@ -83,7 +109,20 @@ def run(args) -> None:
         dist.barrier()
         dist.destroy_process_group()
     if rank == 0:
-        print(json.dumps({"mode": args.mode, "steps": step, "events": events}, ensure_ascii=False))
+        if args.progress_log:
+            path = Path(args.progress_log)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                "\n".join(json.dumps(event, ensure_ascii=False) for event in events) + ("\n" if events else ""),
+                encoding="utf-8",
+            )
+        print(json.dumps({
+            "mode": args.mode,
+            "steps": step,
+            "events": events,
+            "native_progress_available": True,
+            "progress_log": args.progress_log,
+        }, ensure_ascii=False))
 
 
 def main() -> None:
@@ -99,9 +138,9 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--checkpoint-dir", default="/tmp/gridpulse-checkpoints")
+    parser.add_argument("--progress-log", default=None, help="JSONL progress log path (original; never deleted)")
     run(parser.parse_args())
 
 
 if __name__ == "__main__":
     main()
-

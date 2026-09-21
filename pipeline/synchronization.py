@@ -13,11 +13,20 @@ def align_gpu_series(
     *,
     value_col: str = "power_w",
     sample_hz: float | None = None,
+    t0: float | None = None,
+    t1: float | None = None,
 ) -> tuple[np.ndarray, dict[int, np.ndarray], float]:
-    """timestamp 공통 구간에 GPU별 시계열을 선형 보간한다."""
+    """timestamp 공통 구간에 GPU별 시계열을 선형 보간한다.
+
+    Optional ``t0``/``t1`` clip the overlap to a window. Callers must pass a
+    single-session DataFrame; cross-session alignment is forbidden.
+    """
     required = {"timestamp", "gpu_id", value_col}
     if not required.issubset(df.columns):
         raise ValueError(f"동기화 분석 필수 컬럼: {sorted(required)}")
+    if "session_id" in df.columns and df["session_id"].nunique(dropna=False) > 1:
+        raise ValueError("동기화 분석은 단일 session_id만 허용합니다 (교차 세션 정렬 금지).")
+
     groups = {
         int(gpu): group.sort_values("timestamp")
         for gpu, group in df.groupby("gpu_id")
@@ -28,6 +37,10 @@ def align_gpu_series(
     starts = [pd.to_numeric(g["timestamp"], errors="coerce").min() for g in groups.values()]
     ends = [pd.to_numeric(g["timestamp"], errors="coerce").max() for g in groups.values()]
     start, stop = max(starts), min(ends)
+    if t0 is not None:
+        start = max(start, float(t0))
+    if t1 is not None:
+        stop = min(stop, float(t1))
     if not np.isfinite(start) or not np.isfinite(stop) or stop <= start:
         raise ValueError("GPU 시계열의 공통 시간 구간이 없습니다.")
 
@@ -41,6 +54,8 @@ def align_gpu_series(
                 candidates.append(1.0 / np.median(delta))
         sample_hz = min(candidates) if candidates else 1.0
     timeline = np.arange(start, stop, 1.0 / sample_hz)
+    if len(timeline) < 16:
+        raise ValueError("공통 시간 구간 샘플이 16개 미만입니다.")
     aligned: dict[int, np.ndarray] = {}
     for gpu, group in groups.items():
         ts = pd.to_numeric(group["timestamp"], errors="coerce").to_numpy()
@@ -87,3 +102,57 @@ def synchronization_features(df: pd.DataFrame, value_col: str = "power_w") -> li
         })
     return results
 
+
+def session_window_sync_metrics(
+    session_df: pd.DataFrame,
+    t0: float,
+    t1: float,
+    *,
+    value_col: str = "power_w",
+    declared_job_col: str = "declared_job_type",
+) -> dict:
+    """Same-session window sync indices for all GPU pairs and cross-job pairs."""
+    empty = {
+        "multi_gpu_sync_index": 0.0,
+        "cross_job_sync_index": 0.0,
+        "sync_applicable": False,
+        "sync_lag_s": 0.0,
+        "sync_pair": None,
+        "cross_job_sync_pair": None,
+    }
+    if session_df["gpu_id"].nunique() < 2:
+        return empty
+    try:
+        _, aligned, hz = align_gpu_series(session_df, value_col=value_col, t0=t0, t1=t1)
+    except ValueError:
+        return empty
+
+    declared_by_gpu: dict[int, str] = {}
+    if declared_job_col in session_df.columns:
+        for gpu, group in session_df.groupby("gpu_id"):
+            declared_by_gpu[int(gpu)] = str(group[declared_job_col].iloc[0])
+
+    best_all = None
+    best_cross = None
+    for left, right in itertools.combinations(sorted(aligned), 2):
+        metrics = pair_synchronization(aligned[left], aligned[right], hz)
+        candidate = {
+            "gpu_pair": [left, right],
+            **metrics,
+        }
+        if best_all is None or candidate["synchronization_index"] > best_all["synchronization_index"]:
+            best_all = candidate
+        if declared_by_gpu.get(left) != declared_by_gpu.get(right):
+            if best_cross is None or candidate["synchronization_index"] > best_cross["synchronization_index"]:
+                best_cross = candidate
+
+    if best_all is None:
+        return empty
+    return {
+        "multi_gpu_sync_index": float(best_all["synchronization_index"]),
+        "cross_job_sync_index": float(best_cross["synchronization_index"]) if best_cross else 0.0,
+        "sync_applicable": True,
+        "sync_lag_s": float(best_all["lag_seconds"]),
+        "sync_pair": best_all["gpu_pair"],
+        "cross_job_sync_pair": best_cross["gpu_pair"] if best_cross else None,
+    }

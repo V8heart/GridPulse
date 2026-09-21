@@ -213,6 +213,74 @@ def stage1_screen_legacy(
 stage1_screen = stage1_screen_legacy
 
 
+def _stage1_window_summary(row: pd.Series) -> dict:
+    """Compact Stage-1 screening fields for all windows / grid_watch / candidates."""
+    impact = row.get("impact_components") or {}
+    if not isinstance(impact, dict):
+        impact = {}
+    impact_raw = None
+    if "impact_raw" in row and pd.notna(row.get("impact_raw")):
+        impact_raw = float(row["impact_raw"])
+    elif impact.get("impact_raw") is not None:
+        impact_raw = float(impact["impact_raw"])
+    return {
+        "window_id": f"{row.get('session_id')}|gpu{row.get('gpu_id')}|{row.get('start')}-{row.get('end')}",
+        "session_id": str(row.get("session_id")),
+        "gpu_id": int(row.get("gpu_id")) if pd.notna(row.get("gpu_id")) else None,
+        "window_start_s": float(row["window_start_s"]) if "window_start_s" in row and pd.notna(row.get("window_start_s")) else None,
+        "window_end_s": float(row["window_end_s"]) if "window_end_s" in row and pd.notna(row.get("window_end_s")) else None,
+        "declared_job_family": str(row.get("declared_job_family")) if row.get("declared_job_family") is not None else None,
+        "baseline_level": row.get("baseline_level"),
+        "u_score": float(row["u_score"]) if "u_score" in row and pd.notna(row.get("u_score")) else None,
+        "p_value": float(row["p_value"]) if "p_value" in row and pd.notna(row.get("p_value")) else None,
+        "impact_raw": impact_raw,
+        "impact_level": row.get("impact_level"),
+        "multi_gpu_sync_index": float(row["multi_gpu_sync_index"]) if "multi_gpu_sync_index" in row and pd.notna(row.get("multi_gpu_sync_index")) else None,
+        "cross_job_sync_index": float(row["cross_job_sync_index"]) if "cross_job_sync_index" in row and pd.notna(row.get("cross_job_sync_index")) else None,
+        "is_candidate": bool(row.get("is_candidate", False)),
+        "grid_watch": bool(row.get("grid_watch", False)),
+        "candidate_reasons": str(row.get("candidate_reasons") or ""),
+    }
+
+
+def _write_stage1_envelope(path: Path | None, wdf: pd.DataFrame, *, telemetry: str, stage1_version: str) -> dict:
+    if wdf is None or wdf.empty:
+        envelope = {
+            "stage1_version": stage1_version,
+            "telemetry": telemetry,
+            "all_windows": [],
+            "grid_watch": [],
+            "candidates": [],
+            "summary": {"n_windows": 0, "n_candidates": 0, "n_grid_watch": 0},
+        }
+    else:
+        all_windows = [_stage1_window_summary(row) for _, row in wdf.iterrows()]
+        candidates = [w for w in all_windows if w["is_candidate"]]
+        grid_watch = [w for w in all_windows if w["grid_watch"] and not w["is_candidate"]]
+        envelope = {
+            "stage1_version": stage1_version,
+            "telemetry": telemetry,
+            "all_windows": all_windows,
+            "grid_watch": grid_watch,
+            "candidates": candidates,
+            "summary": {
+                "n_windows": len(all_windows),
+                "n_candidates": len(candidates),
+                "n_grid_watch": len(grid_watch),
+            },
+        }
+    if path:
+        target = Path(path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(envelope, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(
+            f"Stage1 저장: {path} (windows={envelope['summary']['n_windows']}, "
+            f"candidates={envelope['summary']['n_candidates']}, "
+            f"grid_watch={envelope['summary']['n_grid_watch']})"
+        )
+    return envelope
+
+
 def run(args):
     df = pd.read_csv(args.telemetry)
     print(f"[입력] {args.telemetry}: {len(df)}행")
@@ -255,6 +323,15 @@ def run(args):
         baseline_model = CohortBaseline.load(getattr(args, "baseline_model", "dataset/eval/cohort_baseline_v2.json"))
         calibration_path = Path(getattr(args, "calibration", "dataset/eval/stage1_v2_calibration.json"))
         calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+        if calibration.get("evidence_surprisal_weights"):
+            config = dict(config)
+            config["evidence_weights"] = {
+                **config.get("evidence_weights", {}),
+                **calibration["evidence_surprisal_weights"],
+            }
+        if calibration.get("evidence_thresholds"):
+            config = dict(config)
+            config["evidence_thresholds"] = calibration["evidence_thresholds"]
         current = build_windows(
             df_infer,
             window_s=float(getattr(args, "window_s", 30.0)),
@@ -264,8 +341,8 @@ def run(args):
         )
         if not current.empty:
             scores = [score_window(row.to_dict(), baseline_model, calibration, config) for _, row in current.iterrows()]
-            for key in ("u_score", "p_value", "baseline_level", "impact_level", "grid_watch"):
-                current[key] = [item[key] for item in scores]
+            for key in ("u_score", "p_value", "baseline_level", "impact_level", "grid_watch", "impact_raw"):
+                current[key] = [item.get(key) for item in scores]
             current["is_candidate"] = [item["is_candidate"] for item in scores]
             current["candidate_reasons"] = [",".join(item["candidate_reasons"]) for item in scores]
             current["impact_components"] = [item["impact_components"] for item in scores]
@@ -303,8 +380,21 @@ def run(args):
     print(f"[1단계] 전체 {len(wdf)}개 윈도우 → 후보 {len(candidates)}개 "
           f"(다중 필터, z>{args.z_threshold})")
 
+    stage1_path = getattr(args, "stage1_out", None)
+    _write_stage1_envelope(
+        Path(stage1_path) if stage1_path else None,
+        wdf,
+        telemetry=str(args.telemetry),
+        stage1_version=stage1_mode,
+    )
+
     if len(candidates) == 0:
         print("의심 후보 없음. 정상으로 판단.")
+        if getattr(args, "out", None):
+            target = Path(args.out)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps([], ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"저장: {args.out}")
         return []
 
     # RAG 검색기 준비 (1회)
@@ -564,7 +654,12 @@ def main():
         default="kundur_ieeest",
         help="운영 모드 Physics 검증에 사용할 공개 테스트계통",
     )
-    ap.add_argument("--out", default=None)
+    ap.add_argument("--out", default=None, help="Stage2 후보 분석 결과 JSON (기존 계약)")
+    ap.add_argument(
+        "--stage1-out",
+        default=None,
+        help="Stage1 envelope JSON: all_windows / grid_watch / candidates / summary",
+    )
     args = ap.parse_args()
     run(args)
 

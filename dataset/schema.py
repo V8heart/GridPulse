@@ -123,6 +123,11 @@ class SessionManifest:
     split: str | None = None
     progress_log_path: str | None = None
     gt_variant: str | None = None
+    native_progress_available: bool | None = None
+    progress_log_masked: bool | None = None
+    progress_log_policy_version: str | None = None
+    progress_log_drop_prob: float | None = None
+    progress_log_policy_seed: int | None = None
 
 
 def normalize_frame(df: pd.DataFrame) -> pd.DataFrame:

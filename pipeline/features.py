@@ -171,6 +171,7 @@ def compute_window_features_v2(
     band_edges_hz: tuple[tuple[float, float], ...] = ((0.05, 0.1), (0.1, 0.7), (0.7, 2.0), (2.0, np.inf)),
     tdp_w: float = 450.0,
     nvml_avg_window_s: float | None = None,
+    util_min_range_pct: float = 5.0,
 ) -> dict:
     """AI datacenter oriented Stage-1 v2 features."""
     base = compute_window_features(power, util, sample_hz=sample_hz)
@@ -185,7 +186,7 @@ def compute_window_features_v2(
     freqs, psd = signal.welch(centered, fs=sample_hz, nperseg=nperseg)
     positive = freqs > 0
     freqs, psd = freqs[positive], psd[positive]
-    total_power = float(np.trapz(psd, freqs)) if len(freqs) else 0.0
+    total_power = float(np.trapezoid(psd, freqs)) if len(freqs) else 0.0
     band_power = {}
     band_frac = {}
     reliability = {}
@@ -193,7 +194,7 @@ def compute_window_features_v2(
         upper = min(hi, sample_hz / 2.0) if np.isfinite(hi) else sample_hz / 2.0
         mask = (freqs >= lo) & (freqs < upper)
         key = _band_key(lo, hi)
-        value = float(np.trapz(psd[mask], freqs[mask])) if np.any(mask) else 0.0
+        value = float(np.trapezoid(psd[mask], freqs[mask])) if np.any(mask) else 0.0
         band_power[key] = value
         band_frac[key] = value / total_power if total_power > 0 else 0.0
         center = (lo + upper) / 2.0 if upper > lo else lo
@@ -231,14 +232,30 @@ def compute_window_features_v2(
         u = np.asarray(util, dtype=float)
         mask = np.isfinite(u) & np.isfinite(np.asarray(power, dtype=float))
         if np.count_nonzero(mask) >= 3:
-            slope, intercept, _, _ = stats.theilslopes(np.asarray(power, dtype=float)[mask], u[mask])
-            residual = np.asarray(power, dtype=float)[mask] - (slope * u[mask] + intercept)
-            med = np.median(residual)
-            out.update({
-                "util_slope_w_per_pct": float(slope),
-                "util_intercept_w": float(intercept),
-                "util_residual_mad_w": float(np.median(np.abs(residual - med))),
-            })
+            u_valid = u[mask]
+            util_range_pct = float(np.nanmax(u_valid) - np.nanmin(u_valid))
+            out["util_range_pct"] = util_range_pct
+            min_range = float(util_min_range_pct) if util_min_range_pct is not None else 5.0
+            if util_range_pct < min_range:
+                # Slope estimate is unstable when util barely moves.
+                out["util_slope_w_per_pct"] = float("nan")
+                out["util_intercept_w"] = float("nan")
+                residual = np.asarray(power, dtype=float)[mask] - np.median(
+                    np.asarray(power, dtype=float)[mask]
+                )
+                med = np.median(residual)
+                out["util_residual_mad_w"] = float(np.median(np.abs(residual - med)))
+            else:
+                slope, intercept, _, _ = stats.theilslopes(
+                    np.asarray(power, dtype=float)[mask], u_valid
+                )
+                residual = np.asarray(power, dtype=float)[mask] - (slope * u_valid + intercept)
+                med = np.median(residual)
+                out.update({
+                    "util_slope_w_per_pct": float(slope),
+                    "util_intercept_w": float(intercept),
+                    "util_residual_mad_w": float(np.median(np.abs(residual - med))),
+                })
     return out
 
 

@@ -30,24 +30,53 @@ def _metrics(rows: list[dict]) -> dict:
             "windows": len(subset),
             "candidate_rate": sum(r["is_candidate"] for r in subset) / len(subset),
         }
+    by_family = {}
+    # Family breakdown from session-level field if available on scored rows.
+    families = sorted({str(r.get("declared_job_family", "unknown")) for r in rows if "declared_job_family" in r})
+    for family in families:
+        subset = [r for r in rows if str(r.get("declared_job_family", "unknown")) == family]
+        fam_normal = [r for r in subset if str(r["gt_label"]).startswith("normal")]
+        fam_attack = [r for r in subset if not str(r["gt_label"]).startswith("normal")]
+        by_family[family] = {
+            "windows": len(subset),
+            "normal_candidate_rate": (
+                sum(r["is_candidate"] for r in fam_normal) / len(fam_normal) if fam_normal else None
+            ),
+            "attack_recall": (
+                sum(r["is_candidate"] for r in fam_attack) / len(fam_attack) if fam_attack else None
+            ),
+        }
     return {
         "windows": len(rows),
         "normal_candidate_rate": sum(r["is_candidate"] for r in normal) / len(normal) if normal else None,
         "attack_recall": sum(r["is_candidate"] for r in attack) / len(attack) if attack else None,
         "grid_watch_rate": sum(r.get("grid_watch", False) for r in rows) / len(rows),
         "by_label": by_label,
+        "by_family": by_family,
     }
 
 
-def _score_rows(windows: pd.DataFrame, baseline: CohortBaseline, calibration: dict, config: dict) -> list[dict]:
+def _score_rows(
+    windows: pd.DataFrame,
+    baseline: CohortBaseline,
+    calibration: dict,
+    config: dict,
+    *,
+    profile: str = "full",
+) -> list[dict]:
     rows = []
     for _, row in windows.iterrows():
-        scored = score_window(row.to_dict(), baseline, calibration, config)
-        rows.append({"gt_label": row["gt_label"], "session_id": row.get("session_id"), **scored})
+        scored = score_window(row.to_dict(), baseline, calibration, config, profile=profile)
+        rows.append({
+            "gt_label": row["gt_label"],
+            "session_id": row.get("session_id"),
+            "declared_job_family": row.get("declared_job_family"),
+            **scored,
+        })
     return rows
 
 
-def _ablation_configs(base: dict) -> dict[str, dict]:
+def _ablation_configs(base: dict) -> dict[str, tuple[dict, str]]:
     full = copy.deepcopy(base)
     no_progress = copy.deepcopy(base)
     no_progress.setdefault("evidence_weights", {})
@@ -55,9 +84,9 @@ def _ablation_configs(base: dict) -> dict[str, dict]:
     no_evidence = copy.deepcopy(base)
     no_evidence["evidence_weights"] = {k: 0.0 for k in no_evidence.get("evidence_weights", {})}
     return {
-        "full": full,
-        "no_progress_log": no_progress,
-        "no_evidence": no_evidence,
+        "full": (full, "full"),
+        "no_progress_log": (no_progress, "full"),
+        "no_evidence": (no_evidence, "no_evidence"),
     }
 
 
@@ -103,11 +132,19 @@ def evaluate(
     config = load_config(config_path)
     baseline = CohortBaseline.load(baseline_model)
     calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
+    if calibration.get("evidence_surprisal_weights"):
+        config = dict(config)
+        config["evidence_weights"] = {
+            **config.get("evidence_weights", {}),
+            **calibration["evidence_surprisal_weights"],
+        }
+    if calibration.get("evidence_thresholds"):
+        config["evidence_thresholds"] = calibration["evidence_thresholds"]
     windows = build_windows(eval_df, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config)
 
     ablation_reports = {}
-    for name, cfg in _ablation_configs(config).items():
-        rows = _score_rows(windows, baseline, calibration, cfg)
+    for name, (cfg, profile) in _ablation_configs(config).items():
+        rows = _score_rows(windows, baseline, calibration, cfg, profile=profile)
         ablation_reports[name] = _metrics(rows)
 
     # no_cohort: force global baseline only
@@ -115,6 +152,7 @@ def evaluate(
         cohort_keys=baseline.cohort_keys,
         features=baseline.features,
         min_windows=baseline.min_windows,
+        mad_floors=getattr(baseline, "mad_floors", {}),
         stats={"global": baseline.stats.get("global", {"features": {}})},
     )
     ablation_reports["no_cohort"] = _metrics(_score_rows(windows, global_only, calibration, config))

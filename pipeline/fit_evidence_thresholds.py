@@ -1,4 +1,4 @@
-"""Fit evidence bool thresholds on train/cal normals only (no hardcoded floors)."""
+"""Fit evidence bool thresholds on train normals only."""
 from __future__ import annotations
 
 import argparse
@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from pipeline.baseline import CohortBaseline
 from pipeline.evidence_vocab import merge_thresholds, prominence_log
 from pipeline.stage1_v2 import build_windows, load_config
 
@@ -28,32 +29,15 @@ def _update_yaml_thresholds(config_path: Path, thresholds: dict) -> None:
     config_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
 
-def fit_thresholds(
-    telemetry: Path,
-    split_manifest: Path,
+def fit_thresholds_on_normals(
+    normals: pd.DataFrame,
+    config: dict,
     *,
-    config_path: Path,
-    progress_log_dir: Path,
-    window_s: float,
-    stride_s: float,
-    out: Path,
-    update_yaml: bool = True,
+    baseline: CohortBaseline | None = None,
 ) -> dict:
-    df = pd.read_csv(telemetry, low_memory=False)
-    manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
-    config = load_config(config_path)
-    fit_sessions = set(map(str, manifest["train"])) | set(map(str, manifest["cal"]))
-    subset = df[df["session_id"].astype(str).isin(fit_sessions)]
-    windows = build_windows(
-        subset,
-        window_s=window_s,
-        stride_s=stride_s,
-        progress_log_dir=progress_log_dir,
-        config=config,
-    )
-    normals = windows[windows["gt_label"].astype(str).str.startswith("normal")]
+    """Quantile thresholds from normal windows only (prefer train)."""
     if normals.empty:
-        raise ValueError("no normal windows in train/cal for evidence threshold fitting")
+        raise ValueError("no normal windows for evidence threshold fitting")
 
     swing = normals["swing_abs_w"].dropna() if "swing_abs_w" in normals else pd.Series(dtype=float)
     mean_w = normals["mean_w"].dropna() if "mean_w" in normals else pd.Series(dtype=float)
@@ -64,7 +48,11 @@ def fit_thresholds(
     if "dominant_peak_prominence_log" in normals:
         peak_log = normals["dominant_peak_prominence_log"].dropna()
     else:
-        peak_log = normals["dominant_peak_prominence"].dropna().map(prominence_log) if "dominant_peak_prominence" in normals else pd.Series(dtype=float)
+        peak_log = (
+            normals["dominant_peak_prominence"].dropna().map(prominence_log)
+            if "dominant_peak_prominence" in normals
+            else pd.Series(dtype=float)
+        )
 
     fitted = merge_thresholds(config)
     if len(peak_log):
@@ -76,7 +64,6 @@ def fit_thresholds(
     if len(swing):
         fitted["flat_power"]["swing_abs_w_max"] = float(swing.quantile(0.20))
     if len(ramp):
-        # flat: low ramp upper bound at normal q20; high_ramp lower bound at normal q95
         fitted["flat_power"]["ramp_p95_w_per_s_max"] = float(ramp.quantile(0.20))
         fitted["high_ramp"]["ramp_p95_w_per_s_min"] = float(ramp.quantile(0.95))
     if len(mean_w):
@@ -84,11 +71,7 @@ def fit_thresholds(
     if len(util_mad):
         fitted["util_power_decoupled"]["util_residual_mad_w_min"] = float(util_mad.quantile(0.95))
 
-    from pipeline.baseline import CohortBaseline
-
-    baseline_path = ROOT / "dataset/eval/cohort_baseline_v2.json"
-    if baseline_path.exists():
-        baseline = CohortBaseline.load(baseline_path)
+    if baseline is not None:
         declared_z = []
         for _, row in normals.iterrows():
             stats = baseline.declared_family_mismatch_stats(row.to_dict())
@@ -106,15 +89,52 @@ def fit_thresholds(
             "declared_family_mismatch",
             {"declared_mean_abs_z_min": 3.0, "other_family_margin": 0.5},
         )
+    return fitted
 
+
+def fit_thresholds(
+    telemetry: Path,
+    split_manifest: Path,
+    *,
+    config_path: Path,
+    progress_log_dir: Path,
+    window_s: float,
+    stride_s: float,
+    out: Path,
+    update_yaml: bool = True,
+    train_only: bool = True,
+) -> dict:
+    df = pd.read_csv(telemetry, low_memory=False)
+    manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
+    config = load_config(config_path)
+    if train_only:
+        fit_sessions = set(map(str, manifest["train"]))
+        fit_split = "train"
+    else:
+        fit_sessions = set(map(str, manifest["train"])) | set(map(str, manifest["cal"]))
+        fit_split = "train+cal"
+    subset = df[df["session_id"].astype(str).isin(fit_sessions)]
+    windows = build_windows(
+        subset,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        config=config,
+    )
+    normals = windows[windows["gt_label"].astype(str).str.startswith("normal")]
+    baseline = None
+    baseline_path = ROOT / "dataset/eval/cohort_baseline_v2.json"
+    if baseline_path.exists():
+        baseline = CohortBaseline.load(baseline_path)
+    fitted = fit_thresholds_on_normals(normals, config, baseline=baseline)
     report = {
-        "fit_split": "train+cal",
+        "fit_split": fit_split,
         "n_normal_windows": int(len(normals)),
         "n_sessions": len(fit_sessions),
         "evidence_thresholds": fitted,
         "note": (
-            "Quantile-only fit on train/cal normals; no floors. "
-            "tau_peak fitted on log10(1+prominence). flat_power uses swing AND ramp upper + mean lower."
+            "Quantile-only fit on train normals by default; no attack labels. "
+            "tau_peak fitted on log10(1+prominence)."
         ),
     }
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -134,6 +154,7 @@ def main() -> None:
     parser.add_argument("--stride-s", type=float, default=15.0)
     parser.add_argument("--out", type=Path, default=ROOT / "dataset/eval/evidence_thresholds.json")
     parser.add_argument("--no-update-yaml", action="store_true")
+    parser.add_argument("--include-cal", action="store_true", help="Legacy: fit on train+cal normals")
     args = parser.parse_args()
     report = fit_thresholds(
         args.telemetry,
@@ -144,6 +165,7 @@ def main() -> None:
         stride_s=args.stride_s,
         out=args.out,
         update_yaml=not args.no_update_yaml,
+        train_only=not args.include_cal,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

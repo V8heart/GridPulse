@@ -397,6 +397,11 @@
     "syn-normal-sync-ddp-80612",
     "syn-normal-sync-ddp-80616"
   ],
+  "progress_log_policy": {
+    "version": "v1_eligible_uniform_drop",
+    "drop_prob": 0.4,
+    "seed": 7
+  },
   "unseen_param_holdout": {
     "swma_period_2_8_3_2": [
       "syn-attack-swma_holdout-99900",

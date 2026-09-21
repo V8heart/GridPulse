@@ -5,6 +5,7 @@ import argparse
 import json
 import random
 import time
+from pathlib import Path
 
 
 def run(args) -> None:
@@ -33,6 +34,8 @@ def run(args) -> None:
     deadline = time.monotonic() + args.duration
     step = inserted = 0
     next_injection = random.randint(7, 23)
+    events: list[dict] = []
+    t0_wall = time.time()
 
     while time.monotonic() < deadline:
         batch = random.choice([16, 24, 32, 40])
@@ -43,6 +46,15 @@ def run(args) -> None:
         loss.backward()
         optimizer.step()
         step += 1
+        now = time.time()
+        if step % 5 == 0:
+            events.append({
+                "t": float(now - t0_wall),
+                "t_epoch": now,
+                "gpu_id": int(args.gpu_id),
+                "event": "step_end",
+                "step": step,
+            })
 
         if step >= next_injection:
             repeats = random.randint(1, args.max_aux_repeats)
@@ -55,6 +67,13 @@ def run(args) -> None:
             next_injection = step + random.randint(5, 31)
 
     torch.cuda.synchronize()
+    if args.progress_log:
+        path = Path(args.progress_log)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "\n".join(json.dumps(event, ensure_ascii=False) for event in events) + ("\n" if events else ""),
+            encoding="utf-8",
+        )
     print(json.dumps({
         "workload": "ltma-like",
         "gpu_id": args.gpu_id,
@@ -62,6 +81,9 @@ def run(args) -> None:
         "training_steps": step,
         "injection_events": inserted,
         "approximation": True,
+        "native_progress_available": True,
+        "progress_log": args.progress_log,
+        "events": events,
     }))
 
 
@@ -72,9 +94,9 @@ def main() -> None:
     parser.add_argument("--width", type=int, default=1024)
     parser.add_argument("--max-aux-repeats", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--progress-log", default=None, help="JSONL progress log path (original; never deleted)")
     run(parser.parse_args())
 
 
 if __name__ == "__main__":
     main()
-

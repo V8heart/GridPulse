@@ -65,6 +65,7 @@ def test_pipeline_row_has_v2_features_and_declared_context(tmp_path):
             "physics_timeout_s": 60.0,
             "physics_test_system": "kundur_ieeest",
             "out": str(out),
+            "stage1_out": str(tmp_path / "stage1.json"),
         },
     )()
     rows = run(args)

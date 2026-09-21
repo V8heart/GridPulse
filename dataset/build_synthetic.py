@@ -18,13 +18,28 @@ from dataset.schema import SessionManifest, validate_frame, write_manifest
 from dataset.synth_attacks import ATTACK_GENERATORS, swma
 from dataset.synth_common import write_csv
 from dataset.synth_normal_patterns import NORMAL_GENERATORS
+from dataset.progress_log_policy import (
+    DEFAULT_DROP_PROB,
+    POLICY_VERSION,
+    decide_progress_log,
+)
 from pipeline.features import compute_window_features
 
 HOLDOUT_PERIOD_S = (2.8, 3.2)
 
 
-def _manifest(df: pd.DataFrame, source: str, seed: int, progress_log_path: str | None = None,
-              split: str | None = None) -> SessionManifest:
+def _manifest(
+    df: pd.DataFrame,
+    source: str,
+    seed: int,
+    progress_log_path: str | None = None,
+    split: str | None = None,
+    *,
+    native_progress_available: bool | None = None,
+    progress_log_masked: bool | None = None,
+    progress_log_drop_prob: float | None = None,
+    progress_log_policy_seed: int | None = None,
+) -> SessionManifest:
     return SessionManifest(
         session_id=str(df["session_id"].iloc[0]),
         label=str(df["gt_label"].iloc[0] if "gt_label" in df else df["label"].iloc[0]),
@@ -38,6 +53,11 @@ def _manifest(df: pd.DataFrame, source: str, seed: int, progress_log_path: str |
         split=split,
         progress_log_path=progress_log_path,
         gt_variant=str(df["gt_variant"].iloc[0]) if "gt_variant" in df else None,
+        native_progress_available=native_progress_available,
+        progress_log_masked=progress_log_masked,
+        progress_log_policy_version=POLICY_VERSION if native_progress_available is not None else None,
+        progress_log_drop_prob=progress_log_drop_prob,
+        progress_log_policy_seed=progress_log_policy_seed,
     )
 
 
@@ -101,6 +121,26 @@ def _write_progress(output_dir: Path, session_id: str, events: list[dict]) -> st
     return str(path)
 
 
+def _apply_progress_policy(
+    output_dir: Path,
+    session_id: str,
+    events: list[dict],
+    *,
+    seed: int,
+    drop_prob: float,
+) -> tuple[str | None, object]:
+    decision = decide_progress_log(
+        session_id,
+        native_events=events,
+        seed=seed,
+        drop_prob=drop_prob,
+    )
+    path = None
+    if decision.write_progress_log:
+        path = _write_progress(output_dir, session_id, events)
+    return path, decision
+
+
 def build(
     output_dir: Path,
     *,
@@ -111,9 +151,11 @@ def build(
     split_ratios: tuple[float, float, float] = (0.5, 0.2, 0.3),
     nvml_avg_window_s: float = 0.0,
     write_session_csvs: bool = False,
+    progress_log_drop_prob: float = DEFAULT_DROP_PROB,
 ) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
-    pending_manifests: list[tuple[pd.DataFrame, int, str | None]] = []
+    # (frame, gen_seed, progress_path, decision)
+    pending_manifests: list[tuple[pd.DataFrame, int, str | None, object]] = []
     stats: dict[str, dict[str, float]] = {}
     sessions_by_label: dict[str, list[str]] = {}
 
@@ -124,9 +166,12 @@ def build(
             session_id = str(frame["session_id"].iloc[0])
             if write_session_csvs:
                 write_csv(frame, output_dir / "normal" / f"{session_id}.csv")
-            progress = _write_progress(output_dir, session_id, frame.attrs.get("progress_events", []))
+            events = list(frame.attrs.get("progress_events", []) or [])
+            progress, decision = _apply_progress_policy(
+                output_dir, session_id, events, seed=seed, drop_prob=progress_log_drop_prob
+            )
             frames.append(frame)
-            pending_manifests.append((frame, gen_seed, progress))
+            pending_manifests.append((frame, gen_seed, progress, decision))
             sessions_by_label.setdefault(label, []).append(session_id)
 
     for class_index, (label, generator) in enumerate(ATTACK_GENERATORS.items(), start=200):
@@ -136,9 +181,12 @@ def build(
             session_id = str(frame["session_id"].iloc[0])
             if write_session_csvs:
                 write_csv(frame, output_dir / "attacks" / f"{session_id}.csv")
-            progress = _write_progress(output_dir, session_id, frame.attrs.get("progress_events", []))
+            events = list(frame.attrs.get("progress_events", []) or [])
+            progress, decision = _apply_progress_policy(
+                output_dir, session_id, events, seed=seed, drop_prob=progress_log_drop_prob
+            )
             frames.append(frame)
-            pending_manifests.append((frame, gen_seed, progress))
+            pending_manifests.append((frame, gen_seed, progress, decision))
             sessions_by_label.setdefault(label, []).append(session_id)
 
     # Unseen-period SWMA holdout: always generated and forced into test only.
@@ -160,13 +208,16 @@ def build(
         session_id = str(frame["session_id"].iloc[0])
         if write_session_csvs:
             write_csv(frame, output_dir / "attacks" / f"{session_id}.csv")
-        progress = _write_progress(output_dir, session_id, frame.attrs.get("progress_events", []))
+        events = list(frame.attrs.get("progress_events", []) or [])
+        progress, decision = _apply_progress_policy(
+            output_dir, session_id, events, seed=seed, drop_prob=progress_log_drop_prob
+        )
         frames.append(frame)
-        pending_manifests.append((frame, gen_seed, progress))
+        pending_manifests.append((frame, gen_seed, progress, decision))
         holdout_ids.append(session_id)
 
     # Also treat any accidentally in-range SWMA periods as holdout.
-    for frame, _, _ in pending_manifests:
+    for frame, _, _, _ in pending_manifests:
         session_id = str(frame["session_id"].iloc[0])
         if session_id in holdout_ids:
             continue
@@ -189,8 +240,18 @@ def build(
     splits = _apply_holdout(splits, holdout_ids)
     session_to_split = {session_id: name for name, values in splits.items() for session_id in values}
     manifests = [
-        _manifest(frame, "synthetic", gen_seed, progress, session_to_split.get(str(frame["session_id"].iloc[0])))
-        for frame, gen_seed, progress in pending_manifests
+        _manifest(
+            frame,
+            "synthetic",
+            gen_seed,
+            progress,
+            session_to_split.get(str(frame["session_id"].iloc[0])),
+            native_progress_available=decision.native_progress_available,
+            progress_log_masked=decision.progress_log_masked,
+            progress_log_drop_prob=decision.drop_prob,
+            progress_log_policy_seed=seed,
+        )
+        for frame, gen_seed, progress, decision in pending_manifests
     ]
     write_manifest(manifests, output_dir / "manifest.json")
     split_manifest = {
@@ -200,6 +261,11 @@ def build(
         "train": splits["train"],
         "cal": splits["cal"],
         "test": splits["test"],
+        "progress_log_policy": {
+            "version": POLICY_VERSION,
+            "drop_prob": float(progress_log_drop_prob),
+            "seed": int(seed),
+        },
         "unseen_param_holdout": {
             "swma_period_2_8_3_2": sorted(set(holdout_ids)),
             "period_s": list(HOLDOUT_PERIOD_S),
@@ -236,6 +302,7 @@ def main() -> None:
     parser.add_argument("--split-ratios", nargs=3, type=float, default=(0.5, 0.2, 0.3))
     parser.add_argument("--nvml-avg-window-s", type=float, default=1.0)
     parser.add_argument("--write-session-csvs", action="store_true")
+    parser.add_argument("--progress-log-drop-prob", type=float, default=DEFAULT_DROP_PROB)
     args = parser.parse_args()
     frame = build(
         args.output_dir,
@@ -246,10 +313,10 @@ def main() -> None:
         split_ratios=tuple(args.split_ratios),
         nvml_avg_window_s=args.nvml_avg_window_s,
         write_session_csvs=args.write_session_csvs,
+        progress_log_drop_prob=args.progress_log_drop_prob,
     )
     print(f"생성 완료: {args.output_dir / 'all_v3.csv'} ({len(frame):,}행)")
 
 
 if __name__ == "__main__":
     main()
-
