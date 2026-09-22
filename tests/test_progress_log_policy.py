@@ -27,11 +27,13 @@ def test_decide_progress_log_deterministic_and_class_independent():
     assert a.native_progress_available is True
     assert a.policy_version == POLICY_VERSION
 
-    # Empty native events are never "masked"; they are simply unavailable.
+    # Empty native events remain eligible under v1.2; idle alone is the exception.
     empty = decide_progress_log("sess-a", native_events=[], seed=7, drop_prob=0.4)
-    assert empty.native_progress_available is False
-    assert empty.progress_log_masked is False
-    assert empty.write_progress_log is False
+    assert empty.native_progress_available is True
+    idle = decide_progress_log("sess-a", native_events=[], seed=7, drop_prob=0.4, idle_exception=True)
+    assert idle.native_progress_available is False
+    assert idle.progress_log_masked is False
+    assert idle.write_progress_log is False
 
 
 def test_eval_mask_hides_without_deleting_original(tmp_path: Path):
@@ -40,8 +42,6 @@ def test_eval_mask_hides_without_deleting_original(tmp_path: Path):
     original = [{"t": 1.0, "gpu_id": 0, "event": "step_end"}]
     path.write_text(json.dumps(original[0]) + "\n", encoding="utf-8")
 
-    # Force a hide by choosing a session that masks under seed/prob.
-    # Brute a session id that masks under drop_prob=1.0 (always).
     assert eval_mask_hides_log("any", seed=1, drop_prob=1.0) is True
     hidden = read_progress_log(
         path,
@@ -52,7 +52,6 @@ def test_eval_mask_hides_without_deleting_original(tmp_path: Path):
         apply_eval_mask=True,
     )
     assert hidden == []
-    # Original file untouched.
     assert path.exists()
     assert json.loads(path.read_text(encoding="utf-8").strip())["event"] == "step_end"
 
@@ -71,7 +70,11 @@ def test_gpu_filter_and_step_period():
     assert n1 == 2 and abs(period1 - 2.0) < 1e-9
 
 
-def test_build_applies_uniform_drop_and_keeps_native_empty(tmp_path: Path):
+def test_build_applies_uniform_drop_policy(tmp_path: Path):
+    """Until S2 decoys land, some generators may still ship empty native events.
+
+    Policy version and eligible masking semantics are what this gate checks.
+    """
     out = tmp_path / "synth"
     build(out, rows=200, sample_hz=10, sessions_per_class=2, seed=7, progress_log_drop_prob=DEFAULT_DROP_PROB)
     manifests = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
@@ -80,11 +83,8 @@ def test_build_applies_uniform_drop_and_keeps_native_empty(tmp_path: Path):
     assert split["progress_log_policy"]["drop_prob"] == DEFAULT_DROP_PROB
 
     eligible = [m for m in manifests if m.get("native_progress_available")]
-    native_empty = [m for m in manifests if m.get("native_progress_available") is False]
     assert eligible, "expected some sessions with native progress"
-    assert native_empty, "expected native-empty workloads (swma/crypto)"
 
-    # Masked eligible sessions must not have an on-disk progress path.
     for item in eligible:
         if item["progress_log_masked"]:
             assert item["progress_log_path"] is None
@@ -93,13 +93,9 @@ def test_build_applies_uniform_drop_and_keeps_native_empty(tmp_path: Path):
             assert item["progress_log_path"] is not None
             assert Path(item["progress_log_path"]).exists()
 
-    # Native-empty: never marked masked, never written.
-    for item in native_empty:
-        assert item["progress_log_masked"] is False
-        assert item["progress_log_path"] is None
-
 
 def test_generators_native_availability_truth_table():
+    # Documents current synth gaps until Part S2 adds decoy logs for standalone attacks.
     assert (normal_checkpoint(n=1200).attrs.get("progress_events") or [])
     assert (ltma(n=200).attrs.get("progress_events") or [])
     assert (swma_piggyback(n=200).attrs.get("progress_events") or [])

@@ -1,4 +1,4 @@
-"""합성·실측 텔레메트리의 공통 스키마와 검증 함수."""
+"""합성·실측 텔레메트리의 공통 스키마와 검증 함수 (gp-telemetry/1.2)."""
 from __future__ import annotations
 
 import json
@@ -10,43 +10,46 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+SCHEMA_VERSION = "gp-telemetry/1.2"
+
+# Canonical columns for new writes (standard §4). Legacy columns are still
+# accepted on read via LEGACY_TO_CANONICAL / normalize_frame.
 CORE_COLUMNS = [
     "timestamp",
-    "collection_timestamp",
-    "raw_timestamp",
+    "t_epoch",
     "session_id",
-    "gt_attack_id",
-    "gt_label",
-    "gt_variant",
-    "gt_params_json",
-    "attack_id",
-    "waveform_kind",
-    "waveform_frequency_hz",
-    "waveform_amplitude_frac",
-    "waveform_duty_cycle",
     "gpu_id",
+    "gpu_uuid",
+    "gpu_model",
     "sample_hz",
-    "power_w",
-    "util_gpu_pct",
-    "mem_copy_util_pct",
-    "sm_clock_mhz",
-    "temp_c",
-    "fb_used_mb",
     "requested_interval_ms",
     "actual_interval_ms",
     "value_changed",
-    "pid",
-    "declared_process_name",
-    "declared_user",
+    "warmup",
+    "power_w",
+    "power_instant_w",
+    "util_gpu_pct",
+    "mem_copy_util_pct",
+    "sm_clock_mhz",
+    "mem_clock_mhz",
+    "temp_c",
+    "fb_used_mb",
+    "fan_speed_pct",
+    "pstate",
+    "power_limit_w",
+    "throttle_reasons",
+    "observed_pid",
+    "observed_process_name",
+    "observed_n_procs",
     "declared_job_type",
     "declared_job_family",
+    "declared_process_name",
+    "declared_user",
     "declared_gres",
-    "gpu_model",
-    "process_name",
-    "id_user",
-    "job_type",
-    "gres_req",
-    "label",
+    "gt_label",
+    "gt_is_attack",
+    "gt_variant",
+    "gt_params_json",
 ]
 
 REQUIRED_COLUMNS = {
@@ -59,9 +62,11 @@ REQUIRED_COLUMNS = {
 
 INFERENCE_FORBIDDEN_COLUMNS = {
     "gt_label",
+    "gt_is_attack",
     "gt_attack_id",
     "gt_variant",
     "gt_params_json",
+    "gt_attack_intervals_epoch",
     "power_phys_w",
     "label",
     "attack_id",
@@ -69,10 +74,19 @@ INFERENCE_FORBIDDEN_COLUMNS = {
     "waveform_frequency_hz",
     "waveform_amplitude_frac",
     "waveform_duty_cycle",
+    "gpu_role",
+    "group_id",
+    "capture_key",
+    "declared_policy",
+    "workload_module",
+    "workload_cmd",
+    "host_workload",
+    "truth_source",
 }
 
 NUMERIC_COLUMNS = {
     "timestamp",
+    "t_epoch",
     "raw_timestamp",
     "waveform_frequency_hz",
     "waveform_amplitude_frac",
@@ -80,30 +94,44 @@ NUMERIC_COLUMNS = {
     "gpu_id",
     "sample_hz",
     "power_w",
+    "power_instant_w",
     "power_phys_w",
     "util_gpu_pct",
     "mem_copy_util_pct",
     "sm_clock_mhz",
+    "mem_clock_mhz",
     "temp_c",
     "fb_used_mb",
+    "fan_speed_pct",
+    "pstate",
+    "power_limit_w",
+    "throttle_reasons",
     "requested_interval_ms",
     "actual_interval_ms",
+    "observed_pid",
+    "observed_n_procs",
     "pid",
 }
 
-LEGACY_TO_DECLARED = {
+LEGACY_TO_CANONICAL = {
     "label": "gt_label",
-    "attack_id": "gt_attack_id",
+    "attack_id": "gt_variant",
     "job_type": "declared_job_type",
     "id_user": "declared_user",
     "gres_req": "declared_gres",
-    "process_name": "declared_process_name",
+    "process_name": "observed_process_name",
+    "pid": "observed_pid",
 }
+
+# Backward-compatible alias used by older call sites / docs.
+LEGACY_TO_DECLARED = LEGACY_TO_CANONICAL
 
 
 def strip_ground_truth(df: pd.DataFrame) -> pd.DataFrame:
     """Return a copy with labels/attack params removed for inference."""
-    return df.drop(columns=[c for c in INFERENCE_FORBIDDEN_COLUMNS if c in df], errors="ignore").copy()
+    drop = set(INFERENCE_FORBIDDEN_COLUMNS)
+    drop.update(c for c in df.columns if str(c).startswith("gt_"))
+    return df.drop(columns=[c for c in drop if c in df], errors="ignore").copy()
 
 
 @dataclass(frozen=True)
@@ -128,23 +156,38 @@ class SessionManifest:
     progress_log_policy_version: str | None = None
     progress_log_drop_prob: float | None = None
     progress_log_policy_seed: int | None = None
+    group_id: str | None = None
 
 
 def normalize_frame(df: pd.DataFrame) -> pd.DataFrame:
     """누락된 선택 컬럼을 추가하고 공통 컬럼 순서로 정렬한다."""
     out = df.copy()
-    for legacy, new_name in LEGACY_TO_DECLARED.items():
+    for legacy, new_name in LEGACY_TO_CANONICAL.items():
         if legacy in out and new_name not in out:
             out[new_name] = out[legacy]
             warnings.warn(
                 f"legacy column {legacy!r} mapped to {new_name!r}; "
-                "new datasets should write declared/gt columns directly",
+                "new datasets should write declared/gt/observed columns directly",
                 RuntimeWarning,
                 stacklevel=2,
             )
+    if "gt_is_attack" not in out:
+        if "gt_label" in out:
+            labels = out["gt_label"].astype(str)
+            out["gt_is_attack"] = ~labels.str.startswith("normal") & labels.ne("nan") & labels.ne("<NA>")
+        elif "label" in out:
+            labels = out["label"].astype(str)
+            out["gt_is_attack"] = ~labels.str.startswith("normal") & labels.ne("nan") & labels.ne("<NA>")
     for column in CORE_COLUMNS:
         if column not in out:
-            out[column] = np.nan if column in NUMERIC_COLUMNS else pd.NA
+            if column == "gt_is_attack":
+                out[column] = False
+            elif column == "warmup":
+                out[column] = False
+            elif column in NUMERIC_COLUMNS:
+                out[column] = np.nan
+            else:
+                out[column] = pd.NA
     ordered = CORE_COLUMNS + [c for c in out.columns if c not in CORE_COLUMNS]
     return out.loc[:, ordered]
 
@@ -200,4 +243,3 @@ def write_manifest(manifests: list[SessionManifest], path: str | Path) -> None:
 def manifest_from_dict(data: dict[str, Any]) -> SessionManifest:
     """JSON 등에서 읽은 사전을 검증 가능한 manifest로 변환한다."""
     return SessionManifest(**data)
-

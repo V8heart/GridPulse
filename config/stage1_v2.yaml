@@ -63,4 +63,4 @@ mad_floors:
   band_frac_0.7_2: 0.02
   band_frac_0.05_0.1: 0.02
   band_frac_2_nyq: 0.02
-progress_log_policy_required: v1_eligible_uniform_drop
+progress_log_policy_required: v1_1_uniform_all_sessions

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import shutil
@@ -14,7 +15,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from dataset.schema import SessionManifest, validate_frame, write_manifest
+from dataset.declared_context import sample_declared
+from dataset.identifiers import group_id_from_parts, is_session_id
+from dataset.schema import SCHEMA_VERSION, SessionManifest, validate_frame, write_manifest
 from dataset.synth_attacks import ATTACK_GENERATORS, swma
 from dataset.synth_common import write_csv
 from dataset.synth_normal_patterns import NORMAL_GENERATORS
@@ -26,6 +29,7 @@ from dataset.progress_log_policy import (
 from pipeline.features import compute_window_features
 
 HOLDOUT_PERIOD_S = (2.8, 3.2)
+DURATION_POOL = (480, 600, 720)
 
 
 def _manifest(
@@ -58,7 +62,199 @@ def _manifest(
         progress_log_policy_version=POLICY_VERSION if native_progress_available is not None else None,
         progress_log_drop_prob=progress_log_drop_prob,
         progress_log_policy_seed=progress_log_policy_seed,
+        group_id=str(df.attrs.get("group_id")) if df.attrs.get("group_id") else None,
     )
+
+
+def duration_for_repeat(seed: int, repeat: int) -> int:
+    """Choose duration without incorporating class/label information."""
+    digest = hashlib.sha256(f"synthetic-duration:{seed}:{repeat}".encode()).digest()
+    return DURATION_POOL[int.from_bytes(digest[:4], "big") % len(DURATION_POOL)]
+
+
+def _contiguous_intervals(times: np.ndarray, active: np.ndarray, step_s: float) -> list[list[float]]:
+    intervals: list[list[float]] = []
+    start: float | None = None
+    for index, enabled in enumerate(active.astype(bool)):
+        if enabled and start is None:
+            start = float(times[index])
+        if start is not None and (not enabled or index == len(active) - 1):
+            stop = float(times[index] if not enabled else times[index] + step_s)
+            intervals.append([start, stop])
+            start = None
+    return intervals
+
+
+def _migrate_frame(frame: pd.DataFrame, *, label: str, seed: int, repeat: int) -> pd.DataFrame:
+    """Attach v1.2-only private metadata while keeping telemetry opaque."""
+    if not is_session_id(str(frame["session_id"].iloc[0])):
+        raise ValueError("synthetic generator produced a non-opaque session id")
+    is_attack = label in ATTACK_GENERATORS
+    variant = str(frame["gt_variant"].dropna().iloc[0]) if frame["gt_variant"].notna().any() else label
+    hosted = label == "ltma" or variant in {"swma_piggyback", "swma_mimicry"}
+    if is_attack:
+        policy = "host_inherited" if hosted else (
+            "pool_random" if repeat % 2 == 0 else "host_family_matched"
+        )
+        rng = np.random.default_rng(seed + 17)
+        if hosted:
+            host = sample_declared("training", rng, policy="honest", mismatch_rate=0.0)
+            declared = sample_declared("training", rng, policy="host_inherited", host_declared=host)
+        else:
+            declared = sample_declared("training", rng, policy=policy)
+    else:
+        policy = "honest"
+        family = str(frame["declared_job_family"].iloc[0])
+        declared = sample_declared(family, np.random.default_rng(seed + 17), policy="honest")
+    declared.setdefault("declared_gres", "gpu:2" if frame["gpu_id"].nunique() > 1 else "gpu:1")
+    for key, value in declared.items():
+        frame[key] = value
+
+    params_raw = frame["gt_params_json"].dropna()
+    params = json.loads(str(params_raw.iloc[0])) if len(params_raw) else {}
+    params["declared_policy"] = policy
+    frame["gt_params_json"] = json.dumps(params, sort_keys=True)
+    frame.attrs["declared_policy"] = policy
+    cluster = {
+        key: (round(float(value), 1) if isinstance(value, (int, float)) else value)
+        for key, value in params.items()
+        if key != "declared_policy"
+    }
+    frame.attrs["group_id"] = group_id_from_parts(label, variant, cluster)
+    intervals: dict[str, list[list[float]]] = {}
+    if is_attack:
+        for gpu_id, group in frame.groupby("gpu_id"):
+            times = pd.to_numeric(group["t_epoch"], errors="raise").to_numpy()
+            step = 1.0 / float(group["sample_hz"].iloc[0])
+            if label == "swma":
+                physical = pd.to_numeric(group.get("power_phys_w", group["power_w"]), errors="raise").to_numpy()
+                threshold = (float(np.nanpercentile(physical, 20)) + float(np.nanpercentile(physical, 80))) / 2
+                intervals[str(int(gpu_id))] = _contiguous_intervals(times, physical >= threshold, step)
+            else:
+                intervals[str(int(gpu_id))] = [[float(times[0]), float(times[-1] + step)]]
+    frame.attrs["gt_attack_intervals_epoch"] = intervals
+    return frame
+
+
+def _write_standard_tree(
+    frames: list[pd.DataFrame],
+    output_dir: Path,
+    *,
+    session_to_split: dict[str, str],
+    policy_seed: int,
+    drop_prob: float,
+) -> None:
+    labels: list[dict] = []
+    for frame in frames:
+        session_id = str(frame["session_id"].iloc[0])
+        session_dir = output_dir / "sessions" / session_id
+        session_dir.mkdir(parents=True, exist_ok=True)
+        write_csv(frame, session_dir / "telemetry.csv")
+        events = list(frame.attrs.get("progress_events", []) or [])
+        label = str(frame["gt_label"].iloc[0])
+        if not events and label != "normal_baseline":
+            end_s = float(frame["timestamp"].max())
+            events = [
+                {"t": float(t), "gpu_id": 0, "event": "step_end", "step": index}
+                for index, t in enumerate(np.linspace(max(0.1, end_s / 10), end_s, 10))
+            ]
+        raw_events = []
+        t0 = float(frame["t_epoch"].iloc[0] - frame["timestamp"].iloc[0])
+        for event in events:
+            item = dict(event)
+            relative = float(item.pop("t", 0.0))
+            item["t_epoch"] = t0 + relative
+            raw_events.append(item)
+        if raw_events:
+            raw_path = session_dir / "progress.raw.jsonl"
+            raw_path.write_text(
+                "\n".join(json.dumps(event, sort_keys=True) for event in raw_events) + "\n",
+                encoding="utf-8",
+            )
+            decision = decide_progress_log(
+                session_id, native_events=raw_events, seed=policy_seed, drop_prob=drop_prob
+            )
+            if decision.write_progress_log:
+                visible = [{**event, "t": event["t_epoch"] - t0} for event in raw_events]
+                (session_dir / "progress.jsonl").write_text(
+                    "\n".join(json.dumps(event, sort_keys=True) for event in visible) + "\n",
+                    encoding="utf-8",
+                )
+        else:
+            decision = decide_progress_log(
+                session_id, native_events=[], seed=policy_seed, drop_prob=drop_prob,
+                idle_exception=True,
+            )
+        declared = {
+            str(int(gpu_id)): {
+                key: str(group[key].iloc[0])
+                for key in (
+                    "declared_job_type", "declared_job_family", "declared_process_name",
+                    "declared_user", "declared_gres",
+                )
+            }
+            for gpu_id, group in frame.groupby("gpu_id")
+        }
+        public = {
+            "schema_version": SCHEMA_VERSION,
+            "session_id": session_id,
+            "source": "synthetic",
+            "t0_epoch": t0,
+            "duration_s": float(frame["timestamp"].max()),
+            "warmup_s": 180.0,
+            "gpus": [
+                {"gpu_id": int(gpu_id), "gpu_model": "synthetic-rtx4090"}
+                for gpu_id in sorted(frame["gpu_id"].unique())
+            ],
+            "progress_log": {
+                "present": (session_dir / "progress.jsonl").exists(),
+                "masked": bool(decision.progress_log_masked),
+                "policy_version": decision.policy_version,
+                "drop_prob": decision.drop_prob,
+                "seed": policy_seed,
+            },
+            "declared": declared,
+        }
+        (session_dir / "session.json").write_text(
+            json.dumps(public, indent=2, sort_keys=True), encoding="utf-8"
+        )
+        intervals = frame.attrs.get("gt_attack_intervals_epoch") or {}
+        for gpu_id in sorted(int(x) for x in frame["gpu_id"].unique()):
+            labels.append({
+                "session_id": session_id,
+                "gpu_id": gpu_id,
+                "gt_label": label,
+                "gt_is_attack": label in ATTACK_GENERATORS,
+                "gt_variant": frame["gt_variant"].iloc[0],
+                "gt_params_json": frame["gt_params_json"].iloc[0],
+                "gt_attack_intervals_epoch": json.dumps(intervals.get(str(gpu_id), [])),
+                "gpu_role": "target",
+                "group_id": frame.attrs["group_id"],
+                "declared_policy": frame.attrs["declared_policy"],
+                "source": "synthetic",
+                "split": session_to_split.get(session_id),
+                "valid": True,
+            })
+    index = output_dir / "index"
+    index.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(labels).to_csv(index / "labels.csv", index=False)
+
+
+def leakage_audit(output_dir: Path) -> dict:
+    forbidden = ("attack", "swma", "ltma", "crypto", "malicious", "unknown_cuda", "synthetic_", "syn-", "real-")
+    findings = []
+    for path in (output_dir / "sessions").glob("*"):
+        if any(token in path.name.lower() for token in forbidden):
+            findings.append(str(path))
+        public = path / "session.json"
+        if public.exists():
+            text = public.read_text(encoding="utf-8").lower()
+            findings.extend(f"{public}:{token}" for token in forbidden if token in text)
+    report = {"passed": not findings, "findings": findings, "sessions_checked": len(list((output_dir / "sessions").glob("*")))}
+    (output_dir / "leakage_audit.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    if findings:
+        raise ValueError(f"synthetic public-tree leakage: {findings[:3]}")
+    return report
 
 
 def _split_sessions(sessions: dict[str, list[str]], seed: int, ratios: tuple[float, float, float]) -> dict:
@@ -129,11 +325,14 @@ def _apply_progress_policy(
     seed: int,
     drop_prob: float,
 ) -> tuple[str | None, object]:
+    # Until Part S2 adds decoy logs for every non-idle class, empty native event
+    # lists are treated as the idle exception so existing synth fixtures stay valid.
     decision = decide_progress_log(
         session_id,
         native_events=events,
         seed=seed,
         drop_prob=drop_prob,
+        idle_exception=not bool(events),
     )
     path = None
     if decision.write_progress_log:
@@ -144,7 +343,7 @@ def _apply_progress_policy(
 def build(
     output_dir: Path,
     *,
-    rows: int = 1200,
+    rows: int | None = 1200,
     sample_hz: float = 10,
     sessions_per_class: int = 1,
     seed: int = 7,
@@ -152,6 +351,7 @@ def build(
     nvml_avg_window_s: float = 0.0,
     write_session_csvs: bool = False,
     progress_log_drop_prob: float = DEFAULT_DROP_PROB,
+    run_leakage_audit: bool = True,
 ) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     # (frame, gen_seed, progress_path, decision)
@@ -162,7 +362,9 @@ def build(
     for class_index, (label, generator) in enumerate(NORMAL_GENERATORS.items(), start=100):
         for repeat in range(sessions_per_class):
             gen_seed = seed * 10000 + class_index * 100 + repeat
-            frame = generator(n=rows, sample_hz=sample_hz, seed=gen_seed, nvml_avg_window_s=nvml_avg_window_s)
+            session_rows = int(rows) if rows is not None else int(round(duration_for_repeat(seed, repeat) * sample_hz))
+            frame = generator(n=session_rows, sample_hz=sample_hz, seed=gen_seed, nvml_avg_window_s=nvml_avg_window_s)
+            frame = _migrate_frame(frame, label=label, seed=gen_seed, repeat=repeat)
             session_id = str(frame["session_id"].iloc[0])
             if write_session_csvs:
                 write_csv(frame, output_dir / "normal" / f"{session_id}.csv")
@@ -177,7 +379,9 @@ def build(
     for class_index, (label, generator) in enumerate(ATTACK_GENERATORS.items(), start=200):
         for repeat in range(sessions_per_class):
             gen_seed = seed * 10000 + class_index * 100 + repeat
-            frame = generator(n=rows, sample_hz=sample_hz, seed=gen_seed, nvml_avg_window_s=nvml_avg_window_s)
+            session_rows = int(rows) if rows is not None else int(round(duration_for_repeat(seed, repeat) * sample_hz))
+            frame = generator(n=session_rows, sample_hz=sample_hz, seed=gen_seed, nvml_avg_window_s=nvml_avg_window_s)
+            frame = _migrate_frame(frame, label=label, seed=gen_seed, repeat=repeat)
             session_id = str(frame["session_id"].iloc[0])
             if write_session_csvs:
                 write_csv(frame, output_dir / "attacks" / f"{session_id}.csv")
@@ -196,8 +400,9 @@ def build(
     for repeat in range(n_holdout):
         period_s = float(holdout_rng.uniform(*HOLDOUT_PERIOD_S))
         gen_seed = seed * 10000 + 299 * 100 + repeat
+        session_rows = int(rows) if rows is not None else int(round(duration_for_repeat(seed, repeat) * sample_hz))
         frame = swma(
-            n=rows,
+            n=session_rows,
             sample_hz=sample_hz,
             seed=gen_seed,
             frequency_hz=1.0 / period_s,
@@ -205,6 +410,7 @@ def build(
             nvml_avg_window_s=nvml_avg_window_s,
             variant="swma_holdout",
         )
+        frame = _migrate_frame(frame, label="swma", seed=gen_seed, repeat=repeat)
         session_id = str(frame["session_id"].iloc[0])
         if write_session_csvs:
             write_csv(frame, output_dir / "attacks" / f"{session_id}.csv")
@@ -239,6 +445,13 @@ def build(
     splits = _split_sessions(sessions_by_label, seed, split_ratios)
     splits = _apply_holdout(splits, holdout_ids)
     session_to_split = {session_id: name for name, values in splits.items() for session_id in values}
+    _write_standard_tree(
+        frames,
+        output_dir,
+        session_to_split=session_to_split,
+        policy_seed=seed,
+        drop_prob=progress_log_drop_prob,
+    )
     manifests = [
         _manifest(
             frame,
@@ -289,13 +502,15 @@ def build(
     (output_dir / "feature_summary.json").write_text(
         json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    if run_leakage_audit:
+        leakage_audit(output_dir)
     return combined
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "dataset" / "synthetic")
-    parser.add_argument("--rows", type=int, default=1200)
+    parser.add_argument("--output-dir", "--output-root", dest="output_dir", type=Path, default=ROOT / "dataset" / "synthetic")
+    parser.add_argument("--rows", type=int, default=None, help="override rows; default uses 480/600/720s pool")
     parser.add_argument("--sample-hz", type=float, default=10.0)
     parser.add_argument("--sessions-per-class", type=int, default=20)
     parser.add_argument("--seed", type=int, default=7)
@@ -303,6 +518,7 @@ def main() -> None:
     parser.add_argument("--nvml-avg-window-s", type=float, default=1.0)
     parser.add_argument("--write-session-csvs", action="store_true")
     parser.add_argument("--progress-log-drop-prob", type=float, default=DEFAULT_DROP_PROB)
+    parser.add_argument("--skip-leakage-audit", action="store_true")
     args = parser.parse_args()
     frame = build(
         args.output_dir,
@@ -314,6 +530,7 @@ def main() -> None:
         nvml_avg_window_s=args.nvml_avg_window_s,
         write_session_csvs=args.write_session_csvs,
         progress_log_drop_prob=args.progress_log_drop_prob,
+        run_leakage_audit=not args.skip_leakage_audit,
     )
     print(f"생성 완료: {args.output_dir / 'all_v3.csv'} ({len(frame):,}행)")
 
