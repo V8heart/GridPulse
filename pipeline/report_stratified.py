@@ -82,6 +82,18 @@ def stratified_report(frame: pd.DataFrame, *, input_scope: str = "all_windows") 
 
     work = frame.copy()
     work["is_candidate"] = work["is_candidate"].astype(str).str.lower().isin({"true", "1"})
+    if "gt_params_json" in work.columns and "period_actual_s" not in work.columns:
+        periods = []
+        for raw in work["gt_params_json"].tolist():
+            period = None
+            if isinstance(raw, str) and raw.strip():
+                try:
+                    payload = json.loads(raw)
+                except json.JSONDecodeError:
+                    payload = {}
+                period = payload.get("period_actual_s", payload.get("period_requested_s"))
+            periods.append(period)
+        work["period_actual_s"] = periods
     views = {
         "primary_target_only": _scope(work, target_only=True, include_warmup=False),
         "secondary_companion_inclusive": _scope(work, target_only=False, include_warmup=False),
@@ -92,6 +104,7 @@ def stratified_report(frame: pd.DataFrame, *, input_scope: str = "all_windows") 
         "declared_policy": "declared_policy",
         "progress_log": "progress_log",
         "gt_variant": "gt_variant",
+        "period_actual_s": "period_actual_s",
     }
     rows = []
     for view_name, view in views.items():
@@ -122,9 +135,16 @@ def stratified_report(frame: pd.DataFrame, *, input_scope: str = "all_windows") 
         representative = representative[
             representative["declared_policy"].astype(str) == "host_family_matched"
         ]
+    empty_cohorts = []
+    if "declared_job_family" in primary.columns:
+        for family, group in primary.groupby(primary["declared_job_family"].astype(str), sort=True):
+            normal_n = int((~_is_attack(group)).sum())
+            if normal_n == 0 and int(_is_attack(group).sum()):
+                empty_cohorts.append(str(family))
     return {
         "valid": True,
         "primary_definition": "target GPU only; warmup excluded",
+        "no_normal_cohort": empty_cohorts,
         "secondary_definitions": [
             "companion-inclusive; warmup excluded",
             "target-only; warmup inclusive",

@@ -34,6 +34,7 @@ def sample_declared(
     policy: DeclaredPolicy | None = None,
     mismatch_rate: float = 0.1,
     host_declared: dict[str, str] | None = None,
+    allowed_families: tuple[str, ...] | None = None,
 ) -> dict[str, str]:
     """Sample declared scheduler context without exposing the true class label.
 
@@ -67,6 +68,18 @@ def sample_declared(
             choices = list(DECLARED_POOL)
         else:
             choices = list(FAMILY_TO_DECLARED.get(true_family, DECLARED_POOL))
+    if allowed_families is not None:
+        allowed = set(allowed_families)
+        unknown = allowed - set(FAMILY_TO_DECLARED)
+        if unknown:
+            raise ValueError(f"unknown declared families: {sorted(unknown)}")
+        choices = [
+            job
+            for job in choices
+            if DECLARED_POOL[job]["family"] in allowed
+        ]
+        if not choices:
+            raise ValueError("allowed_families removed every declared choice")
 
     job_type = str(rng.choice(choices))
     spec = DECLARED_POOL[job_type]

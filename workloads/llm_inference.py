@@ -43,7 +43,7 @@ def run(args) -> None:
                 quiet = 0.05 + 0.55 * (1.0 - abs(hour_frac - 0.5) * 2.0)
                 time.sleep(quiet * random.uniform(0.02, 0.2))
             elif args.mode == "serving":
-                time.sleep(random.uniform(0.01, 0.08))
+                time.sleep(1.0 / max(float(args.rps), 0.1))
 
             n_prompt = random.randint(8, min(args.seq_len, model.cfg.block_size // 2))
             n_gen = random.randint(4, min(32, model.cfg.block_size - n_prompt))
@@ -109,12 +109,17 @@ def main() -> None:
     parser.add_argument("--preset", choices=sorted(PRESETS), default="tiny")
     parser.add_argument("--gpu-id", type=int, default=0)
     parser.add_argument("--max-seconds", type=float, default=30)
+    parser.add_argument("--duration", type=float, default=None, help="alias for --max-seconds")
     parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument("--rps", type=float, default=2.0)
     parser.add_argument("--seq-len", type=int, default=64)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--progress-log", default=None)
     parser.add_argument("--allow-cpu", action="store_true")
-    run(parser.parse_args())
+    args = parser.parse_args()
+    if args.duration is not None:
+        args.max_seconds = float(args.duration)
+    run(args)
 
 
 if __name__ == "__main__":

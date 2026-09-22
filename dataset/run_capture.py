@@ -34,22 +34,76 @@ NORMAL_MODES = {
     "eval_train_switch": ("normal_mlp_small", "training"),
 }
 
-ATTACK_WORKLOADS = {
-    "swma": ("swma", "swma_basic", False),
-    "swma_multi": ("swma", "swma_coordinated", False),
-    "ltma": ("ltma", "ltma_basic", True),
-    "cryptojacking": ("cryptojacking", "crypto_flat", False),
+LLM_TRAIN_WORKLOADS = {
+    # label, mode, multi-gpu, default preset
+    "gpt_tiny_finetune": ("normal_llm_finetune", "finetune", False, "tiny"),
+    "llm_pretrain_ddp": ("normal_llm_pretrain_ddp", "pretrain_ddp", True, "small"),
+    "llm_pretrain_fsdp": ("normal_llm_pretrain_fsdp", "pretrain_fsdp", True, "small"),
+    "llm_flat_pretrain": ("normal_llm_flat_pretrain", "flat_pretrain", False, "small"),
+    "llm_finetune": ("normal_llm_finetune", "finetune", False, "small"),
 }
 
-OPTIONAL_LLM_WORKLOADS = {
-    "gpt_tiny_finetune": ("normal_llm_finetune", "workloads.gpt_tiny_finetune", "finetune"),
-    "llm_pretrain_ddp": ("normal_llm_pretrain_ddp", "workloads.llm_workloads", "pretrain_ddp"),
-    "llm_pretrain_fsdp": ("normal_llm_pretrain_fsdp", "workloads.llm_workloads", "pretrain_fsdp"),
-    "llm_flat_pretrain": ("normal_llm_flat_pretrain", "workloads.llm_workloads", "flat_pretrain"),
-    "llm_finetune": ("normal_llm_finetune", "workloads.llm_workloads", "finetune"),
-    "llm_inference_serving": ("normal_llm_inference_serving", "workloads.llm_workloads", "inference_serving"),
-    "llm_inference_batch": ("normal_llm_inference_batch", "workloads.llm_workloads", "inference_batch"),
+INFERENCE_WORKLOADS = {
+    "llm_inference_serving": ("normal_llm_inference_serving", "serving"),
+    "llm_inference_batch": ("normal_llm_inference_batch", "batch"),
 }
+
+VISION_WORKLOADS = {
+    "resnet_single": ("normal_resnet_train", "single", False),
+    "resnet_ddp": ("normal_resnet_train", "ddp", True),
+}
+
+# label, variant, hosted, attack_variants --variant
+ATTACK_WORKLOADS = {
+    "swma": ("swma", "swma_basic", False, "basic"),
+    "swma_basic": ("swma", "swma_basic", False, "basic"),
+    "swma_shallow": ("swma", "swma_shallow", False, "shallow"),
+    "swma_jitter": ("swma", "swma_jitter", False, "jitter"),
+    "swma_piggyback": ("swma", "swma_piggyback", True, "piggyback"),
+    "swma_mimicry": ("swma", "swma_mimicry", True, "mimicry"),
+    "swma_multi": ("swma", "swma_coordinated", False, "coordinated"),
+    "swma_coordinated": ("swma", "swma_coordinated", False, "coordinated"),
+    "ltma": ("ltma", "ltma_basic", True, "ltma"),
+    "cryptojacking": ("cryptojacking", "crypto_flat", False, "crypto"),
+}
+
+# Kept so older imports/tests that expect the name still resolve.
+OPTIONAL_LLM_WORKLOADS = {**LLM_TRAIN_WORKLOADS, **INFERENCE_WORKLOADS}
+
+
+def merge_workload_summary(params: dict, summary: dict) -> dict:
+    """Copy measured attack period and probe fields onto the private param record."""
+    for key in ("period_requested_s", "period_actual_s", "micro_batch", "preset"):
+        if summary.get(key) is not None:
+            params[key] = summary[key]
+    if summary.get("n_params") is not None:
+        params["n_params"] = summary["n_params"]
+    elif isinstance(summary.get("params"), (int, float)):
+        params["n_params"] = int(summary["params"])
+    return params
+
+
+def apply_probe_result(workload: list[str], stdout: str) -> tuple[list[str], dict]:
+    """Read the probe JSON and pin its micro-batch onto the timed command."""
+    summary = None
+    for line in reversed(stdout.splitlines()):
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            summary = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        break
+    fields: dict = {}
+    if not summary:
+        return list(workload), fields
+    merge_workload_summary(fields, summary)
+    micro = fields.get("micro_batch")
+    updated = list(workload)
+    if micro is not None and "--batch-size" not in updated:
+        updated.extend(["--batch-size", str(int(micro))])
+    return updated, fields
 
 
 def _atomic_write(path: Path, text: str, *, mode: int = 0o644) -> None:
@@ -135,6 +189,15 @@ def build_plan(args) -> dict:
 
     rng = np.random.default_rng(seed)
 
+    preset = getattr(args, "preset", None)
+    seq_len = getattr(args, "seq_len", None)
+    grad_accum = getattr(args, "grad_accum", None)
+    batch_size = getattr(args, "batch_size", None)
+    rps = getattr(args, "rps", None)
+    dataloader = getattr(args, "dataloader", None)
+    host_name = getattr(args, "host", None) or "llm"
+    probe = None
+
     if args.workload in NORMAL_MODES:
         gt_label, true_family = NORMAL_MODES[args.workload]
         gt_variant = args.workload
@@ -142,133 +205,131 @@ def build_plan(args) -> dict:
         declared_policy = "honest"
         host_workload = None
         hosted = False
+        module = "workloads.normal_workloads"
         if args.workload == "distributed":
             target_gpus = [0, 1]
             workload = [
-                "torchrun",
-                "--standalone",
-                "--nproc-per-node=2",
-                "-m",
-                "workloads.normal_workloads",
-                "--mode",
-                "distributed",
-                "--max-seconds",
-                str(duration),
-                "--progress-log",
-                str(progress_raw),
+                "torchrun", "--standalone", "--nproc-per-node=2",
+                "-m", module, "--mode", "distributed",
+                "--max-seconds", str(duration),
+                "--progress-log", str(progress_raw),
             ]
         else:
             target_gpus = [args.gpu_id]
             workload = [
-                sys.executable,
-                "-m",
-                "workloads.normal_workloads",
-                "--mode",
-                args.workload,
-                "--gpu-id",
-                str(args.gpu_id),
-                "--max-seconds",
-                str(duration),
-                "--progress-log",
-                str(progress_raw),
+                sys.executable, "-m", module,
+                "--mode", args.workload,
+                "--gpu-id", str(args.gpu_id),
+                "--max-seconds", str(duration),
+                "--progress-log", str(progress_raw),
             ]
-        module = "workloads.normal_workloads"
-    elif args.workload in OPTIONAL_LLM_WORKLOADS:
-        gt_label, module, mode = OPTIONAL_LLM_WORKLOADS[args.workload]
+        if batch_size is not None:
+            workload.extend(["--batch-size", str(batch_size)])
+    elif args.workload in LLM_TRAIN_WORKLOADS:
+        gt_label, mode, multi, default_preset = LLM_TRAIN_WORKLOADS[args.workload]
         gt_variant = mode
         gt_is_attack = False
-        true_family = "training" if "inference" not in mode else "inference"
+        true_family = "training"
         declared_policy = "honest"
         host_workload = None
         hosted = False
-        target_gpus = [0, 1] if mode in {"pretrain_ddp", "pretrain_fsdp"} else [args.gpu_id]
-        available = _module_available(module)
+        module = "workloads.llm_workloads"
+        chosen_preset = preset or default_preset
+        preset = chosen_preset
+        target_gpus = [0, 1] if multi else [args.gpu_id]
+        launcher = ["torchrun", "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
         workload = [
-            sys.executable,
-            "-m",
-            module,
-            "--mode",
-            mode,
-            "--duration",
-            str(duration),
-            "--progress-log",
-            str(progress_raw),
+            *launcher, "-m", module,
+            "--mode", mode,
+            "--preset", chosen_preset,
+            "--duration", str(duration),
+            "--progress-log", str(progress_raw),
         ]
-        if len(target_gpus) == 1:
+        if not multi:
             workload.extend(["--gpu-id", str(args.gpu_id)])
-        if not available and not args.dry_run:
-            raise ImportError(
-                f"{args.workload} requires optional module {module!r}; "
-                "install/add that workload module or use --dry-run to inspect the plan"
-            )
+        if seq_len is not None:
+            workload.extend(["--seq-len", str(seq_len)])
+        if grad_accum is not None:
+            workload.extend(["--grad-accum", str(grad_accum)])
+        if batch_size is not None:
+            workload.extend(["--batch-size", str(batch_size)])
+        probe = [
+            *launcher, "-m", module,
+            "--mode", mode,
+            "--preset", chosen_preset,
+            "--probe-only", "--probe-steps", "12",
+        ]
+        if seq_len is not None:
+            probe.extend(["--seq-len", str(seq_len)])
+        if not multi:
+            probe.extend(["--gpu-id", str(args.gpu_id)])
+    elif args.workload in INFERENCE_WORKLOADS:
+        gt_label, mode = INFERENCE_WORKLOADS[args.workload]
+        gt_variant = mode
+        gt_is_attack = False
+        true_family = "inference"
+        declared_policy = "honest"
+        host_workload = None
+        hosted = False
+        module = "workloads.llm_inference"
+        target_gpus = [args.gpu_id]
+        chosen_preset = preset or "small"
+        preset = chosen_preset
+        workload = [
+            sys.executable, "-m", module,
+            "--mode", mode,
+            "--preset", chosen_preset,
+            "--max-seconds", str(duration),
+            "--gpu-id", str(args.gpu_id),
+            "--progress-log", str(progress_raw),
+        ]
+        if rps is not None:
+            workload.extend(["--rps", str(rps)])
+        if batch_size is not None:
+            workload.extend(["--batch-size", str(batch_size)])
+        if seq_len is not None:
+            workload.extend(["--seq-len", str(seq_len)])
+    elif args.workload in VISION_WORKLOADS:
+        gt_label, mode, multi = VISION_WORKLOADS[args.workload]
+        gt_variant = mode
+        gt_is_attack = False
+        true_family = "training"
+        declared_policy = "honest"
+        host_workload = None
+        hosted = False
+        module = "workloads.vision_workloads"
+        target_gpus = [0, 1] if multi else [args.gpu_id]
+        launcher = ["torchrun", "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
+        workload = [
+            *launcher, "-m", module,
+            "--mode", mode,
+            "--max-seconds", str(duration),
+            "--dataloader", dataloader or "gpu",
+            "--progress-log", str(progress_raw),
+        ]
+        if not multi:
+            workload.extend(["--gpu-id", str(args.gpu_id)])
+        if batch_size is not None:
+            workload.extend(["--batch-size", str(batch_size)])
     elif args.workload in ATTACK_WORKLOADS:
-        gt_label, gt_variant, hosted = ATTACK_WORKLOADS[args.workload]
+        gt_label, gt_variant, hosted, variant = ATTACK_WORKLOADS[args.workload]
         gt_is_attack = True
         true_family = "training"
         host_workload = "normal_llm_finetune" if hosted else None
-        declared_policy = args.declared_policy if not hosted else "host_inherited"
-        target_gpus = [0, 1] if args.workload == "swma_multi" else [args.gpu_id]
-        if args.workload.startswith("swma"):
-            module = "bit2watt_impl.swma_workload"
-            if args.workload == "swma_multi":
-                workload = [
-                    "torchrun",
-                    "--standalone",
-                    "--nproc-per-node=2",
-                    "-m",
-                    module,
-                    "--distributed",
-                    "--duration",
-                    str(duration),
-                    "--period",
-                    str(args.period),
-                    "--duty-cycle",
-                    str(args.duty_cycle),
-                    "--progress-log",
-                    str(progress_raw),
-                ]
-            else:
-                workload = [
-                    sys.executable,
-                    "-m",
-                    module,
-                    "--gpu-id",
-                    str(args.gpu_id),
-                    "--duration",
-                    str(duration),
-                    "--period",
-                    str(args.period),
-                    "--duty-cycle",
-                    str(args.duty_cycle),
-                    "--progress-log",
-                    str(progress_raw),
-                ]
-        elif args.workload == "ltma":
-            module = "bit2watt_impl.ltma_inject"
-            workload = [
-                sys.executable,
-                "-m",
-                module,
-                "--gpu-id",
-                str(args.gpu_id),
-                "--duration",
-                str(duration),
-                "--progress-log",
-                str(progress_raw),
-            ]
-        else:
-            module = "bit2watt_impl.crypto_workload"
-            workload = [
-                sys.executable,
-                "-m",
-                module,
-                "--gpu-id",
-                str(args.gpu_id),
-                "--duration",
-                str(duration),
-                "--progress-log",
-                str(progress_raw),
-            ]
+        declared_policy = "host_inherited" if hosted else args.declared_policy
+        module = "bit2watt_impl.attack_variants"
+        target_gpus = [0, 1] if variant == "coordinated" else [args.gpu_id]
+        workload = [
+            sys.executable, "-m", module,
+            "--variant", variant,
+            "--duration", str(duration),
+            "--gpu-id", str(args.gpu_id),
+            "--seed", str(seed),
+            "--progress-log", str(progress_raw),
+            "--period", str(args.period),
+            "--duty-cycle", str(args.duty_cycle),
+            "--host", host_name,
+        ]
     else:
         raise ValueError(f"unknown workload: {args.workload}")
 
@@ -299,6 +360,12 @@ def build_plan(args) -> dict:
                     true_family,
                     rng,
                     policy=declared_policy if gt_is_attack else "honest",
+                    mismatch_rate=0.0,
+                    allowed_families=(
+                        ("training", "inference")
+                        if gt_is_attack and declared_policy == "pool_random"
+                        else None
+                    ),
                 )
 
     collector = [
@@ -331,9 +398,15 @@ def build_plan(args) -> dict:
             {
                 "workload": args.workload,
                 "duration_s": duration,
-                "period": args.period,
+                "period_requested_s": args.period if gt_is_attack else None,
+                "period_actual_s": args.period if gt_is_attack and not hosted else None,
                 "duty_cycle": args.duty_cycle,
                 "declared_policy": declared_policy,
+                "declared_pool": "training_inference" if declared_policy == "pool_random" else None,
+                "preset": preset,
+                "seq_len": seq_len,
+                "grad_accum": grad_accum,
+                "host": host_name if hosted else None,
             }
         ),
         "declared_policy": declared_policy,
@@ -373,8 +446,8 @@ def build_plan(args) -> dict:
         "target_gpus": target_gpus,
         "probe": (
             shlex.split(args.probe_cmd)
-            if args.probe_cmd and args.workload in OPTIONAL_LLM_WORKLOADS
-            else None
+            if getattr(args, "probe_cmd", None)
+            else probe
         ),
         "dry_run": bool(args.dry_run),
     }
@@ -384,7 +457,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--workload",
-        choices=[*NORMAL_MODES, *OPTIONAL_LLM_WORKLOADS, *ATTACK_WORKLOADS],
+        choices=[
+            *NORMAL_MODES,
+            *LLM_TRAIN_WORKLOADS,
+            *INFERENCE_WORKLOADS,
+            *VISION_WORKLOADS,
+            *ATTACK_WORKLOADS,
+        ],
         required=True,
     )
     parser.add_argument("--gpu-id", type=int, default=0)
@@ -393,6 +472,13 @@ def main() -> None:
     parser.add_argument("--interval-ms", type=float, default=100.0)
     parser.add_argument("--period", type=float, default=1.0)
     parser.add_argument("--duty-cycle", type=float, default=0.5)
+    parser.add_argument("--preset", default=None)
+    parser.add_argument("--seq-len", type=int, default=None)
+    parser.add_argument("--grad-accum", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--rps", type=float, default=None)
+    parser.add_argument("--dataloader", choices=["gpu", "cpu"], default=None)
+    parser.add_argument("--host", choices=["mlp", "llm"], default="llm")
     parser.add_argument("--session-id", default=None)
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--group-id", default=None)
@@ -460,10 +546,19 @@ def main() -> None:
     _atomic_write(staging_dir / "capture_private.json", json.dumps(plan["private"], ensure_ascii=False, indent=2), mode=0o600)
 
     if plan["probe"]:
-        probe = subprocess.run(plan["probe"], cwd=ROOT, check=False)
+        probe = subprocess.run(
+            plan["probe"], cwd=ROOT, check=False, capture_output=True, text=True
+        )
+        workload_cmd, probe_fields = apply_probe_result(plan["workload"], probe.stdout or "")
+        plan["workload"] = workload_cmd
+        params = json.loads(plan["private"]["gt_params_json"])
+        params.update(probe_fields)
+        plan["private"]["gt_params_json"] = json.dumps(params)
         plan["private"]["preflight"]["probe"] = {
             "command": plan["probe"],
             "returncode": probe.returncode,
+            "micro_batch": probe_fields.get("micro_batch"),
+            "n_params": probe_fields.get("n_params"),
         }
         _atomic_write(
             staging_dir / "capture_private.json",
@@ -472,6 +567,7 @@ def main() -> None:
         )
         if probe.returncode:
             raise RuntimeError(f"LLM probe failed exit={probe.returncode}")
+        time.sleep(5)
 
     collector = subprocess.Popen(plan["collector"], cwd=ROOT)
     try:
@@ -500,6 +596,7 @@ def main() -> None:
             if "gt_attack_intervals_epoch" in summary:
                 plan["private"]["gt_attack_intervals_epoch"] = summary["gt_attack_intervals_epoch"]
             params = json.loads(plan["private"]["gt_params_json"])
+            merge_workload_summary(params, summary)
             params["workload_summary"] = {
                 k: summary[k]
                 for k in summary

@@ -48,3 +48,5 @@ def test_workload_modules_help(module):
 
 def test_presets_defined():
     assert set(PRESETS) >= {"tiny", "small", "medium"}
+    small = PRESETS["small"]
+    assert (small.n_layer, small.n_head, small.n_embd, small.block_size) == (8, 12, 768, 128)

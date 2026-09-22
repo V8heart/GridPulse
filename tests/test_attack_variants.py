@@ -171,6 +171,18 @@ def test_dry_plan_argv_snapshots():
     assert "--progress-log" in plan2["argv_attack"]
 
 
+def test_merge_records_requested_and_actual_period():
+    from dataset.run_capture import merge_workload_summary
+
+    params = {"period_requested_s": 1.0, "period_actual_s": None}
+    merge_workload_summary(
+        params,
+        {"period_requested_s": 1.0, "period_actual_s": 0.42, "ok": True},
+    )
+    assert params["period_requested_s"] == 1.0
+    assert params["period_actual_s"] == 0.42
+
+
 def test_swma_variant_params():
     assert SWMA_VARIANTS["shallow"]["matrix_size"] < SWMA_VARIANTS["basic"]["matrix_size"]
     assert SWMA_VARIANTS["jitter"]["jitter_frac"] > 0

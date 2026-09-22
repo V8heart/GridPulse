@@ -328,4 +328,4 @@ telemetry 행의 `gt_*`는 finalize가 labels와 맞춰 붙인다. **공격 활�
 |---|---|---|
 | 1.0 | 2026-09-21 | 최초 작성 |
 | 1.1 | 2026-09-21 | progress always-raw + finalize mask, 위장 로그 필수, `t` 기록 금지, declared_policy 층화 |
-| 1.2 | 2026-09-22 | private/staging 경로, gpu_role, group_id(≠run_id), gt_attack_intervals·창 overlap 정답, stdout을 private로 이전(v1.1 sessions/*/workload_stdout.log는 누설 통로로 폐기), warmup 기본 180s, 공통 duration pool, remask CLI, 금지 토큰 정의 명확화, companion/target 평가 규칙 |
+| 1.2 | 2026-09-22 | private/staging 경로, gpu_role, group_id(≠run_id), gt_attack_intervals·창 overlap 정답, stdout을 private로 이전(v1.1 sessions/*/workload_stdout.log는 누설 통로로 폐기), warmup 기본 180s, 공통 duration pool, remask CLI, 금지 토큰 정의 명확화, companion/target 평가 규칙. 실측 정상은 honest + mismatch_rate=0 (합성 기본 10% mismatch는 실측 캡처에 쓰지 않음). 실측 pool_random은 training/inference 선언만 사용 |

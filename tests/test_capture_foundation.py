@@ -58,6 +58,16 @@ def test_sample_declared_policies():
     matched = {sample_declared("training", np.random.default_rng(i), policy="host_family_matched")["declared_job_type"] for i in range(40)}
     assert matched <= set(FAMILY_TO_DECLARED["training"])
     pool = sample_declared(None, rng, policy="pool_random")
+    restricted = {
+        sample_declared(
+            "training",
+            np.random.default_rng(i),
+            policy="pool_random",
+            allowed_families=("training", "inference"),
+        )["declared_job_family"]
+        for i in range(40)
+    }
+    assert restricted <= {"training", "inference"}
     assert pool["declared_job_type"] in {
         "llm_pretrain",
         "llm_finetune",

@@ -212,7 +212,9 @@ def run(args) -> None:
                 time.sleep(random.uniform(0.05, 0.6))
             x = torch.randint(0, raw_model.cfg.vocab_size, (batch, args.seq_len), device=device)
             y = torch.randint(0, raw_model.cfg.vocab_size, (batch, args.seq_len), device=device)
-            optimizer.zero_grad(set_to_none=True)
+            accum = max(1, int(args.grad_accum))
+            if step % accum == 0:
+                optimizer.zero_grad(set_to_none=True)
             try:
                 with torch.autocast(
                     device_type=device.type,
@@ -223,8 +225,9 @@ def run(args) -> None:
                     loss = torch.nn.functional.cross_entropy(
                         logits.reshape(-1, logits.size(-1)), y.reshape(-1)
                     )
-                loss.backward()
-                optimizer.step()
+                (loss / accum).backward()
+                if (step + 1) % accum == 0:
+                    optimizer.step()
             except RuntimeError as exc:
                 if "out of memory" in str(exc).lower():
                     oom = True
@@ -298,6 +301,7 @@ def main() -> None:
     parser.add_argument("--duration", type=float, default=None, help="alias for --max-seconds")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--seq-len", type=int, default=64)
+    parser.add_argument("--grad-accum", type=int, default=1)
     parser.add_argument("--dtype", choices=["bf16", "fp16", "fp32"], default="bf16")
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=7)

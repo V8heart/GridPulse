@@ -85,16 +85,22 @@ def compare_synth_vs_real(
             "direction": "higher" if delta > 0 else "lower" if delta < 0 else "equal",
         }
     real_normal = real[~_attack(real)]
-    if "declared_job_family" in real_normal:
-        real_normal = real_normal[
-            real_normal["declared_job_family"].astype(str) == "training"
-        ]
-    llm_mean = pd.to_numeric(real_normal["mean_w"], errors="coerce").mean()
+    if "gt_label" in real_normal:
+        labels = real_normal["gt_label"].astype(str)
+        llm = labels.str.startswith("normal_llm_") & ~labels.str.contains("inference")
+        real_normal = real_normal[llm]
+    if real_normal.empty or "mean_w" not in real_normal:
+        llm_mean = float("nan")
+        llm_status = "pending_real_capture"
+    else:
+        llm_mean = pd.to_numeric(real_normal["mean_w"], errors="coerce").mean()
+        llm_status = "measured" if pd.notna(llm_mean) else "pending_real_capture"
     same_direction = direction["synthetic"]["direction"] == direction["real"]["direction"]
     return {
         "features": features,
         "distributions": rows,
         "normal_llm_training": {
+            "status": llm_status,
             "real_mean_w": None if np.isnan(llm_mean) else float(llm_mean),
             "tdp_w": float(tdp_w),
             "mean_fraction_tdp": None if np.isnan(llm_mean) else float(llm_mean / tdp_w),

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import random
 import signal
 import subprocess
 import sys
@@ -164,12 +165,16 @@ def run(args) -> None:
     children: list[subprocess.Popen] = []
     stdout_chunks: list[str] = []
     intervals: dict[str, list[list[float]]] = {}
+    period_requested = None if args.period is None else float(args.period)
+    period_actual = period_requested
     try:
         if args.variant in {"basic", "shallow", "jitter", "swma_basic", "swma_shallow", "swma_jitter"}:
             key = args.variant.replace("swma_", "")
             params = dict(SWMA_VARIANTS[key if key in SWMA_VARIANTS else "basic"])
             if args.period is not None:
                 params["period"] = args.period
+            period_requested = float(params["period"])
+            period_actual = float(params["period"])
             argv = _swma_argv(
                 args,
                 gpu_id=args.gpu_id,
@@ -186,6 +191,10 @@ def run(args) -> None:
             intervals = summary.get("gt_attack_intervals_epoch") or {str(args.gpu_id): []}
         elif args.variant == "coordinated":
             params = dict(SWMA_VARIANTS["basic"])
+            if args.period is not None:
+                params["period"] = args.period
+            period_requested = float(params["period"])
+            period_actual = float(params["period"])
             coordinated: list[tuple[int, subprocess.Popen]] = []
             plan["argv_attack"] = []
             for gpu_id in (args.gpu_id, args.gpu_id + 1):
@@ -242,11 +251,15 @@ def run(args) -> None:
                 raise RuntimeError(
                     f"host did not complete 30 warmup steps (observed={len(times)})"
                 )
-            period = _median_period(times) or 1.0
+            host_period = _median_period(times) or 1.0
+            scale = random.Random(args.seed).uniform(
+                *( (0.3, 0.7) if args.variant == "piggyback" else (0.9, 1.1) )
+            )
+            period_requested = None if args.period is None else float(args.period)
+            period_actual = float(host_period) * float(scale)
             # Passive first 30 host steps are NOT attack intervals.
             params = dict(SWMA_VARIANTS["basic"])
-            if args.variant == "mimicry":
-                params["period"] = float(period)
+            params["period"] = period_actual
             attack_cmd = _swma_argv(
                 args,
                 gpu_id=args.gpu_id,
@@ -334,6 +347,8 @@ def run(args) -> None:
                 "hosted": plan["hosted"],
                 "attack_progress_log": plan["attack_progress_log"],
                 "gt_attack_intervals_epoch": intervals,
+                "period_requested_s": period_requested,
+                "period_actual_s": period_actual,
                 "plan": {k: v for k, v in plan.items() if k.startswith("argv") or k in {"params", "passive_host_steps"}},
             },
             ensure_ascii=False,

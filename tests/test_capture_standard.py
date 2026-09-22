@@ -74,8 +74,9 @@ def test_real_capture_requires_explicit_shared_gpu_safety_flag():
 def test_matrix_keys_shards_and_even_attack_repeats(tmp_path: Path):
     config = load_config(ROOT / "config" / "capture_matrix.yaml")
     matrix = build_matrix(config)
-    assert len(matrix) == 140
-    assert 22 <= (sum(x["duration_s"] for x in matrix) + 60 * 139) / 3600 <= 26
+    assert len(matrix) == 116
+    lower_hours = (sum(x["duration_s"] for x in matrix) + 60 * (len(matrix) - 1)) / 3600
+    assert 20 <= lower_hours <= 26
     assert len({x["capture_key"] for x in matrix}) == len(matrix)
     left, right = shard(matrix, 2, 0), shard(matrix, 2, 1)
     assert {x["capture_key"] for x in left}.isdisjoint(x["capture_key"] for x in right)
@@ -169,3 +170,32 @@ def test_workload_registry_covers_matrix_core():
         plan = build_plan(_Args(workload=name, dry_run=True))
         assert plan["workload"]
         assert re.fullmatch(r"s-[0-9a-f]{16}", plan["session_id"])
+
+
+def test_new_workloads_dry_run_launchers():
+    from dataset.run_capture import apply_probe_result
+
+    resnet = build_plan(_Args(workload="resnet_single"))
+    assert "workloads.vision_workloads" in resnet["workload"]
+    assert resnet["workload"][0] != "torchrun"
+    serving = build_plan(_Args(workload="llm_inference_serving"))
+    assert "workloads.llm_inference" in serving["workload"]
+    assert serving["workload"][serving["workload"].index("--mode") + 1] == "serving"
+    piggy = build_plan(_Args(workload="swma_piggyback"))
+    assert "bit2watt_impl.attack_variants" in piggy["workload"]
+    assert piggy["workload"][piggy["workload"].index("--variant") + 1] == "piggyback"
+    assert "--declared-policy" not in piggy["workload"]
+    shallow = build_plan(_Args(workload="swma_shallow"))
+    assert shallow["workload"][shallow["workload"].index("--variant") + 1] == "shallow"
+    assert "--progress-log" in shallow["workload"]
+    ddp = build_plan(_Args(workload="llm_pretrain_ddp"))
+    assert ddp["workload"][0] == "torchrun"
+    assert ddp["probe"][0] == "torchrun"
+    assert "--probe-only" in ddp["probe"]
+    assert ddp["workload"][ddp["workload"].index("--preset") + 1] == "small"
+    pinned, fields = apply_probe_result(
+        ["python", "-m", "workloads.llm_workloads"],
+        '{"probe_only": true, "micro_batch": 3, "params": 12345}\n',
+    )
+    assert pinned[-2:] == ["--batch-size", "3"]
+    assert fields["n_params"] == 12345

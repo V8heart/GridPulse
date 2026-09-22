@@ -20,7 +20,48 @@ from dataset.identifiers import group_id_from_parts
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG = ROOT / "config" / "capture_matrix.yaml"
 DEFAULT_LABELS = ROOT / "dataset" / "real" / "index" / "labels.csv"
-ATTACK_WORKLOADS = {"swma", "swma_multi", "ltma", "cryptojacking"}
+ATTACK_WORKLOADS = {
+    "swma",
+    "swma_basic",
+    "swma_shallow",
+    "swma_jitter",
+    "swma_piggyback",
+    "swma_mimicry",
+    "swma_multi",
+    "swma_coordinated",
+    "ltma",
+    "cryptojacking",
+}
+HOSTED_WORKLOADS = {"swma_piggyback", "swma_mimicry", "ltma"}
+NORMAL_WORKLOADS = {
+    "baseline",
+    "distributed",
+    "hpo",
+    "checkpoint",
+    "dataloader_stall",
+    "eval_train_switch",
+    "gpt_tiny_finetune",
+    "llm_pretrain_ddp",
+    "llm_pretrain_fsdp",
+    "llm_flat_pretrain",
+    "llm_finetune",
+    "llm_inference_serving",
+    "llm_inference_batch",
+    "resnet_single",
+    "resnet_ddp",
+}
+FORWARDED_PARAMS = {
+    "period",
+    "duty_cycle",
+    "declared_policy",
+    "host",
+    "dataloader",
+    "preset",
+    "seq_len",
+    "grad_accum",
+    "rps",
+    "batch_size",
+}
 
 
 def _canonical(value: Any) -> str:
@@ -55,20 +96,44 @@ def load_config(path: Path) -> dict[str, Any]:
     return data
 
 
+def _grid_assignments(grid: dict[str, Any], repeats: int, rng: np.random.Generator) -> list[dict[str, Any]]:
+    if not grid:
+        return [{} for _ in range(repeats)]
+    combos: list[dict[str, Any]] = [{}]
+    for key in sorted(grid):
+        values = list(grid[key])
+        if not values:
+            raise ValueError(f"params_grid.{key} is empty")
+        combos = [{**base, key: value} for base in combos for value in values]
+    order = list(range(len(combos)))
+    rng.shuffle(order)
+    return [dict(combos[order[index % len(combos)]]) for index in range(repeats)]
+
+
 def build_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
     """Expand and seed-shuffle entries; duration assignment does not use labels."""
     seed = int(config.get("seed", 7))
     config_hash = hashlib.sha256(_canonical(config).encode()).hexdigest()[:16]
-    pending: list[tuple[int, int, dict[str, Any]]] = []
+    grid_rng = np.random.default_rng(seed + 10007)
+    pending: list[tuple[int, int, dict[str, Any], dict[str, Any]]] = []
     for entry_index, entry in enumerate(config["entries"]):
-        for repeat in range(int(entry["repeats"])):
-            pending.append((entry_index, repeat, entry))
+        repeats = int(entry["repeats"])
+        assignments = _grid_assignments(dict(entry.get("params_grid") or {}), repeats, grid_rng)
+        policies = list(entry.get("declared_policies") or [])
+        hosted = entry["workload"] in HOSTED_WORKLOADS
+        for repeat in range(repeats):
+            params = dict(entry.get("params") or {})
+            params.update(assignments[repeat])
+            if hosted:
+                params["declared_policy"] = "host_inherited"
+            elif policies:
+                params["declared_policy"] = policies[repeat % len(policies)]
+            pending.append((entry_index, repeat, entry, params))
     rng = np.random.default_rng(seed)
     rng.shuffle(pending)
     durations = list(config["duration_pool_s"])
     result = []
-    for shuffled_index, (entry_index, repeat, entry) in enumerate(pending):
-        params = dict(entry.get("params") or {})
+    for shuffled_index, (entry_index, repeat, entry, params) in enumerate(pending):
         duration = int(durations[int(rng.integers(0, len(durations)))])
         key_payload = {
             "config": config_hash,
@@ -80,7 +145,7 @@ def build_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
         result.append(
             {
                 "capture_key": capture_key,
-                "group_id": group_id_from_parts(config_hash, entry_index, params),
+                "group_id": group_id_from_parts(config_hash, entry["workload"], params),
                 "entry_index": entry_index,
                 "repeat": repeat,
                 "shuffle_index": shuffled_index,
@@ -115,15 +180,36 @@ def shard(items: list[dict[str, Any]], count: int, index: int) -> list[dict[str,
 
 def summarize(items: list[dict[str, Any]], cooldown_s: float) -> dict[str, Any]:
     duration_seconds = sum(item["duration_s"] for item in items)
-    estimated = duration_seconds + max(0, len(items) - 1) * cooldown_s
+    gaps = max(0, len(items) - 1)
+    estimated = duration_seconds + gaps * cooldown_s
+    # Startup plus a typical cooldown tail. The 15 minute cap is not assumed every session.
+    planning = duration_seconds + len(items) * 90 + gaps * 180
+    normal = [item for item in items if item["workload"] in NORMAL_WORKLOADS]
+    attack = [item for item in items if item["workload"] in ATTACK_WORKLOADS]
     return {
         "session_count": len(items),
+        "normal_sessions": len(normal),
+        "attack_sessions": len(attack),
         "estimated_hours": round(estimated / 3600.0, 2),
+        "planning_hours": round(planning / 3600.0, 2),
+        "planning_note": "3 night shards; 90s startup and 3 min mean cooldown are in planning_hours. The 15 minute cooldown cap is not fully budgeted.",
         "workloads": dict(sorted(Counter(x["workload"] for x in items).items())),
         "durations_s": dict(sorted(Counter(x["duration_s"] for x in items).items())),
         "declared_policy": dict(
-            sorted(Counter(x["params"].get("declared_policy", "default") for x in items).items())
+            sorted(Counter(str(x["params"].get("declared_policy", "default")) for x in items).items())
         ),
+        "periods": dict(
+            sorted(Counter(x["params"].get("period") for x in items if "period" in x["params"]).items())
+        ),
+        "hosted_vs_standalone": {
+            "hosted": sum(item["workload"] in HOSTED_WORKLOADS for item in attack),
+            "standalone": sum(item["workload"] not in HOSTED_WORKLOADS for item in attack),
+        },
+        "attack_policy_counts": dict(
+            sorted(Counter(str(item["params"].get("declared_policy", "default")) for item in attack).items())
+        ),
+        "normal_group_count": len({item["group_id"] for item in normal}),
+        "attack_group_count": len({item["group_id"] for item in attack}),
     }
 
 
@@ -163,6 +249,10 @@ def command_for(item: dict[str, Any], *, allow_busy: bool, confirm: bool) -> lis
         "--group-id", item["group_id"],
     ]
     for key, value in sorted(item["params"].items()):
+        if key not in FORWARDED_PARAMS or value is None:
+            continue
+        if key == "declared_policy" and value == "host_inherited":
+            continue
         flag = "--" + key.replace("_", "-")
         if isinstance(value, bool):
             if value:

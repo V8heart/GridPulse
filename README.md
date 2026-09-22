@@ -95,6 +95,9 @@ bash scripts/capture_all.sh --confirm-shared-gpu-safe --shard 0 --shards 3
 python -m dataset.observability dataset/real/sessions --output dataset/real/observability/summary.md
 ```
 
+이번 매트릭스에는 서로 다른 정상 잡이 한 세션에서 동시에 도는 `mixed_tenants`가 없다.
+그래서 `cross_job_sync`의 정상 기준은 없고, 그 지표는 coordinated 공격에서만 관측된다.
+
 `--interval-ms`는 API 호출 요청 주기이지 센서의 물리 측정률이 아니다.
 `actual_interval_ms`, `value_changed`와 observability summary로 실효 갱신률을
 별도로 확인해야 한다. Nyquist 초과 성분은 `aliased`로 기록하고 folded frequency와

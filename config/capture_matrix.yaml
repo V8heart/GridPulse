@@ -8,27 +8,97 @@ cooldown:
   idle_temp_delta_c: 3
   poll_seconds: 10
 entries:
+  - workload: llm_pretrain_ddp
+    repeats: 8
+    params_grid:
+      preset: [small]
+      seq_len: [64, 128]
+      grad_accum: [1, 2]
+  - workload: llm_pretrain_fsdp
+    repeats: 8
+    params_grid:
+      preset: [small]
+      seq_len: [64, 128]
+      grad_accum: [1, 2]
+  - workload: llm_flat_pretrain
+    repeats: 8
+    params_grid:
+      preset: [small]
+      seq_len: [64, 128]
+      grad_accum: [1, 2]
+  - workload: llm_finetune
+    repeats: 8
+    params_grid:
+      preset: [small]
+      seq_len: [64, 128]
+      grad_accum: [1, 2]
+  - workload: llm_inference_serving
+    repeats: 6
+    params_grid:
+      preset: [small]
+      rps: [1, 2, 4]
+  - workload: llm_inference_batch
+    repeats: 6
+    params_grid:
+      preset: [small]
+      batch_size: [1, 4, 8]
+  - workload: resnet_single
+    repeats: 6
+    params_grid:
+      batch_size: [8, 16, 32]
+  - workload: resnet_ddp
+    repeats: 6
+    params_grid:
+      batch_size: [8, 16, 32]
   - workload: baseline
-    repeats: 14
-  - workload: distributed
-    repeats: 14
+    repeats: 4
+    params_grid:
+      batch_size: [16, 32]
   - workload: hpo
-    repeats: 14
-  - workload: checkpoint
-    repeats: 14
+    repeats: 4
+    params_grid:
+      batch_size: [16, 32]
   - workload: dataloader_stall
-    repeats: 14
-  - workload: eval_train_switch
-    repeats: 14
-  - workload: swma
-    repeats: 14
-    params: {period: 1.0, duty_cycle: 0.5, declared_policy: pool_random}
-  - workload: swma_multi
-    repeats: 14
-    params: {period: 1.0, duty_cycle: 0.5, declared_policy: host_family_matched}
+    repeats: 4
+    params_grid:
+      batch_size: [16, 32]
+  - workload: swma_basic
+    repeats: 6
+    declared_policies: [pool_random, host_family_matched]
+    params: {duty_cycle: 0.5}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
+  - workload: swma_shallow
+    repeats: 6
+    declared_policies: [pool_random, host_family_matched]
+    params: {duty_cycle: 0.5}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
+  - workload: swma_jitter
+    repeats: 6
+    declared_policies: [pool_random, host_family_matched]
+    params: {duty_cycle: 0.5}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
+  - workload: swma_coordinated
+    repeats: 6
+    declared_policies: [pool_random, host_family_matched]
+    params: {duty_cycle: 0.5}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
+  - workload: swma_piggyback
+    repeats: 6
+    params: {duty_cycle: 0.5, host: llm}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
+  - workload: swma_mimicry
+    repeats: 6
+    params: {duty_cycle: 0.5, host: llm}
+    params_grid:
+      period: [0.5, 1.0, 2.0, 4.0]
   - workload: ltma
-    repeats: 14
-    params: {declared_policy: host_family_matched}
+    repeats: 6
+    params: {host: llm}
   - workload: cryptojacking
-    repeats: 14
-    params: {declared_policy: pool_random}
+    repeats: 6
+    declared_policies: [pool_random, host_family_matched]

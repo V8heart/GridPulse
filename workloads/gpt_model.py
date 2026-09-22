@@ -19,7 +19,9 @@ class GPTPreset:
 
 PRESETS: dict[str, GPTPreset] = {
     "tiny": GPTPreset("tiny", n_layer=2, n_head=2, n_embd=64, vocab_size=512, block_size=64),
-    "small": GPTPreset("small", n_layer=4, n_head=4, n_embd=128, vocab_size=1024, block_size=128),
+    # Capture default. Wider than the old toy small so training power is not
+    # trivially separable from SWMA/crypto matmuls. medium stays unused.
+    "small": GPTPreset("small", n_layer=8, n_head=12, n_embd=768, vocab_size=1024, block_size=128),
     "medium": GPTPreset("medium", n_layer=6, n_head=8, n_embd=256, vocab_size=2048, block_size=256),
 }
 
