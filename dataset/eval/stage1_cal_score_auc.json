@@ -1,18 +1,18 @@
 {
-  "u_score_auc_overall": 0.8524718915343915,
+  "u_score_auc_overall": 0.8524896069538926,
   "u_score_auc_by_label": {
     "cryptojacking": {
-      "auc": 0.8321641156462585,
+      "auc": 0.9007227891156463,
       "n": 28,
       "root_cause": "alpha_may_help"
     },
     "ltma": {
-      "auc": 0.9168792517006803,
+      "auc": 0.9466411564625851,
       "n": 28,
       "root_cause": "alpha_may_help"
     },
     "swma": {
-      "auc": 0.8461719509232264,
+      "auc": 0.8321489310009719,
       "n": 196,
       "root_cause": "alpha_may_help"
     }
