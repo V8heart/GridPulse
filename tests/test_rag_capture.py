@@ -89,5 +89,9 @@ def test_capture_dry_run_does_not_require_gpu(capsys):
         capture_main()
     output = json.loads(capsys.readouterr().out)
     assert output["dry_run"] is True
-    assert output["label"] == "swma"
-    assert "dataset/real/swma/" in output["output"]
+    assert output["private"]["gt_label"] == "swma"
+    assert "/sessions/" in output["session_dir"]
+    assert output["session_id"].startswith("s-")
+    assert "--progress-log" in output["workload"]
+    assert "label" not in output
+    assert all("swma" not in str(output["session_dir"]).lower() for _ in [0])
