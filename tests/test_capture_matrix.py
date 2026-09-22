@@ -2,11 +2,21 @@
 from __future__ import annotations
 
 import json
+from argparse import Namespace
 from collections import Counter
 from pathlib import Path
 
-from dataset.capture_matrix import build_matrix, command_for, load_config, summarize
+from bit2watt_impl.attack_variants import hosted_scale
+from dataset.capture_matrix import (
+    ATTACK_WORKLOADS,
+    NORMAL_WORKLOADS,
+    build_matrix,
+    command_for,
+    load_config,
+    summarize,
+)
 from dataset.identifiers import is_group_id
+from dataset.run_capture import build_plan
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -123,3 +133,76 @@ def test_reports_use_actual_period_and_mark_missing_real_power():
     )
     compared = compare_synth_vs_real(windows, windows)
     assert compared["normal_llm_training"]["status"] == "pending_real_capture"
+
+
+def _plan_for(item: dict) -> dict:
+    params = item["params"]
+    return build_plan(Namespace(
+        workload=item["workload"],
+        gpu_id=item["gpu_id"],
+        gpu_ids_override="0,1",
+        duration=item["duration_s"],
+        interval_ms=100.0,
+        period=params.get("period", 1.0),
+        duty_cycle=params.get("duty_cycle", 0.5),
+        session_id=None,
+        run_id=None,
+        group_id=item["group_id"],
+        capture_key=item["capture_key"],
+        seed=item["seed"],
+        pre_capture_s=10.0,
+        post_capture_s=10.0,
+        warmup_s=180.0,
+        proc_poll_s=1.0,
+        progress_mask_seed=7,
+        progress_mask_drop_prob=0.4,
+        declared_policy=params.get("declared_policy", "pool_random"),
+        dry_run=True,
+        probe_cmd=None,
+        preset=params.get("preset"),
+        seq_len=params.get("seq_len"),
+        grad_accum=params.get("grad_accum"),
+        batch_size=params.get("batch_size"),
+        rps=params.get("rps"),
+        dataloader=params.get("dataloader"),
+        host=params.get("host", "llm"),
+    ))
+
+
+def _primary_user(plan: dict) -> str:
+    target_ids = sorted(
+        (gpu_id for gpu_id, role in plan["gpu_roles"].items() if role == "target"),
+        key=int,
+    )
+    return plan["declared_by_gpu"][target_ids[0]]["declared_user"]
+
+
+def test_capture_seeds_are_unique_reproducible_and_spread_declarations():
+    config = load_config(ROOT / "config" / "capture_matrix.yaml")
+    first = build_matrix(config)
+    second = build_matrix(config)
+    assert [item["seed"] for item in first] == [item["seed"] for item in second]
+    assert len({item["seed"] for item in first}) == len(first) == 116
+    for item in first:
+        command = command_for(item, allow_busy=False, confirm=False)
+        assert command[command.index("--seed") + 1] == str(item["seed"])
+
+    normal_users = []
+    attack_users = []
+    for item in first:
+        user = _primary_user(_plan_for(item))
+        if item["workload"] in NORMAL_WORKLOADS:
+            normal_users.append(user)
+        elif item["workload"] in ATTACK_WORKLOADS:
+            attack_users.append(user)
+    for users in (normal_users, attack_users):
+        counts = Counter(users)
+        assert max(counts.values()) / len(users) <= 0.20
+
+    scales = [
+        hosted_scale(item["seed"], "piggyback")
+        for item in first
+        if item["workload"] == "swma_piggyback"
+    ]
+    assert len(scales) == 6
+    assert len(set(scales)) == len(scales)

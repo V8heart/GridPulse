@@ -335,6 +335,11 @@ def build_plan(args) -> dict:
     else:
         raise ValueError(f"unknown workload: {args.workload}")
 
+    if "--seed" not in workload:
+        workload.extend(["--seed", str(seed)])
+    if probe and "--seed" not in probe:
+        probe.extend(["--seed", str(seed)])
+
     # GPU roles: all recorded GPUs; non-targets are companion_idle
     record_gpus = list(range(2))  # collector default all on dual-GPU box; dry-run assumes 0..1
     if args.gpu_ids_override:
@@ -444,6 +449,7 @@ def build_plan(args) -> dict:
         "host_workload": host_workload,
         "group_id": args.group_id or f"g-{session_id[2:]}",
         "capture_key": args.capture_key or f"{args.workload}:{duration}:{seed}",
+        "seed": seed,
         "run_id": run_id,
         "source": "real",
         "created_epoch": time.time(),

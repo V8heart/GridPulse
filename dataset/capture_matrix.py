@@ -68,6 +68,12 @@ def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def capture_seed(config_seed: int, capture_key: str) -> int:
+    """Positive int63 seed unique to one capture and stable across dry-runs."""
+    digest = hashlib.sha256(f"{int(config_seed)}:{capture_key}".encode()).digest()
+    return int.from_bytes(digest[:8], "big") & ((1 << 63) - 1) or 1
+
+
 def load_config(path: Path) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or data.get("schema") != "kdn-capture-matrix/1":
@@ -133,6 +139,7 @@ def build_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
     rng.shuffle(pending)
     durations = list(config["duration_pool_s"])
     result = []
+    used_seeds: set[int] = set()
     for shuffled_index, (entry_index, repeat, entry, params) in enumerate(pending):
         duration = int(durations[int(rng.integers(0, len(durations)))])
         key_payload = {
@@ -142,9 +149,14 @@ def build_matrix(config: dict[str, Any]) -> list[dict[str, Any]]:
             "params": params,
         }
         capture_key = "c-" + hashlib.sha256(_canonical(key_payload).encode()).hexdigest()[:20]
+        session_seed = capture_seed(seed, capture_key)
+        while session_seed in used_seeds:
+            session_seed = (session_seed + 1) & ((1 << 63) - 1) or 1
+        used_seeds.add(session_seed)
         result.append(
             {
                 "capture_key": capture_key,
+                "seed": session_seed,
                 "group_id": group_id_from_parts(config_hash, entry["workload"], params),
                 "entry_index": entry_index,
                 "repeat": repeat,
@@ -247,6 +259,7 @@ def command_for(item: dict[str, Any], *, allow_busy: bool, confirm: bool) -> lis
         "--duration", str(item["duration_s"]),
         "--capture-key", item["capture_key"],
         "--group-id", item["group_id"],
+        "--seed", str(item["seed"]),
     ]
     for key, value in sorted(item["params"].items()):
         if key not in FORWARDED_PARAMS or value is None:

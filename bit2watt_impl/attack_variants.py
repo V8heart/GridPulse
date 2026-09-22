@@ -40,6 +40,12 @@ def _read_step_times(progress_path: Path, *, gpu_id: int, limit: int = 30) -> li
     return times
 
 
+def hosted_scale(seed: int, variant: str) -> float:
+    """Multiplier applied to the host step period. Piggyback and mimicry use different ranges."""
+    low, high = (0.3, 0.7) if variant == "piggyback" else (0.9, 1.1)
+    return random.Random(int(seed)).uniform(low, high)
+
+
 def _median_period(times: list[float]) -> float | None:
     if len(times) < 2:
         return None
@@ -95,6 +101,8 @@ def _host_argv(args, *, progress_log: str, duration: float) -> list[str]:
             progress_log,
             "--batch-size",
             "2",
+            "--seed",
+            str(args.seed),
         ]
     return [
         sys.executable,
@@ -108,6 +116,8 @@ def _host_argv(args, *, progress_log: str, duration: float) -> list[str]:
         str(duration),
         "--progress-log",
         progress_log,
+        "--seed",
+        str(args.seed),
     ]
 
 
@@ -252,9 +262,7 @@ def run(args) -> None:
                     f"host did not complete 30 warmup steps (observed={len(times)})"
                 )
             host_period = _median_period(times) or 1.0
-            scale = random.Random(args.seed).uniform(
-                *( (0.3, 0.7) if args.variant == "piggyback" else (0.9, 1.1) )
-            )
+            scale = hosted_scale(args.seed, args.variant)
             period_requested = None if args.period is None else float(args.period)
             period_actual = float(host_period) * float(scale)
             # Passive first 30 host steps are NOT attack intervals.
@@ -299,6 +307,8 @@ def run(args) -> None:
                 str(args.duration),
                 "--host",
                 args.host,
+                "--seed",
+                str(args.seed),
             ]
             if progress:
                 cmd.extend(["--progress-log", str(progress)])
@@ -318,6 +328,8 @@ def run(args) -> None:
                 str(args.gpu_id),
                 "--duration",
                 str(args.duration),
+                "--seed",
+                str(args.seed),
             ]
             if progress:
                 cmd.extend(["--progress-log", str(progress)])
