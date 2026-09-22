@@ -199,3 +199,47 @@ def test_new_workloads_dry_run_launchers():
     )
     assert pinned[-2:] == ["--batch-size", "3"]
     assert fields["n_params"] == 12345
+
+
+def test_ddp_targets_share_one_declaration_and_have_no_companion():
+    for workload in ("llm_pretrain_ddp", "llm_pretrain_fsdp", "resnet_ddp"):
+        plan = build_plan(_Args(
+            workload=workload,
+            gpu_ids_override="0,1",
+            seed=3,
+            session_id="s-0000000000000003",
+        ))
+        assert plan["gpu_roles"] == {"0": "target", "1": "target"}
+        assert plan["declared_by_gpu"]["0"] == plan["declared_by_gpu"]["1"]
+        assert plan["declared_by_gpu"]["0"] is not plan["declared_by_gpu"]["1"]
+
+
+def test_single_gpu_companion_stays_interactive():
+    for workload in ("baseline", "swma_basic", "resnet_single"):
+        plan = build_plan(_Args(
+            workload=workload,
+            gpu_ids_override="0,1",
+            seed=4,
+            session_id="s-0000000000000004",
+        ))
+        assert plan["gpu_roles"]["0"] == "target"
+        assert plan["gpu_roles"]["1"] == "companion_idle"
+        assert plan["declared_by_gpu"]["1"]["declared_job_family"] == "interactive"
+
+
+def test_coordinated_gpus_differ_on_every_seed():
+    for policy in ("pool_random", "host_family_matched"):
+        for seed in range(24):
+            plan = build_plan(_Args(
+                workload="swma_coordinated",
+                declared_policy=policy,
+                gpu_ids_override="0,1",
+                seed=seed,
+                session_id=f"s-{seed:016x}",
+            ))
+            left = plan["declared_by_gpu"]["0"]
+            right = plan["declared_by_gpu"]["1"]
+            assert left["declared_user"] != right["declared_user"]
+            assert left["declared_job_type"] != right["declared_job_type"]
+            params = json.loads(plan["private"]["gt_params_json"])
+            assert params["coordinated_disguise"] == "split_jobs"

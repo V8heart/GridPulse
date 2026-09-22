@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dataset.declared_context import FAMILY_TO_DECLARED, sample_declared
+from dataset.declared_context import FAMILY_TO_DECLARED, sample_declared, sample_split_partner
 from dataset.identifiers import (
     group_id_from_parts,
     is_group_id,
@@ -87,6 +87,25 @@ def test_sample_declared_policies():
     assert host == honest
     legacy = sample_declared("training", rng, disguise=True)
     assert "declared_job_type" in legacy
+    anchor = sample_declared(
+        "training",
+        np.random.default_rng(1),
+        policy="pool_random",
+        mismatch_rate=0.0,
+        allowed_families=("training", "inference"),
+    )
+    forced = sample_split_partner(
+        anchor,
+        np.random.default_rng(2),
+        true_family="training",
+        policy="pool_random",
+        mismatch_rate=0.0,
+        allowed_families=("training", "inference"),
+        attempts=0,
+    )
+    assert forced["declared_user"] != anchor["declared_user"]
+    assert forced["declared_job_type"] != anchor["declared_job_type"]
+    assert forced["declared_job_family"] in {"training", "inference"}
 
 
 def test_progress_policy_uniform_and_idle_exception():

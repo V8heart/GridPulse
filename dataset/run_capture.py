@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from dataset.declared_context import sample_declared
+from dataset.declared_context import sample_declared, sample_split_partner
 from dataset.finalize_session import finalize_session
 from dataset.identifiers import is_session_id, new_run_id, new_session_id, require_session_id
 
@@ -197,6 +197,7 @@ def build_plan(args) -> dict:
     dataloader = getattr(args, "dataloader", None)
     host_name = getattr(args, "host", None) or "llm"
     probe = None
+    per_target_declared = False
 
     if args.workload in NORMAL_MODES:
         gt_label, true_family = NORMAL_MODES[args.workload]
@@ -317,6 +318,7 @@ def build_plan(args) -> dict:
         true_family = "training"
         host_workload = "normal_llm_finetune" if hosted else None
         declared_policy = "host_inherited" if hosted else args.declared_policy
+        per_target_declared = variant == "coordinated"
         module = "bit2watt_impl.attack_variants"
         target_gpus = [0, 1] if variant == "coordinated" else [args.gpu_id]
         workload = [
@@ -340,6 +342,21 @@ def build_plan(args) -> dict:
     gpu_roles = {str(g): ("target" if g in target_gpus else "companion_idle") for g in record_gpus}
 
     declared_by_gpu = {}
+    target_sample = dict(
+        policy=declared_policy if gt_is_attack else "honest",
+        mismatch_rate=0.0,
+        allowed_families=(
+            ("training", "inference")
+            if gt_is_attack and declared_policy == "pool_random"
+            else None
+        ),
+    )
+
+    def _companion_declared() -> dict:
+        declared = sample_declared("interactive", rng, policy="honest", mismatch_rate=0.0)
+        declared["declared_job_family"] = "interactive"
+        return declared
+
     if hosted:
         host_declared = sample_declared(true_family, rng, policy="honest", mismatch_rate=0.0)
         for gid, role in gpu_roles.items():
@@ -348,25 +365,32 @@ def build_plan(args) -> dict:
                     true_family, rng, policy="host_inherited", host_declared=host_declared
                 )
             else:
-                declared_by_gpu[gid] = sample_declared("interactive", rng, policy="honest", mismatch_rate=0.0)
-                declared_by_gpu[gid]["declared_job_family"] = "interactive"
+                declared_by_gpu[gid] = _companion_declared()
     else:
+        shared = None
+        anchor = None
+        target_ids = sorted(
+            (gid for gid, role in gpu_roles.items() if role == "target"),
+            key=int,
+        )
         for gid, role in gpu_roles.items():
             if role == "companion_idle":
-                declared_by_gpu[gid] = sample_declared("interactive", rng, policy="honest", mismatch_rate=0.0)
-                declared_by_gpu[gid]["declared_job_family"] = "interactive"
+                declared_by_gpu[gid] = _companion_declared()
+            elif per_target_declared:
+                continue
             else:
-                declared_by_gpu[gid] = sample_declared(
-                    true_family,
-                    rng,
-                    policy=declared_policy if gt_is_attack else "honest",
-                    mismatch_rate=0.0,
-                    allowed_families=(
-                        ("training", "inference")
-                        if gt_is_attack and declared_policy == "pool_random"
-                        else None
-                    ),
-                )
+                if shared is None:
+                    shared = sample_declared(true_family, rng, **target_sample)
+                declared_by_gpu[gid] = dict(shared)
+        if per_target_declared:
+            for gid in target_ids:
+                if anchor is None:
+                    anchor = sample_declared(true_family, rng, **target_sample)
+                    declared_by_gpu[gid] = anchor
+                else:
+                    declared_by_gpu[gid] = sample_split_partner(
+                        anchor, rng, true_family=true_family, **target_sample
+                    )
 
     collector = [
         sys.executable,
@@ -407,6 +431,11 @@ def build_plan(args) -> dict:
                 "seq_len": seq_len,
                 "grad_accum": grad_accum,
                 "host": host_name if hosted else None,
+                **(
+                    {"coordinated_disguise": "split_jobs"}
+                    if per_target_declared
+                    else {}
+                ),
             }
         ),
         "declared_policy": declared_policy,
