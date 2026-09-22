@@ -5,7 +5,12 @@ __pycache__/
 *.deb
 result.json
 data/raw/
+# Real capture: entire tree (sessions, staging, private, probes)
 dataset/real/
+dataset/real/.staging/
+dataset/real/private/
+dataset/real/**/*.spool.csv
+dataset/real/**/*.tmp
 dataset/**/*.csv.gz
 dataset/**/summary.md
 .DS_Store
@@ -18,4 +23,5 @@ stage1_results.csv
 dataset/synthetic/normal/syn-*.csv
 dataset/synthetic/attacks/syn-*.csv
 dataset/synthetic/steps/
+dataset/synthetic/sessions/
 dataset/synthetic/all_v3.csv
