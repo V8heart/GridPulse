@@ -7,9 +7,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from dataset.window_truth import label_window, parse_intervals
 from pipeline.baseline import CohortBaseline, FEATURES_V2
 from pipeline.changepoint import cusum_changepoints
-from pipeline.context_evidence import explained_changepoints, period_match, read_progress_log, step_period_from_log
+from pipeline.context_evidence import (
+    explained_changepoints,
+    period_match,
+    read_progress_log,
+    read_session_progress,
+    step_period_from_log,
+)
 from pipeline.evidence_vocab import (
     BUILD_DEFERRED_BOOL_KEYS,
     strip_recompute_bools,
@@ -82,6 +89,66 @@ def load_config(path: str | Path | None = None) -> dict:
             else:
                 config[key] = value
     return config
+
+
+def load_truth_index(
+    labels_csv: str | Path,
+    *,
+    sessions_root: str | Path | None = None,
+) -> dict[tuple[str, int], dict]:
+    """Load evaluation-only labels keyed by ``(session_id, gpu_id)``."""
+    labels = pd.read_csv(labels_csv, low_memory=False)
+    if "valid" in labels.columns:
+        valid = labels["valid"].astype(str).str.lower().isin({"true", "1"})
+        labels = labels[valid]
+    index: dict[tuple[str, int], dict] = {}
+    roots = Path(sessions_root) if sessions_root else None
+    for _, row in labels.iterrows():
+        session_id = str(row["session_id"])
+        gpu_id = int(row["gpu_id"])
+        raw_intervals = row.get("gt_attack_intervals_epoch")
+        intervals = None if pd.isna(raw_intervals) else parse_intervals(raw_intervals)
+        t0_epoch = None
+        if roots is not None:
+            metadata_path = roots / session_id / "session.json"
+            if metadata_path.is_file():
+                metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                if metadata.get("t0_epoch") is not None:
+                    t0_epoch = float(metadata["t0_epoch"])
+        host = row.get("host_workload")
+        index[(session_id, gpu_id)] = {
+            "intervals": intervals,
+            "session_gt_label": str(row["gt_label"]),
+            "host_workload": None if pd.isna(host) else str(host),
+            "hosted": bool(not pd.isna(host) and str(host).strip()),
+            "gpu_role": None if pd.isna(row.get("gpu_role")) else str(row.get("gpu_role")),
+            "gt_variant": None if pd.isna(row.get("gt_variant")) else str(row.get("gt_variant")),
+            "declared_policy": (
+                None if pd.isna(row.get("declared_policy")) else str(row.get("declared_policy"))
+            ),
+            "group_id": None if pd.isna(row.get("group_id")) else str(row.get("group_id")),
+            "source": None if pd.isna(row.get("source")) else str(row.get("source")),
+            "t0_epoch": t0_epoch,
+        }
+    return index
+
+
+def _window_epoch_bounds(subset: pd.DataFrame, truth: dict) -> tuple[float, float]:
+    if "t_epoch" in subset.columns:
+        epochs = pd.to_numeric(subset["t_epoch"], errors="coerce")
+        if epochs.notna().all():
+            return float(epochs.iloc[0]), float(epochs.iloc[-1])
+    timestamps = pd.to_numeric(subset["timestamp"], errors="raise")
+    t0_epoch = truth.get("t0_epoch")
+    if t0_epoch is None and "t0_epoch" in subset.columns:
+        origins = pd.to_numeric(subset["t0_epoch"], errors="coerce").dropna()
+        if len(origins):
+            t0_epoch = float(origins.iloc[0])
+    if t0_epoch is None and float(timestamps.iloc[0]) > 1_000_000_000:
+        return float(timestamps.iloc[0]), float(timestamps.iloc[-1])
+    if t0_epoch is None:
+        raise ValueError("interval truth requires t_epoch telemetry or session t0_epoch")
+    return float(t0_epoch) + float(timestamps.iloc[0]), float(t0_epoch) + float(timestamps.iloc[-1])
 
 
 def flatten_features(feats: dict) -> dict:
@@ -341,17 +408,29 @@ def build_windows(
     *,
     window_s: float,
     stride_s: float,
-    progress_log_dir: str | Path | None,
     config: dict,
+    progress_log_dir: str | Path | None = None,
+    sessions_root: str | Path | None = None,
+    truth_index: dict[tuple[str, int], dict] | None = None,
 ) -> pd.DataFrame:
     rows = []
-    label_col = "gt_label" if "gt_label" in df else "label"
     for (session_id, gpu_id), group in df.groupby(["session_id", "gpu_id"], sort=False):
         group = group.sort_values("timestamp").reset_index(drop=True)
         hz = float(group["sample_hz"].dropna().iloc[0]) if "sample_hz" in group else 1.0
         window = max(8, int(round(window_s * hz)))
         stride = max(1, int(round(stride_s * hz)))
-        events = read_progress_log(Path(progress_log_dir) / f"{session_id}.jsonl" if progress_log_dir else None)
+        if sessions_root is not None:
+            events = read_session_progress(Path(sessions_root) / str(session_id))
+        else:
+            events = read_progress_log(
+                Path(progress_log_dir) / f"{session_id}.jsonl" if progress_log_dir else None
+            )
+        truth = None
+        if truth_index is not None:
+            key = (str(session_id), int(gpu_id))
+            if key not in truth_index:
+                raise KeyError(f"missing truth for session/GPU {key!r}")
+            truth = truth_index[key]
         for start in range(0, len(group) - window + 1, stride):
             subset = group.iloc[start:start + window]
             t0, t1 = float(subset["timestamp"].iloc[0]), float(subset["timestamp"].iloc[-1])
@@ -399,9 +478,9 @@ def build_windows(
                 "sample_hz": hz,
                 "start": start,
                 "end": start + window,
+                "window_id": f"{session_id}:{int(gpu_id)}:{start}:{start + window}",
                 "window_start_s": t0,
                 "window_end_s": t1,
-                "gt_label": str(subset[label_col].iloc[0]) if label_col in subset else None,
                 "declared_job_type": str(subset.get("declared_job_type", pd.Series(["unknown"])).iloc[0]),
                 "declared_job_family": str(subset.get("declared_job_family", pd.Series(["unknown"])).iloc[0]),
                 "gpu_model": str(subset.get("gpu_model", pd.Series(["unknown"])).iloc[0]),
@@ -411,6 +490,33 @@ def build_windows(
                 "cross_job_sync_index": 0.0,
                 "sync_applicable": False,
             })
+            if truth is not None:
+                epoch_start, epoch_end = _window_epoch_bounds(subset, truth)
+                gt_label, gt_is_attack, truth_source = label_window(
+                    window_start_epoch=epoch_start,
+                    window_end_epoch=epoch_end,
+                    intervals=truth.get("intervals"),
+                    session_gt_label=str(truth["session_gt_label"]),
+                    host_workload=truth.get("host_workload"),
+                    hosted=bool(truth.get("hosted", False)),
+                )
+                warmup = False
+                if "warmup" in subset.columns:
+                    warm = subset["warmup"]
+                    if warm.dtype != bool:
+                        warm = warm.astype(str).str.lower().isin({"true", "1"})
+                    warmup = float(warm.mean()) >= 0.5
+                flat.update({
+                    "gt_label": gt_label,
+                    "gt_is_attack": bool(gt_is_attack),
+                    "truth_source": truth_source,
+                    "warmup": bool(warmup),
+                    "gpu_role": truth.get("gpu_role"),
+                    "gt_variant": truth.get("gt_variant"),
+                    "declared_policy": truth.get("declared_policy"),
+                    "group_id": truth.get("group_id"),
+                    "source": truth.get("source"),
+                })
             rows.append(flat)
     windows = pd.DataFrame(rows)
     if windows.empty:

@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from dataset.identifiers import synthetic_session_id
 from dataset.schema import normalize_frame, validate_frame
 
 DEFAULT_SEED = 42
@@ -63,7 +64,7 @@ def build_frame(
     gt_variant: str | None = None,
     gt_params_json: str | None = None,
     power_phys_w: np.ndarray | None = None,
-    gpu_model: str = "RTX4090-synthetic",
+    gpu_model: str = "synthetic-rtx4090",
     waveform_kind: str | None = None,
     waveform_frequency_hz: float | None = None,
     waveform_amplitude_frac: float | None = None,
@@ -111,17 +112,20 @@ def build_frame(
             | (np.diff(np.round(mem_copy, 3)) != 0)
         )
 
+    opaque_session_id = synthetic_session_id(seed=seed, key=session_id)
+    t0_epoch = 1_767_225_600.0 + float(seed) * 1000.0
     frame = pd.DataFrame(
         {
             "timestamp": timestamp,
+            "t_epoch": t0_epoch + timestamp,
             "collection_timestamp": collection.astype(str),
             "raw_timestamp": np.nan,
-            "session_id": session_id,
-            "gt_attack_id": attack_id or session_id,
+            "session_id": opaque_session_id,
+            "gt_attack_id": attack_id or opaque_session_id,
             "gt_label": label,
             "gt_variant": gt_variant,
             "gt_params_json": gt_params_json,
-            "attack_id": attack_id or session_id,
+            "attack_id": attack_id or opaque_session_id,
             "waveform_kind": waveform_kind,
             "waveform_frequency_hz": (
                 np.nan if waveform_frequency_hz is None else waveform_frequency_hz

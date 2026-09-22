@@ -224,7 +224,10 @@ def _stage1_window_summary(row: pd.Series) -> dict:
     elif impact.get("impact_raw") is not None:
         impact_raw = float(impact["impact_raw"])
     return {
-        "window_id": f"{row.get('session_id')}|gpu{row.get('gpu_id')}|{row.get('start')}-{row.get('end')}",
+        "window_id": str(
+            row.get("window_id")
+            or f"{row.get('session_id')}:{row.get('gpu_id')}:{row.get('start')}:{row.get('end')}"
+        ),
         "session_id": str(row.get("session_id")),
         "gpu_id": int(row.get("gpu_id")) if pd.notna(row.get("gpu_id")) else None,
         "window_start_s": float(row["window_start_s"]) if "window_start_s" in row and pd.notna(row.get("window_start_s")) else None,
@@ -337,6 +340,7 @@ def run(args):
             window_s=float(getattr(args, "window_s", 30.0)),
             stride_s=float(getattr(args, "stride_s", 15.0)),
             progress_log_dir=getattr(args, "progress_log_dir", None),
+            sessions_root=getattr(args, "sessions_root", None),
             config=config,
         )
         if not current.empty:
@@ -484,7 +488,7 @@ def run(args):
             "session_id": str(cand["session_id"]),
             "attack_id": attack_id,
             "window_id": (
-                f"{cand['session_id']}:gpu{int(cand['gpu_id'])}:rows{start}-{end}"
+                str(cand.get("window_id") or f"{cand['session_id']}:{int(cand['gpu_id'])}:{start}:{end}")
             ),
             "gpu_id": int(cand["gpu_id"]),
             "window_start": start,
@@ -628,6 +632,7 @@ def main():
     ap.add_argument("--window-s", type=float, default=30.0)
     ap.add_argument("--stride-s", type=float, default=15.0)
     ap.add_argument("--progress-log-dir", default="dataset/synthetic/steps")
+    ap.add_argument("--sessions-root", default=None)
     ap.add_argument("--query-context", choices=["off", "declared"], default="off")
     ap.add_argument("--rag-backend", choices=["sbert", "tfidf"], default="sbert")
     ap.add_argument("--llm-backend", choices=["ollama", "stub"], default="stub")

@@ -25,6 +25,7 @@ from pipeline.stage1_v2 import (
     build_windows,
     impact_components,
     load_config,
+    load_truth_index,
     score_window,
 )
 from pipeline.evidence_vocab import strip_recompute_bools, to_bool_evidence
@@ -106,6 +107,8 @@ def fit(
     baseline_out: Path,
     calibration_out: Path,
     progress_log_dir: Path,
+    labels_csv: Path,
+    sessions_root: Path | None,
     window_s: float,
     stride_s: float,
 ) -> dict:
@@ -116,11 +119,24 @@ def fit(
     cal = set(map(str, manifest["cal"]))
     train_df = df[df["session_id"].astype(str).isin(train)]
     cal_df = df[df["session_id"].astype(str).isin(cal)]
+    truth_index = load_truth_index(labels_csv, sessions_root=sessions_root)
     train_windows = build_windows(
-        train_df, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config
+        train_df,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        sessions_root=sessions_root,
+        truth_index=truth_index,
+        config=config,
     )
     cal_windows = build_windows(
-        cal_df, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config
+        cal_df,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        sessions_root=sessions_root,
+        truth_index=truth_index,
+        config=config,
     )
     train_normals = train_windows[train_windows["gt_label"].astype(str).str.startswith("normal")]
     cal_normals = cal_windows[cal_windows["gt_label"].astype(str).str.startswith("normal")]
@@ -236,10 +252,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--telemetry", type=Path, default=ROOT / "dataset/synthetic/all_v3.csv")
     parser.add_argument("--split-manifest", type=Path, default=ROOT / "dataset/synthetic/split_manifest.json")
-    parser.add_argument("--stage1-config", type=Path, default=ROOT / "config/stage1_v2.yaml")
+    parser.add_argument("--stage1-config", "--config", dest="stage1_config", type=Path, default=ROOT / "config/stage1_v2.yaml")
     parser.add_argument("--baseline-out", type=Path, default=ROOT / "dataset/eval/cohort_baseline_v2.json")
     parser.add_argument("--calibration-out", type=Path, default=ROOT / "dataset/eval/stage1_v2_calibration.json")
     parser.add_argument("--progress-log-dir", type=Path, default=ROOT / "dataset/synthetic/steps")
+    parser.add_argument("--sessions-root", type=Path, default=None)
+    parser.add_argument("--labels", type=Path, default=ROOT / "dataset/synthetic/index/labels.csv")
     parser.add_argument("--window-s", type=float, default=30.0)
     parser.add_argument("--stride-s", type=float, default=15.0)
     args = parser.parse_args()
@@ -250,6 +268,8 @@ def main() -> None:
         baseline_out=args.baseline_out,
         calibration_out=args.calibration_out,
         progress_log_dir=args.progress_log_dir,
+        labels_csv=args.labels,
+        sessions_root=args.sessions_root,
         window_s=args.window_s,
         stride_s=args.stride_s,
     )

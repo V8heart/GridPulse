@@ -15,7 +15,8 @@ if str(ROOT) not in sys.path:
 
 from pipeline.baseline import CohortBaseline
 from pipeline.run_pipeline import infer_sample_hz, stage1_screen_legacy
-from pipeline.stage1_v2 import build_windows, load_config, score_window
+from pipeline.stage1_v2 import build_windows, load_config, load_truth_index, score_window
+from dataset.window_truth import label_window
 
 
 def _metrics(rows: list[dict]) -> dict:
@@ -69,8 +70,21 @@ def _score_rows(
         scored = score_window(row.to_dict(), baseline, calibration, config, profile=profile)
         rows.append({
             "gt_label": row["gt_label"],
+            "gt_is_attack": bool(row.get("gt_is_attack", False)),
             "session_id": row.get("session_id"),
+            "window_id": row.get("window_id"),
             "declared_job_family": row.get("declared_job_family"),
+            "declared_policy": row.get("declared_policy"),
+            "gt_variant": row.get("gt_variant"),
+            "gpu_role": row.get("gpu_role"),
+            "group_id": row.get("group_id"),
+            "source": row.get("source"),
+            "warmup": bool(row.get("warmup", False)),
+            "progress_log": (
+                "masked"
+                if bool((row.get("evidence") or {}).get("progress_log_missing", True))
+                else "present"
+            ),
             **scored,
         })
     return rows
@@ -98,6 +112,8 @@ def evaluate(
     calibration_path: Path,
     config_path: Path,
     progress_log_dir: Path,
+    labels_csv: Path,
+    sessions_root: Path | None,
     window_s: float,
     stride_s: float,
     split: str = "cal",
@@ -114,8 +130,10 @@ def evaluate(
         eval_sessions = set(map(str, manifest["train"])) | set(map(str, manifest["cal"]))
     holdout = set(map(str, manifest.get("unseen_param_holdout", {}).get("swma_period_2_8_3_2", [])))
     eval_df = df[df["session_id"].astype(str).isin(eval_sessions)]
+    truth_index = load_truth_index(labels_csv, sessions_root=sessions_root)
     legacy_rows = []
-    for (_, _), group in eval_df.groupby(["session_id", "gpu_id"], sort=False):
+    for (session_id, gpu_id), group in eval_df.groupby(["session_id", "gpu_id"], sort=False):
+        group = group.sort_values("timestamp").reset_index(drop=True)
         hz = infer_sample_hz(group)
         screened = stage1_screen_legacy(
             group.reset_index(drop=True),
@@ -124,9 +142,25 @@ def evaluate(
             window=max(8, int(window_s * hz)),
             stride=max(1, int(stride_s * hz)),
         )
-        label_col = "gt_label" if "gt_label" in group else "label"
-        gt = str(group[label_col].iloc[0])
         for _, row in screened.iterrows():
+            truth = truth_index[(str(session_id), int(gpu_id))]
+            subset = group.iloc[int(row["start"]):int(row["end"])]
+            if "t_epoch" in subset and subset["t_epoch"].notna().all():
+                epoch_start = float(subset["t_epoch"].iloc[0])
+                epoch_end = float(subset["t_epoch"].iloc[-1])
+            else:
+                if truth.get("t0_epoch") is None:
+                    raise ValueError("legacy evaluation requires t_epoch or session t0_epoch")
+                epoch_start = float(truth["t0_epoch"]) + float(subset["timestamp"].iloc[0])
+                epoch_end = float(truth["t0_epoch"]) + float(subset["timestamp"].iloc[-1])
+            gt, _, _ = label_window(
+                window_start_epoch=epoch_start,
+                window_end_epoch=epoch_end,
+                intervals=truth.get("intervals"),
+                session_gt_label=truth["session_gt_label"],
+                host_workload=truth.get("host_workload"),
+                hosted=bool(truth.get("hosted", False)),
+            )
             legacy_rows.append({"gt_label": gt, "is_candidate": bool(row["is_candidate"]), "grid_watch": False})
 
     config = load_config(config_path)
@@ -140,7 +174,15 @@ def evaluate(
         }
     if calibration.get("evidence_thresholds"):
         config["evidence_thresholds"] = calibration["evidence_thresholds"]
-    windows = build_windows(eval_df, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config)
+    windows = build_windows(
+        eval_df,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        sessions_root=sessions_root,
+        truth_index=truth_index,
+        config=config,
+    )
 
     ablation_reports = {}
     for name, (cfg, profile) in _ablation_configs(config).items():
@@ -166,6 +208,7 @@ def evaluate(
         "sessions": len(eval_sessions),
         "legacy": _metrics(legacy_rows),
         "v2": _metrics(v2_rows),
+        "scored_rows": v2_rows,
         "ablation": ablation_reports,
         "holdout": {
             "sessions": sorted(holdout),
@@ -183,12 +226,14 @@ def main() -> None:
     parser.add_argument("--split-manifest", type=Path, default=ROOT / "dataset/synthetic/split_manifest.json")
     parser.add_argument("--baseline-model", type=Path, default=ROOT / "dataset/eval/cohort_baseline_v2.json")
     parser.add_argument("--calibration", type=Path, default=ROOT / "dataset/eval/stage1_v2_calibration.json")
-    parser.add_argument("--stage1-config", type=Path, default=ROOT / "config/stage1_v2.yaml")
+    parser.add_argument("--stage1-config", "--config", dest="stage1_config", type=Path, default=ROOT / "config/stage1_v2.yaml")
     parser.add_argument("--progress-log-dir", type=Path, default=ROOT / "dataset/synthetic/steps")
+    parser.add_argument("--sessions-root", type=Path, default=None)
+    parser.add_argument("--labels", type=Path, default=ROOT / "dataset/synthetic/index/labels.csv")
     parser.add_argument("--window-s", type=float, default=30.0)
     parser.add_argument("--stride-s", type=float, default=15.0)
     parser.add_argument("--split", choices=["cal", "test", "train", "train_cal"], default="cal")
-    parser.add_argument("--out", type=Path, default=ROOT / "dataset/eval/stage1_v2_report.json")
+    parser.add_argument("--out", "--output", dest="out", type=Path, default=ROOT / "dataset/eval/stage1_v2_report.json")
     args = parser.parse_args()
     report = evaluate(
         args.telemetry,
@@ -197,6 +242,8 @@ def main() -> None:
         calibration_path=args.calibration,
         config_path=args.stage1_config,
         progress_log_dir=args.progress_log_dir,
+        labels_csv=args.labels,
+        sessions_root=args.sessions_root,
         window_s=args.window_s,
         stride_s=args.stride_s,
         split=args.split,

@@ -1,0 +1,34 @@
+schema: kdn-capture-matrix/1
+seed: 20260922
+duration_pool_s: [480, 600, 720]
+cooldown:
+  min_seconds: 60
+  max_wait_seconds: 900
+  idle_temp_c: 35
+  idle_temp_delta_c: 3
+  poll_seconds: 10
+entries:
+  - workload: baseline
+    repeats: 14
+  - workload: distributed
+    repeats: 14
+  - workload: hpo
+    repeats: 14
+  - workload: checkpoint
+    repeats: 14
+  - workload: dataloader_stall
+    repeats: 14
+  - workload: eval_train_switch
+    repeats: 14
+  - workload: swma
+    repeats: 14
+    params: {period: 1.0, duty_cycle: 0.5, declared_policy: pool_random}
+  - workload: swma_multi
+    repeats: 14
+    params: {period: 1.0, duty_cycle: 0.5, declared_policy: host_family_matched}
+  - workload: ltma
+    repeats: 14
+    params: {declared_policy: host_family_matched}
+  - workload: cryptojacking
+    repeats: 14
+    params: {declared_policy: pool_random}

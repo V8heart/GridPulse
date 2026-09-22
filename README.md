@@ -71,36 +71,62 @@ pytest -q
 `all_v2.csv`는 하위 호환용 산출물이며 공식 재현 대상은 `all_v3.csv`와
 `split_manifest.json`이다.
 
-### 실측 텔레메트리
+### 실측 텔레메트리 (gp-telemetry/1.2)
+
+표준: [`dataset/dataset_standard_v1_2.md`](dataset/dataset_standard_v1_2.md).
+
+Collector는 observed만 기록하고, declared/gt는 finalize가 붙인다. 경로는 opaque
+`s-<hex>` 세션 ID만 쓰며 라벨 이름을 넣지 않는다.
 
 ```bash
-python -m bit2watt_impl.collect_telemetry \
-  --output dataset/real/observability/idle-100ms.csv \
-  --duration 30 --interval-ms 100 --gpu-ids 0 \
-  --label normal_baseline --job-type normal_baseline
+# dry-run (GPU 없음): 명령·역할·declared만 확인
+python -m dataset.run_capture --workload gpt_tiny_finetune --dry-run
+python -m dataset.capture_matrix --dry-run
 
-python dataset/observability.py \
-  dataset/real/observability/idle-100ms.csv
+# 120초 vertical-slice smoke (공유 GPU 안전 확인 후)
+bash scripts/gpu_smoke_v2.sh --dry-run
+bash scripts/gpu_smoke_v2.sh --confirm-shared-gpu-safe
+
+# 전체 matrix (~22–26h, resume 가능; 승인 후 night shard로 분할)
+bash scripts/capture_all.sh --dry-run
+bash scripts/capture_all.sh --confirm-shared-gpu-safe --shard 0 --shards 3
+
+# 관측성 (alias / boxcar / period_retention.csv)
+python -m dataset.observability dataset/real/sessions --output dataset/real/observability/summary.md
 ```
 
 `--interval-ms`는 API 호출 요청 주기이지 센서의 물리 측정률이 아니다.
 `actual_interval_ms`, `value_changed`와 observability summary로 실효 갱신률을
-별도로 확인해야 한다.
+별도로 확인해야 한다. Nyquist 초과 성분은 `aliased`로 기록하고 folded frequency와
+boxcar `sinc` 감쇠를 함께 본다.
 
 ### 통제된 실측 워크로드
 
 다른 사용자의 GPU 작업이 없는지 먼저 확인한 다음에만 실행한다.
+`--confirm-shared-gpu-safe` 없이는 실부하가 거부된다.
 
 ```bash
-python dataset/run_capture.py --workload baseline --duration 30 \
+python -m dataset.run_capture --workload baseline --confirm-shared-gpu-safe
+python -m dataset.run_capture --workload swma --period 1 --duty-cycle 0.5 \
   --confirm-shared-gpu-safe
-python dataset/run_capture.py --workload swma --duration 30 \
-  --period 1 --duty-cycle 0.5 --confirm-shared-gpu-safe
+python -m dataset.run_capture --workload gpt_tiny_finetune --duration 120 \
+  --confirm-shared-gpu-safe
 ```
 
+기본 duration은 클래스 공통 pool `{480,600,720}`에서 라벨과 독립적으로 뽑는다.
 SWMA 코드는 Bit2Watt persistent kernel의 동일 재현이 아니라, PyTorch CUDA
 연산과 sleep으로 소프트웨어 telemetry에서 보이는 규칙적 변동을 만드는 근사다.
 2-GPU 캡처는 `distributed` 또는 `swma_multi` workload를 사용한다.
+
+합성 재적합은 기존 `dataset/eval/`을 덮지 않고 `dataset/eval/v2_regen/`에만 쓴다.
+먼저 Mondrian baseline을 커밋·태그(`stage1-mondrian-baseline`)한 뒤:
+
+```bash
+bash scripts/refit_stage1_v2_regen.sh          # cal only
+bash scripts/refit_stage1_v2_regen.sh --run-test  # 동결 후 1회
+```
+
+pytest 기본: `pytest -q -m "not gpu"`.
 
 ## 구성요소
 
