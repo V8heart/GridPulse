@@ -32,6 +32,22 @@ from pipeline.stage1_v2 import (
 from pipeline.evidence_vocab import strip_recompute_bools, to_bool_evidence
 
 
+def _mondrian_n_sessions(cal_normals: pd.DataFrame, key: str) -> int:
+    if cal_normals.empty:
+        return 0
+    if "|" in key:
+        family, band = key.split("|", 1)
+        mask = cal_normals["declared_job_family"].astype(str).eq(family)
+        if "expected_band" in cal_normals.columns:
+            mask = mask & cal_normals["expected_band"].astype(str).eq(band)
+        subset = cal_normals.loc[mask]
+    else:
+        subset = cal_normals.loc[cal_normals["declared_job_family"].astype(str) == key]
+    if "session_id" in subset.columns:
+        return int(subset["session_id"].nunique())
+    return int(len(subset))
+
+
 def _session_equalized_rate(windows: pd.DataFrame, key: str) -> float:
     if windows.empty or "session_id" not in windows:
         return 0.0
@@ -92,8 +108,11 @@ def _collect_feature_abs_z(cal_normals: pd.DataFrame, baseline: CohortBaseline) 
         abs_z = {k: abs(v) for k, v in z.items() if k != "baseline_level" and k in FEATURES_V2}
         per_row_z.append(abs_z)
         family = str(row.get("declared_job_family", "unknown"))
+        band = row.get("expected_band")
         for feature, value in abs_z.items():
             by_family[family][feature].append(float(value))
+            if band is not None and str(band) not in {"", "nan", "None"}:
+                by_family[f"{family}|{band}"][feature].append(float(value))
             global_bucket[feature].append(float(value))
     out = {family: dict(feats) for family, feats in by_family.items()}
     out["global"] = dict(global_bucket)
@@ -148,11 +167,24 @@ def fit(
     cal_normals = cal_normals.loc[~zero_proc_mask(cal_normals)].copy()
 
     mad_floors = dict(config.get("mad_floors") or DEFAULT_MAD_FLOORS)
-    cohort_keys = tuple(config.get("cohort_keys") or ("declared_job_family", "gpu_model"))
+    if config.get("cohort_expected_band"):
+        cohort_keys = tuple(
+            config.get("cohort_keys")
+            or ("declared_job_family", "expected_band", "gpu_model")
+        )
+    elif config.get("cohort_mid_group"):
+        cohort_keys = tuple(
+            config.get("cohort_keys")
+            or ("declared_job_family", "declared_mid_group", "gpu_model")
+        )
+    else:
+        cohort_keys = tuple(config.get("cohort_keys") or ("declared_job_family", "gpu_model"))
     baseline = CohortBaseline().fit(
         train_normals,
         cohort_keys=cohort_keys,
         min_windows=int(config.get("min_windows", 30)),
+        min_sessions=int(config.get("min_sessions", 1)),
+        min_sessions_band=int(config.get("min_sessions_band", 2)),
         mad_floors=mad_floors,
     )
 
@@ -205,8 +237,13 @@ def fit(
             data, baseline, partial_cal, config, profile="no_evidence", leave_out_feature_z=abs_z
         )
         family = str(data.get("declared_job_family", "unknown"))
+        band = data.get("expected_band")
         full_by_family[family].append(float(full["u_score"]))
         none_by_family[family].append(float(none["u_score"]))
+        if band is not None and str(band) not in {"", "nan", "None"}:
+            band_key = f"{family}|{band}"
+            full_by_family[band_key].append(float(full["u_score"]))
+            none_by_family[band_key].append(float(none["u_score"]))
         full_global.append(float(full["u_score"]))
         none_global.append(float(none["u_score"]))
 
@@ -243,6 +280,11 @@ def fit(
             "min_windows=30; evaluation family falls back to global when n<30"
         ),
         "mondrian_min_n": int(config.get("mondrian_min_n", 30)),
+        "mondrian_min_sessions": int(config.get("min_sessions", 1)),
+        "mondrian_min_sessions_band": int(config.get("min_sessions_band", 2)),
+        "mondrian_n_sessions": {
+            key: _mondrian_n_sessions(cal_normals, key) for key in full_by_family
+        },
         "config": config,
     }
     baseline.save(baseline_out)

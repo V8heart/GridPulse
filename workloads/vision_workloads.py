@@ -7,13 +7,27 @@ import os
 import random
 import sys
 import time
+from datetime import timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from workloads.llm_workloads import NCCL_TIMEOUT, distributed_should_stop
 from workloads.progress_log import ProgressLog
+
+BARRIER_TIMEOUT = timedelta(seconds=30)
+
+
+def _timed_barrier(dist, timeout: timedelta = BARRIER_TIMEOUT) -> None:
+    try:
+        if hasattr(dist, "monitored_barrier"):
+            dist.monitored_barrier(timeout=timeout)
+            return
+    except ValueError:
+        pass
+    dist.barrier()
 
 
 def build_resnet18(num_classes: int = 10):
@@ -79,7 +93,7 @@ def run(args) -> None:
     distributed = args.mode == "ddp"
     rank = 0
     if distributed:
-        dist.init_process_group("nccl")
+        dist.init_process_group("nccl", timeout=NCCL_TIMEOUT)
         rank = int(os.environ["LOCAL_RANK"])
         device = torch.device(f"cuda:{rank}")
     else:
@@ -99,32 +113,47 @@ def run(args) -> None:
     log = ProgressLog(args.progress_log, gpu_id)
     log.emit("workload_start", mode=args.mode)
     deadline = time.monotonic() + args.max_seconds
+    stop = torch.zeros(1, device=device)
     step = 0
-    while time.monotonic() < deadline:
-        if args.dataloader == "cpu":
-            # Intentionally produce on CPU then copy — stalls like a CPU dataloader.
-            images = torch.randn(args.batch_size, 3, args.image_size, args.image_size)
-            labels = torch.randint(0, 10, (args.batch_size,))
-            time.sleep(random.uniform(0.01, 0.05))
-            images = images.to(device, non_blocking=True)
-            labels = labels.to(device, non_blocking=True)
-        else:
-            images = torch.randn(args.batch_size, 3, args.image_size, args.image_size, device=device)
-            labels = torch.randint(0, 10, (args.batch_size,), device=device)
-        opt.zero_grad(set_to_none=True)
-        logits = model(images)
-        loss = torch.nn.functional.cross_entropy(logits, labels)
-        loss.backward()
-        opt.step()
-        if device.type == "cuda":
-            torch.cuda.synchronize(device)
-        log.emit("step_end", step=step)
-        step += 1
-    log.emit("workload_end", steps=step)
-    log.close()
-    if distributed:
-        dist.barrier()
-        dist.destroy_process_group()
+    try:
+        while True:
+            local = distributed_should_stop(
+                float(stop.item()), rank=rank, deadline=deadline, now=time.monotonic()
+            )
+            stop.fill_(local)
+            if distributed:
+                dist.all_reduce(stop, op=dist.ReduceOp.MAX)
+            if float(stop.item()):
+                break
+            if args.dataloader == "cpu":
+                # Intentionally produce on CPU then copy — stalls like a CPU dataloader.
+                images = torch.randn(args.batch_size, 3, args.image_size, args.image_size)
+                labels = torch.randint(0, 10, (args.batch_size,))
+                time.sleep(random.uniform(0.01, 0.05))
+                images = images.to(device, non_blocking=True)
+                labels = labels.to(device, non_blocking=True)
+            else:
+                images = torch.randn(args.batch_size, 3, args.image_size, args.image_size, device=device)
+                labels = torch.randint(0, 10, (args.batch_size,), device=device)
+            opt.zero_grad(set_to_none=True)
+            logits = model(images)
+            loss = torch.nn.functional.cross_entropy(logits, labels)
+            loss.backward()
+            opt.step()
+            if device.type == "cuda":
+                torch.cuda.synchronize(device)
+            log.emit("step_end", step=step)
+            step += 1
+    finally:
+        log.emit("workload_end", steps=step)
+        log.close()
+        if distributed:
+            try:
+                _timed_barrier(dist)
+            except Exception:
+                pass
+            if dist.is_initialized():
+                dist.destroy_process_group()
     if rank == 0:
         print(
             json.dumps(

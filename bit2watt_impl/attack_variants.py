@@ -15,11 +15,48 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from bit2watt_impl.swma_workload import MIN_SWMA_PERIOD_S
+
 SWMA_VARIANTS = {
-    "basic": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 2048, "active_streams": 1, "jitter_frac": 0.0},
-    "shallow": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 512, "active_streams": 1, "jitter_frac": 0.0},
-    "jitter": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 2048, "active_streams": 1, "jitter_frac": 0.15},
+    "basic": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 4096, "active_streams": 2, "jitter_frac": 0.0},
+    "shallow": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 1024, "active_streams": 1, "jitter_frac": 0.0},
+    "jitter": {"period": 1.0, "duty_cycle": 0.5, "matrix_size": 4096, "active_streams": 2, "jitter_frac": 0.15},
 }
+
+
+def hosted_period(
+    host_period_s: float,
+    scale: float,
+    *,
+    floor_s: float = MIN_SWMA_PERIOD_S,
+) -> dict:
+    """Derive the SWMA period from the host step. Floor is a safety net only."""
+    requested = float(host_period_s) * float(scale)
+    actual = max(requested, float(floor_s))
+    return {
+        "period_requested_s": requested,
+        "period_actual_s": actual,
+        "period_floored": actual > requested,
+        "host_period_s": float(host_period_s),
+        "period_scale": float(scale),
+    }
+
+
+def host_warmup_wait_s(duration: float) -> float:
+    return min(300.0, max(float(duration) + 60.0, 180.0))
+
+
+def _apply_param_overrides(params: dict, args) -> dict:
+    updated = dict(params)
+    if getattr(args, "period", None) is not None:
+        updated["period"] = args.period
+    if getattr(args, "duty_cycle", None) is not None:
+        updated["duty_cycle"] = args.duty_cycle
+    if getattr(args, "matrix_size", None) is not None:
+        updated["matrix_size"] = int(args.matrix_size)
+    if getattr(args, "active_streams", None) is not None:
+        updated["active_streams"] = int(args.active_streams)
+    return updated
 
 
 def _read_step_times(progress_path: Path, *, gpu_id: int, limit: int = 30) -> list[float]:
@@ -85,6 +122,9 @@ def _swma_argv(args, *, gpu_id: int, progress_log: str | None, duration: float, 
 
 def _host_argv(args, *, progress_log: str, duration: float) -> list[str]:
     if args.host == "llm":
+        preset = getattr(args, "llm_preset", None) or getattr(args, "preset", None) or "small"
+        batch = getattr(args, "llm_micro_batch", None) or getattr(args, "batch_size", None) or 64
+        seq_len = getattr(args, "seq_len", None) or 512
         return [
             sys.executable,
             "-m",
@@ -92,7 +132,7 @@ def _host_argv(args, *, progress_log: str, duration: float) -> list[str]:
             "--mode",
             "finetune",
             "--preset",
-            "tiny",
+            str(preset),
             "--gpu-id",
             str(args.gpu_id),
             "--max-seconds",
@@ -100,7 +140,9 @@ def _host_argv(args, *, progress_log: str, duration: float) -> list[str]:
             "--progress-log",
             progress_log,
             "--batch-size",
-            "2",
+            str(int(batch)),
+            "--seq-len",
+            str(int(seq_len)),
             "--seed",
             str(args.seed),
         ]
@@ -146,11 +188,10 @@ def _terminate(proc: subprocess.Popen | None) -> None:
 def build_variant_plan(args) -> dict:
     """Return argv plan without launching (for tests / dry-run)."""
     variant = args.variant
-    params = dict(SWMA_VARIANTS.get(variant.replace("swma_", ""), SWMA_VARIANTS["basic"]))
-    if args.period is not None:
-        params["period"] = args.period
-    if args.duty_cycle is not None:
-        params["duty_cycle"] = args.duty_cycle
+    params = _apply_param_overrides(
+        SWMA_VARIANTS.get(variant.replace("swma_", ""), SWMA_VARIANTS["basic"]),
+        args,
+    )
     hosted = variant in {"piggyback", "mimicry"} or args.variant.startswith("ltma")
     coordinated = variant == "coordinated"
     return {
@@ -177,14 +218,21 @@ def run(args) -> None:
     intervals: dict[str, list[list[float]]] = {}
     period_requested = None if args.period is None else float(args.period)
     period_actual = period_requested
+    period_floored = False
+    host_period_s = None
+    period_scale = None
+    extra_summary: dict = {}
     try:
         if args.variant in {"basic", "shallow", "jitter", "swma_basic", "swma_shallow", "swma_jitter"}:
             key = args.variant.replace("swma_", "")
-            params = dict(SWMA_VARIANTS[key if key in SWMA_VARIANTS else "basic"])
-            if args.period is not None:
-                params["period"] = args.period
+            params = _apply_param_overrides(
+                SWMA_VARIANTS[key if key in SWMA_VARIANTS else "basic"],
+                args,
+            )
             period_requested = float(params["period"])
-            period_actual = float(params["period"])
+            period_actual = max(period_requested, MIN_SWMA_PERIOD_S)
+            period_floored = period_actual > period_requested
+            params["period"] = period_actual
             argv = _swma_argv(
                 args,
                 gpu_id=args.gpu_id,
@@ -200,11 +248,11 @@ def run(args) -> None:
             summary = _parse_summary(proc.stdout or "")
             intervals = summary.get("gt_attack_intervals_epoch") or {str(args.gpu_id): []}
         elif args.variant == "coordinated":
-            params = dict(SWMA_VARIANTS["basic"])
-            if args.period is not None:
-                params["period"] = args.period
+            params = _apply_param_overrides(SWMA_VARIANTS["basic"], args)
             period_requested = float(params["period"])
-            period_actual = float(params["period"])
+            period_actual = max(period_requested, MIN_SWMA_PERIOD_S)
+            period_floored = period_actual > period_requested
+            params["period"] = period_actual
             coordinated: list[tuple[int, subprocess.Popen]] = []
             plan["argv_attack"] = []
             for gpu_id in (args.gpu_id, args.gpu_id + 1):
@@ -240,15 +288,16 @@ def run(args) -> None:
         elif args.variant in {"piggyback", "mimicry"}:
             if progress is None:
                 raise ValueError("hosted variants require --progress-log for the host")
+            wait_s = host_warmup_wait_s(args.duration)
             host_cmd = _host_argv(
-                args, progress_log=str(progress), duration=args.duration + 120.0
+                args, progress_log=str(progress), duration=wait_s + args.duration
             )
             plan["argv_host"] = host_cmd
             # Host gets progress-log; attack does not.
             host = subprocess.Popen(host_cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             children.append(host)
             # Wait until 30 host step_end events exist.
-            deadline = time.monotonic() + min(120.0, args.duration)
+            deadline = time.monotonic() + wait_s
             times: list[float] = []
             while time.monotonic() < deadline:
                 times = _read_step_times(progress, gpu_id=args.gpu_id, limit=30)
@@ -263,10 +312,14 @@ def run(args) -> None:
                 )
             host_period = _median_period(times) or 1.0
             scale = hosted_scale(args.seed, args.variant)
-            period_requested = None if args.period is None else float(args.period)
-            period_actual = float(host_period) * float(scale)
+            derived = hosted_period(host_period, scale)
+            period_requested = float(derived["period_requested_s"])
+            period_actual = float(derived["period_actual_s"])
+            period_floored = bool(derived["period_floored"])
+            host_period_s = float(derived["host_period_s"])
+            period_scale = float(derived["period_scale"])
             # Passive first 30 host steps are NOT attack intervals.
-            params = dict(SWMA_VARIANTS["basic"])
+            params = _apply_param_overrides(SWMA_VARIANTS["basic"], args)
             params["period"] = period_actual
             attack_cmd = _swma_argv(
                 args,
@@ -307,6 +360,14 @@ def run(args) -> None:
                 str(args.duration),
                 "--host",
                 args.host,
+                "--llm-preset",
+                str(getattr(args, "llm_preset", None) or getattr(args, "preset", None) or "small"),
+                "--llm-micro-batch",
+                str(getattr(args, "llm_micro_batch", None) or getattr(args, "batch_size", None) or 64),
+                "--seq-len",
+                str(getattr(args, "seq_len", None) or 512),
+                "--aux-width",
+                str(getattr(args, "aux_width", None) or 2048),
                 "--seed",
                 str(args.seed),
             ]
@@ -319,7 +380,13 @@ def run(args) -> None:
                 raise RuntimeError(f"ltma failed exit={proc.returncode}")
             summary = _parse_summary(proc.stdout or "")
             intervals = summary.get("gt_attack_intervals_epoch") or {str(args.gpu_id): []}
+            extra_summary = {
+                key: summary[key]
+                for key in ("ltma_mode", "baseline_w", "aux_width")
+                if key in summary
+            }
         elif args.variant in {"crypto", "cryptojacking"}:
+            matrix_size = getattr(args, "matrix_size", None) or 4096
             cmd = [
                 sys.executable,
                 "-m",
@@ -328,6 +395,8 @@ def run(args) -> None:
                 str(args.gpu_id),
                 "--duration",
                 str(args.duration),
+                "--matrix-size",
+                str(int(matrix_size)),
                 "--seed",
                 str(args.seed),
             ]
@@ -361,6 +430,10 @@ def run(args) -> None:
                 "gt_attack_intervals_epoch": intervals,
                 "period_requested_s": period_requested,
                 "period_actual_s": period_actual,
+                "period_floored": period_floored,
+                "host_period_s": host_period_s,
+                "period_scale": period_scale,
+                **extra_summary,
                 "plan": {k: v for k, v in plan.items() if k.startswith("argv") or k in {"params", "passive_host_steps"}},
             },
             ensure_ascii=False,
@@ -393,6 +466,14 @@ def main() -> None:
     parser.add_argument("--duration", type=float, default=30)
     parser.add_argument("--period", type=float, default=None)
     parser.add_argument("--duty-cycle", type=float, default=None)
+    parser.add_argument("--matrix-size", type=int, default=None)
+    parser.add_argument("--active-streams", type=int, default=None)
+    parser.add_argument("--llm-preset", default="small")
+    parser.add_argument("--preset", default=None)
+    parser.add_argument("--llm-micro-batch", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--seq-len", type=int, default=None)
+    parser.add_argument("--aux-width", type=int, default=2048)
     parser.add_argument("--host", choices=["mlp", "llm"], default="llm")
     parser.add_argument("--progress-log", default=None)
     parser.add_argument("--seed", type=int, default=7)

@@ -11,7 +11,9 @@ from dataset.capture_matrix import (
     ATTACK_WORKLOADS,
     NORMAL_WORKLOADS,
     build_matrix,
+    cleanup_incomplete_capture,
     command_for,
+    execute_captures,
     load_config,
     summarize,
 )
@@ -83,6 +85,24 @@ def test_matrix_balance_policies_periods_and_planning_budget():
         if item["workload"] == "swma_basic"
     }
     assert periods <= {0.5, 1.0, 2.0, 4.0}
+    matrices = {
+        item["params"]["matrix_size"]
+        for item in items
+        if item["workload"] == "swma_basic"
+    }
+    assert matrices <= {2048, 4096}
+    crypto_sizes = {
+        item["params"]["matrix_size"]
+        for item in items
+        if item["workload"] == "cryptojacking"
+    }
+    assert crypto_sizes == {2048, 3072, 4096}
+    crypto_cmd = command_for(
+        next(item for item in items if item["workload"] == "cryptojacking"),
+        allow_busy=False,
+        confirm=False,
+    )
+    assert "--matrix-size" in crypto_cmd
     command = command_for(items[0], allow_busy=False, confirm=False)
     assert "--params-grid" not in command
     llm = next(item for item in items if item["workload"] == "llm_finetune")
@@ -123,6 +143,36 @@ def test_reports_use_actual_period_and_mark_missing_real_power():
     report = stratified_report(frame)
     assert report["no_normal_cohort"] == ["evaluation"]
     periods = {row["value"] for row in report["rows"] if row["axis"] == "period_actual_s"}
+    floored = pd.DataFrame(
+        {
+            "session_id": ["s3"],
+            "is_candidate": [True],
+            "gt_is_attack": [True],
+            "gt_label": ["swma"],
+            "gt_variant": ["swma_mimicry"],
+            "declared_job_family": ["training"],
+            "gpu_role": ["target"],
+            "warmup": [False],
+            "gt_params_json": [
+                json.dumps(
+                    {
+                        "period_requested_s": 0.01,
+                        "period_actual_s": 0.05,
+                        "period_floored": True,
+                        "matrix_size": 4096,
+                    }
+                )
+            ],
+        }
+    )
+    floored_report = stratified_report(floored)
+    variants = {
+        row["value"]
+        for row in floored_report["rows"]
+        if row["axis"] == "gt_variant"
+    }
+    assert "swma_floored" in variants
+    assert "swma_mimicry" not in variants
     assert periods == {"0.4", "2.0"}
     windows = pd.DataFrame(
         {
@@ -206,3 +256,61 @@ def test_capture_seeds_are_unique_reproducible_and_spread_declarations():
     ]
     assert len(scales) == 6
     assert len(set(scales)) == len(scales)
+
+
+def test_execute_captures_continues_after_a_failed_cell(tmp_path):
+    import subprocess
+
+    remaining = [
+        {"capture_key": "c-fail", "workload": "resnet_ddp", "duration_s": 480, "gpu_id": 0},
+        {"capture_key": "c-ok", "workload": "baseline", "duration_s": 480, "gpu_id": 0},
+    ]
+    seen = []
+
+    def runner(item):
+        seen.append(item["capture_key"])
+        code = 1 if item["capture_key"] == "c-fail" else 0
+        return subprocess.CompletedProcess(args=["x"], returncode=code)
+
+    cooled = []
+    failures = execute_captures(
+        remaining,
+        runner=runner,
+        cooldown_fn=lambda *a, **k: cooled.append(a[0] if a else True),
+        cooldown_cfg={
+            "min_seconds": 0,
+            "max_wait_seconds": 0,
+            "idle_temp_c": None,
+            "idle_temp_delta_c": 3,
+            "poll_seconds": 1,
+        },
+        failures_path=tmp_path / "failures.jsonl",
+        cleanup_fn=lambda key: [key],
+    )
+    assert seen == ["c-fail", "c-ok"]
+    assert [row["capture_key"] for row in failures] == ["c-fail"]
+    assert cooled == [0]
+    lines = (tmp_path / "failures.jsonl").read_text(encoding="utf-8").strip().splitlines()
+    assert len(lines) == 1
+    assert json.loads(lines[0])["capture_key"] == "c-fail"
+
+
+def test_cleanup_incomplete_capture_only_touches_matching_key(tmp_path):
+    staging = tmp_path / "dataset" / "real" / ".staging" / "s-deadbeefdeadbeef"
+    staging.mkdir(parents=True)
+    (staging / "capture_private.json").write_text(
+        json.dumps({"capture_key": "c-target"}), encoding="utf-8"
+    )
+    session = tmp_path / "dataset" / "real" / "sessions" / "s-deadbeefdeadbeef"
+    session.mkdir(parents=True)
+    (session / "telemetry.csv").write_text("x\n", encoding="utf-8")
+    other = tmp_path / "dataset" / "real" / ".staging" / "s-aaaaaaaaaaaaaaaa"
+    other.mkdir(parents=True)
+    (other / "capture_private.json").write_text(
+        json.dumps({"capture_key": "c-keep"}), encoding="utf-8"
+    )
+    removed = cleanup_incomplete_capture("c-target", root=tmp_path)
+    assert not session.exists()
+    assert not staging.exists()
+    assert other.exists()
+    assert any("s-deadbeefdeadbeef" in path for path in removed)

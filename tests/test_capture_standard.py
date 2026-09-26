@@ -145,6 +145,16 @@ def test_dry_run_opaque_paths_and_shared_duration_pool():
     assert "workload_stdout" not in blob or "private/stdout" in plan["private_stdout"]
 
 
+def test_honest_normal_plan_uses_workload_job_type():
+    finetune = build_plan(_Args(workload="llm_finetune", gpu_ids_override="0,1"))
+    assert finetune["declared_by_gpu"]["0"]["declared_job_type"] == "llm_finetune"
+    serving = build_plan(_Args(workload="llm_inference_serving", gpu_ids_override="0,1"))
+    assert serving["declared_by_gpu"]["0"]["declared_job_type"] == "online_inference"
+    assert serving["declared_by_gpu"]["1"]["declared_job_type"] == "notebook"
+    attack = build_plan(_Args(workload="swma", gpu_ids_override="0,1", declared_policy="pool_random"))
+    assert attack["declared_by_gpu"]["0"]["declared_job_type"] != "swma"
+
+
 def test_companion_roles_and_attack_progress_log():
     plan = build_plan(_Args(workload="baseline", gpu_ids_override="0,1"))
     roles = plan["gpu_roles"]
@@ -189,8 +199,10 @@ def test_new_workloads_dry_run_launchers():
     assert shallow["workload"][shallow["workload"].index("--variant") + 1] == "shallow"
     assert "--progress-log" in shallow["workload"]
     ddp = build_plan(_Args(workload="llm_pretrain_ddp"))
-    assert ddp["workload"][0] == "torchrun"
-    assert ddp["probe"][0] == "torchrun"
+    assert Path(ddp["workload"][0]).name == "torchrun"
+    assert Path(ddp["probe"][0]).name == "torchrun"
+    assert Path(ddp["workload"][0]).is_file()
+    assert Path(ddp["probe"][0]).is_file()
     assert "--probe-only" in ddp["probe"]
     assert ddp["workload"][ddp["workload"].index("--preset") + 1] == "small"
     pinned, fields = apply_probe_result(

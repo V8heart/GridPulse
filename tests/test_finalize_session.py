@@ -41,6 +41,8 @@ def test_window_overlap_boundary_and_merge():
 
 def test_forbidden_token_allows_declared_vocab():
     assert contains_forbidden_token("ddp_training") is None
+    assert contains_forbidden_token("vision_training") is None
+    assert contains_forbidden_token("dataloader_bound") is None
     assert contains_forbidden_token("python train.py") is None
     assert contains_forbidden_token("real-swma-1") in {"real-", "swma"}
     assert contains_forbidden_token("unknown_cuda_workload") == "unknown_cuda"

@@ -36,6 +36,7 @@ DEFAULT_CONFIG = {
     "util_min_range_pct": 5.0,
     "score_mode": "tail_min_plus_evidence",
     "mondrian_min_n": 30,
+    "min_sessions": 1,
     "evidence_weights": {
         "period_mismatch": 1.0,
         "unexplained_changepoint": 0.8,
@@ -113,6 +114,17 @@ def median_observed_n_procs(subset: pd.DataFrame) -> int | None:
     return int(round(float(series.median())))
 
 
+def fill_session_observed_n_procs(windows: pd.DataFrame) -> pd.DataFrame:
+    """Fill window n_procs from the session median of non-missing windows."""
+    if windows.empty or "observed_n_procs" not in windows.columns or "session_id" not in windows.columns:
+        return windows
+    out = windows.copy()
+    values = pd.to_numeric(out["observed_n_procs"], errors="coerce")
+    session_median = values.groupby(out["session_id"]).transform("median")
+    out["observed_n_procs"] = values.fillna(session_median)
+    return out
+
+
 def idle_gate_decision(row: dict, config: dict) -> dict | None:
     """Observe-only idle policy. Never uses gpu_role, declared family, or gt_label."""
     gate = config.get("idle_gate") or {}
@@ -120,11 +132,11 @@ def idle_gate_decision(row: dict, config: dict) -> dict | None:
         return None
     raw = row.get("observed_n_procs")
     if raw is None or (isinstance(raw, float) and pd.isna(raw)):
-        return None
+        return {"is_candidate": None, "idle_status": "unknown", "candidate_reasons": []}
     try:
         n_procs = int(raw)
     except (TypeError, ValueError):
-        return None
+        return {"is_candidate": None, "idle_status": "unknown", "candidate_reasons": []}
     if n_procs > 0:
         return None
     mean_w = row.get("mean_w")
@@ -281,18 +293,39 @@ def require_calibration_schema(calibration: dict) -> None:
         )
 
 
+def _has_band_buckets(calibration: dict) -> bool:
+    keys = set((calibration.get("feature_abs_z") or {})) | set(
+        ((calibration.get("normal_u_scores") or {}).get("full") or {})
+    )
+    return any("|" in str(key) for key in keys)
+
+
 def _select_feature_refs(
     calibration: dict,
     family: str,
     feature: str,
     *,
     min_n: int,
+    band: str | None = None,
 ) -> tuple[list[float], str]:
-    by_family = (calibration.get("feature_abs_z") or {}).get(family) or {}
+    by_z = calibration.get("feature_abs_z") or {}
+    n_map = calibration.get("mondrian_n_sessions") or {}
+    if band and _has_band_buckets(calibration):
+        band_key = f"{family}|{band}"
+        refs = (by_z.get(band_key) or {}).get(feature) or []
+        n_sessions = int(n_map.get(band_key) or 0)
+        min_band = int(calibration.get("mondrian_min_sessions_band") or 2)
+        session_ok = (not n_map) or n_sessions >= min_band
+        if len(refs) >= min_n and session_ok:
+            return list(refs), "band"
+    by_family = by_z.get(family) or {}
     refs = by_family.get(feature) or []
-    if len(refs) >= min_n:
+    n_sessions = int(n_map.get(family) or 0)
+    min_sessions = int(calibration.get("mondrian_min_sessions") or 1)
+    session_ok = (not calibration.get("mondrian_n_sessions")) or n_sessions >= min_sessions
+    if len(refs) >= min_n and session_ok:
         return list(refs), "family"
-    global_refs = ((calibration.get("feature_abs_z") or {}).get("global") or {}).get(feature) or []
+    global_refs = (by_z.get("global") or {}).get(feature) or []
     return list(global_refs), "global"
 
 
@@ -302,11 +335,22 @@ def _select_u_scores(
     *,
     profile: str,
     min_n: int,
+    band: str | None = None,
 ) -> tuple[list[float], str]:
     profiles = calibration.get("normal_u_scores") or {}
     bucket = profiles.get(profile) or {}
+    n_map = calibration.get("mondrian_n_sessions") or {}
+    if band and _has_band_buckets(calibration):
+        band_key = f"{family}|{band}"
+        refs = bucket.get(band_key) or []
+        n_sessions = int(n_map.get(band_key) or 0)
+        min_band = int(calibration.get("mondrian_min_sessions_band") or 2)
+        if len(refs) >= min_n and (n_sessions >= min_band or not n_map):
+            return list(refs), "band"
     refs = bucket.get(family) or []
-    if len(refs) >= min_n:
+    n_sessions = int(n_map.get(family) or 0)
+    min_sessions = int(calibration.get("mondrian_min_sessions") or 1)
+    if len(refs) >= min_n and (n_sessions >= min_sessions or not calibration.get("mondrian_n_sessions")):
         return list(refs), "family"
     return list(bucket.get("global") or []), "global"
 
@@ -352,10 +396,12 @@ def combine_u_score(
     """Tail-min feature score + optional normal-surprisal evidence."""
     min_n = int(config.get("mondrian_min_n", 30))
     family = str(row.get("declared_job_family", "unknown"))
+    band = row.get("expected_band")
+    band = str(band) if band is not None and str(band) not in {"", "nan", "None"} else None
     feature_ps = {}
     levels = []
     for feature, abs_z in z_values.items():
-        refs, level = _select_feature_refs(calibration, family, feature, min_n=min_n)
+        refs, level = _select_feature_refs(calibration, family, feature, min_n=min_n, band=band)
         if leave_out_feature_z and feature in leave_out_feature_z and refs:
             # Leave-one-out: drop one matching value (closest) for cal self-scoring.
             target = float(leave_out_feature_z[feature])
@@ -395,8 +441,11 @@ def combine_u_score(
         "min_feature_tail_p": float(min_p),
         "driving_feature": driving,
         "active_evidence": active,
-        "feature_tail_level": "family" if levels and all(x == "family" for x in levels) else (
-            "mixed" if levels and any(x == "family" for x in levels) else "global"
+        "feature_tail_level": (
+            "band" if levels and all(x == "band" for x in levels) else
+            "family" if levels and all(x == "family" for x in levels) else
+            "mixed" if levels and len(set(levels)) > 1 else
+            (levels[0] if levels else "global")
         ),
     }
 
@@ -431,7 +480,11 @@ def score_window(
     u_score = combined["u_score"]
     family = str(row.get("declared_job_family", "unknown"))
     min_n = int(config.get("mondrian_min_n", 30))
-    cal_scores, cal_level = _select_u_scores(calibration, family, profile=profile, min_n=min_n)
+    band = row.get("expected_band")
+    band = str(band) if band is not None and str(band) not in {"", "nan", "None"} else None
+    cal_scores, cal_level = _select_u_scores(
+        calibration, family, profile=profile, min_n=min_n, band=band
+    )
     p_value = conformal_pvalue(u_score, cal_scores)
     comps = impact_components(row, config)
     raw_impact = float(comps.get("impact_raw", 0.0))
@@ -444,10 +497,11 @@ def score_window(
     idle = idle_gate_decision(row, config)
     idle_status = None
     if idle is not None:
-        is_candidate = bool(idle["is_candidate"])
         idle_status = idle["idle_status"]
-        if idle["candidate_reasons"]:
-            reasons = list(idle["candidate_reasons"])
+        if idle_status in {"idle", "undeclared_load"}:
+            is_candidate = bool(idle["is_candidate"])
+            if idle.get("candidate_reasons"):
+                reasons = list(idle["candidate_reasons"])
     return {
         "u_score": float(u_score),
         "p_value": p_value,
@@ -605,7 +659,17 @@ def build_windows(
     windows = pd.DataFrame(rows)
     if windows.empty:
         return windows
-    return _attach_session_sync(windows, df)
+    windows = _attach_session_sync(windows, df)
+    windows = fill_session_observed_n_procs(windows)
+    if config.get("cohort_expected_band") and "declared_job_type" in windows.columns:
+        from dataset.declared_context import apply_expected_band_column
+
+        windows = apply_expected_band_column(windows)
+    elif config.get("cohort_mid_group") and "declared_job_type" in windows.columns:
+        from dataset.declared_context import apply_mid_group_column
+
+        windows = apply_mid_group_column(windows)
+    return windows
 
 
 def _attach_session_sync(windows: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:

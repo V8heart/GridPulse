@@ -21,7 +21,7 @@ PRESETS: dict[str, GPTPreset] = {
     "tiny": GPTPreset("tiny", n_layer=2, n_head=2, n_embd=64, vocab_size=512, block_size=64),
     # Capture default. Wider than the old toy small so training power is not
     # trivially separable from SWMA/crypto matmuls. medium stays unused.
-    "small": GPTPreset("small", n_layer=8, n_head=12, n_embd=768, vocab_size=1024, block_size=128),
+    "small": GPTPreset("small", n_layer=8, n_head=12, n_embd=768, vocab_size=4096, block_size=512),
     "medium": GPTPreset("medium", n_layer=6, n_head=8, n_embd=256, vocab_size=2048, block_size=256),
 }
 
@@ -154,8 +154,33 @@ def count_parameters(model: nn.Module) -> int:
     return int(sum(p.numel() for p in model.parameters()))
 
 
-def build_gpt(preset: str = "tiny", *, device: str | torch.device = "cpu") -> TinyGPT:
-    if preset not in PRESETS:
-        raise KeyError(f"unknown preset {preset!r}; choose from {sorted(PRESETS)}")
-    model = TinyGPT(preset)
-    return model.to(device)
+def resolve_preset(
+    name: str,
+    *,
+    vocab_size: int | None = None,
+    block_size: int | None = None,
+) -> GPTPreset:
+    if name not in PRESETS:
+        raise KeyError(f"unknown preset {name!r}; choose from {sorted(PRESETS)}")
+    cfg = PRESETS[name]
+    if vocab_size is None and block_size is None:
+        return cfg
+    return GPTPreset(
+        name=cfg.name,
+        n_layer=cfg.n_layer,
+        n_head=cfg.n_head,
+        n_embd=cfg.n_embd,
+        vocab_size=int(vocab_size or cfg.vocab_size),
+        block_size=int(block_size or cfg.block_size),
+    )
+
+
+def build_gpt(
+    preset: str = "tiny",
+    *,
+    device: str | torch.device = "cpu",
+    vocab_size: int | None = None,
+    block_size: int | None = None,
+) -> TinyGPT:
+    cfg = resolve_preset(preset, vocab_size=vocab_size, block_size=block_size)
+    return TinyGPT(cfg).to(device)

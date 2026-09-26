@@ -4,12 +4,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import time
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -20,6 +21,7 @@ from dataset.identifiers import group_id_from_parts
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG = ROOT / "config" / "capture_matrix.yaml"
 DEFAULT_LABELS = ROOT / "dataset" / "real" / "index" / "labels.csv"
+DEFAULT_FAILURES = ROOT / "dataset" / "real" / "private" / "capture_failures.jsonl"
 ATTACK_WORKLOADS = {
     "swma",
     "swma_basic",
@@ -61,6 +63,9 @@ FORWARDED_PARAMS = {
     "grad_accum",
     "rps",
     "batch_size",
+    "matrix_size",
+    "active_streams",
+    "aux_width",
 }
 
 
@@ -251,6 +256,85 @@ def cooldown(gpu_id: int, *, minimum_s: float, max_wait_s: float, idle_temp_c: f
         time.sleep(min(poll_s, max(0.0, deadline - time.monotonic())))
 
 
+def append_failure(path: Path, record: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def cleanup_incomplete_capture(capture_key: str, *, root: Path = ROOT) -> list[str]:
+    """Remove unlabeled leftovers for one capture_key so resume can retry cleanly."""
+    removed: list[str] = []
+    staging_root = root / "dataset" / "real" / ".staging"
+    if not staging_root.is_dir():
+        return removed
+    for staging in staging_root.iterdir():
+        private = staging / "capture_private.json"
+        if not private.is_file():
+            continue
+        try:
+            payload = json.loads(private.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if str(payload.get("capture_key")) != str(capture_key):
+            continue
+        session_id = staging.name
+        for target in (
+            root / "dataset" / "real" / "sessions" / session_id,
+            staging,
+            root / "dataset" / "real" / "private" / "stdout" / f"{session_id}.log",
+        ):
+            if not target.exists():
+                continue
+            if target.is_dir():
+                shutil.rmtree(target)
+            else:
+                target.unlink()
+            removed.append(str(target))
+    return removed
+
+
+def execute_captures(
+    remaining: list[dict[str, Any]],
+    *,
+    runner: Callable[[dict[str, Any]], subprocess.CompletedProcess],
+    cooldown_fn: Callable[..., None],
+    cooldown_cfg: dict[str, Any],
+    failures_path: Path,
+    cleanup_fn: Callable[[str], list[str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Run remaining captures; a failed cell is logged and skipped, not fatal."""
+    failures: list[dict[str, Any]] = []
+    for position, item in enumerate(remaining):
+        result = runner(item)
+        if result.returncode:
+            record = {
+                "capture_key": item["capture_key"],
+                "workload": item["workload"],
+                "duration_s": item["duration_s"],
+                "returncode": int(result.returncode),
+                "epoch": time.time(),
+            }
+            if cleanup_fn is not None:
+                record["removed"] = cleanup_fn(item["capture_key"])
+            append_failure(failures_path, record)
+            failures.append(record)
+            print(json.dumps({"ok": False, **record}, ensure_ascii=False), flush=True)
+        if position + 1 < len(remaining):
+            cooldown_fn(
+                item["gpu_id"],
+                minimum_s=float(cooldown_cfg["min_seconds"]),
+                max_wait_s=float(cooldown_cfg["max_wait_seconds"]),
+                idle_temp_c=(
+                    None if cooldown_cfg.get("idle_temp_c") is None
+                    else float(cooldown_cfg["idle_temp_c"])
+                ),
+                delta_c=float(cooldown_cfg["idle_temp_delta_c"]),
+                poll_s=float(cooldown_cfg.get("poll_seconds", 10)),
+            )
+    return failures
+
+
 def command_for(item: dict[str, Any], *, allow_busy: bool, confirm: bool) -> list[str]:
     command = [
         sys.executable, "-m", "dataset.run_capture",
@@ -309,25 +393,25 @@ def main() -> None:
     if not args.confirm_shared_gpu_safe:
         parser.error("--confirm-shared-gpu-safe is required for real captures")
 
-    for position, item in enumerate(remaining):
-        subprocess.run(
+    def _run(item: dict[str, Any]) -> subprocess.CompletedProcess:
+        return subprocess.run(
             command_for(item, allow_busy=args.allow_busy, confirm=True),
             cwd=ROOT,
-            check=True,
+            check=False,
         )
-        if position + 1 < len(remaining):
-            cooldown(
-                item["gpu_id"],
-                minimum_s=float(cooldown_cfg["min_seconds"]),
-                max_wait_s=float(cooldown_cfg["max_wait_seconds"]),
-                idle_temp_c=(
-                    None if cooldown_cfg.get("idle_temp_c") is None
-                    else float(cooldown_cfg["idle_temp_c"])
-                ),
-                delta_c=float(cooldown_cfg["idle_temp_delta_c"]),
-                poll_s=float(cooldown_cfg.get("poll_seconds", 10)),
-            )
-    print(json.dumps({"summary": summary, "status": "complete"}, indent=2))
+
+    failures = execute_captures(
+        remaining,
+        runner=_run,
+        cooldown_fn=cooldown,
+        cooldown_cfg=cooldown_cfg,
+        failures_path=DEFAULT_FAILURES,
+        cleanup_fn=lambda key: cleanup_incomplete_capture(key, root=ROOT),
+    )
+    status = "complete" if not failures else "partial"
+    print(json.dumps({"summary": summary, "status": status, "failures": failures}, indent=2))
+    if failures:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

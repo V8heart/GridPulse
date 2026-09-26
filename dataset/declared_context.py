@@ -10,6 +10,8 @@ DECLARED_POOL = {
     "llm_finetune": {"family": "training", "process": "python finetune.py"},
     "ddp_training": {"family": "training", "process": "torchrun train.py"},
     "hpo_sweep": {"family": "training", "process": "python sweep.py"},
+    "vision_training": {"family": "training", "process": "python train_vision.py"},
+    "dataloader_bound": {"family": "training", "process": "python dataloader.py"},
     "batch_inference": {"family": "inference", "process": "python batch_infer.py"},
     "online_inference": {"family": "inference", "process": "python serve.py"},
     "evaluation": {"family": "evaluation", "process": "python eval.py"},
@@ -17,11 +19,108 @@ DECLARED_POOL = {
 }
 
 FAMILY_TO_DECLARED = {
-    "training": ("llm_pretrain", "llm_finetune", "ddp_training", "hpo_sweep"),
+    "training": (
+        "llm_pretrain",
+        "llm_finetune",
+        "ddp_training",
+        "hpo_sweep",
+        "vision_training",
+        "dataloader_bound",
+    ),
     "inference": ("batch_inference", "online_inference"),
     "evaluation": ("evaluation",),
     "interactive": ("notebook",),
 }
+
+# Capture --workload / gt_variant / gt_params.workload → honest job_type.
+HONEST_WORKLOAD_TO_JOB_TYPE = {
+    "llm_finetune": "llm_finetune",
+    "gpt_tiny_finetune": "llm_finetune",
+    "finetune": "llm_finetune",
+    "llm_pretrain_ddp": "ddp_training",
+    "pretrain_ddp": "ddp_training",
+    "llm_pretrain_fsdp": "ddp_training",
+    "pretrain_fsdp": "ddp_training",
+    "resnet_ddp": "ddp_training",
+    "ddp": "ddp_training",
+    "distributed": "ddp_training",
+    "llm_flat_pretrain": "llm_pretrain",
+    "flat_pretrain": "llm_pretrain",
+    "hpo": "hpo_sweep",
+    "dataloader_stall": "dataloader_bound",
+    "resnet_single": "vision_training",
+    "single": "vision_training",
+    "llm_inference_serving": "online_inference",
+    "serving": "online_inference",
+    "llm_inference_batch": "batch_inference",
+    "batch": "batch_inference",
+    "baseline": "notebook",
+    "checkpoint": "notebook",
+    "eval_train_switch": "notebook",
+}
+
+ATTACK_DECLARED_POLICIES = frozenset({"pool_random", "host_family_matched", "host_inherited"})
+
+# Optional mid-group keys (used only after inventory decision).
+MID_GROUP_FOR_JOB_TYPE = {
+    "llm_pretrain": "llm_train",
+    "llm_finetune": "llm_train",
+    "hpo_sweep": "llm_train",
+    "ddp_training": "distributed_train",
+    "vision_training": "vision_train",
+    "dataloader_bound": "vision_train",
+    "online_inference": "inference_online",
+    "batch_inference": "inference_batch",
+    "notebook": "interactive",
+    "evaluation": "interactive",
+}
+
+
+def mid_group_for_job_type(job_type: object) -> str:
+    key = str(job_type or "").strip()
+    return MID_GROUP_FOR_JOB_TYPE.get(key, key or "unknown")
+
+
+def apply_mid_group_column(frame):
+    """Add declared_mid_group. Used only after the inventory mid-group choice."""
+    out = frame.copy()
+    out["declared_mid_group"] = out["declared_job_type"].map(mid_group_for_job_type)
+    return out
+
+
+# Declared expected power band. Never derived from observed mean_w.
+# evaluation: low is unused on the real capture; revisit before applying to synth.
+DECLARED_EXPECTED_BAND = {
+    "llm_pretrain": "high",
+    "llm_finetune": "high",
+    "ddp_training": "high",
+    "vision_training": "mid",
+    "hpo_sweep": "low",
+    "dataloader_bound": "low",
+    "batch_inference": "low",
+    "online_inference": "low",
+    "notebook": "low",
+    "evaluation": "low",
+}
+
+
+def expected_band_for_job_type(job_type: object) -> str:
+    key = str(job_type or "").strip()
+    return DECLARED_EXPECTED_BAND.get(key, "low")
+
+
+def family_for_job_type(job_type: object) -> str:
+    key = str(job_type or "").strip()
+    spec = DECLARED_POOL.get(key)
+    return str(spec["family"]) if spec else "unknown"
+
+
+def apply_expected_band_column(frame):
+    """Add expected_band from declared_job_type only."""
+    out = frame.copy()
+    out["expected_band"] = out["declared_job_type"].map(expected_band_for_job_type)
+    return out
+
 
 DeclaredPolicy = Literal["honest", "pool_random", "host_family_matched", "host_inherited"]
 SPLIT_DECLARED_ATTEMPTS = 16
@@ -56,6 +155,30 @@ def _job_choices(
         if not choices:
             raise ValueError("allowed_families removed every declared choice")
     return choices
+
+
+def resolve_honest_workload_key(*candidates: object) -> str | None:
+    """Return the first candidate that maps to an honest job type."""
+    for raw in candidates:
+        if raw is None:
+            continue
+        key = str(raw).strip()
+        if not key or key.lower() in {"nan", "none"}:
+            continue
+        if key in HONEST_WORKLOAD_TO_JOB_TYPE:
+            return key
+    return None
+
+
+def honest_job_type_for_workload(*candidates: object) -> str:
+    key = resolve_honest_workload_key(*candidates)
+    if key is None:
+        raise ValueError(f"no honest job_type mapping for {candidates!r}")
+    return HONEST_WORKLOAD_TO_JOB_TYPE[key]
+
+
+def honest_declared_for_workload(*candidates: object, user: str) -> dict[str, str]:
+    return _declared_from_job(honest_job_type_for_workload(*candidates), user)
 
 
 def _declared_from_job(job_type: str, user: str) -> dict[str, str]:

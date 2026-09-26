@@ -19,6 +19,19 @@ if str(ROOT) not in sys.path:
 
 from workloads.progress_log import DecoyStepper, ProgressLog
 
+MIN_SWMA_PERIOD_S = 0.05
+
+
+def allocate_independent_streams(torch, device, matrix_size: int, n_streams: int, dtype):
+    """One independent (A, B, out) triple per stream — no a@b chaining."""
+    streams = []
+    for _ in range(max(1, int(n_streams))):
+        left = torch.randn(matrix_size, matrix_size, device=device, dtype=dtype)
+        right = torch.randn(matrix_size, matrix_size, device=device, dtype=dtype)
+        out = torch.empty(matrix_size, matrix_size, device=device, dtype=dtype)
+        streams.append((left, right, out))
+    return streams
+
 
 def run(args) -> None:
     try:
@@ -32,7 +45,7 @@ def run(args) -> None:
         raise ValueError("--duration은 0초 초과 1800초 이하여야 합니다.")
     if not 0.1 <= args.duty_cycle <= 0.9:
         raise ValueError("--duty-cycle은 0.1~0.9 범위여야 합니다.")
-    if args.period < 0.05:
+    if args.period < MIN_SWMA_PERIOD_S:
         raise ValueError("--period는 최소 50ms입니다. kHz 물리 재현용 도구가 아닙니다.")
 
     rank = 0
@@ -54,13 +67,9 @@ def run(args) -> None:
     decoy = DecoyStepper(log, decoy_period, jitter_frac=0.05, rng=random.Random(args.seed)) if args.progress_log else None
 
     streams = max(1, int(args.active_streams))
-    mats = [
-        (
-            torch.randn(args.matrix_size, args.matrix_size, device=device, dtype=torch.float16),
-            torch.randn(args.matrix_size, args.matrix_size, device=device, dtype=torch.float16),
-        )
-        for _ in range(streams)
-    ]
+    mats = allocate_independent_streams(
+        torch, device, int(args.matrix_size), streams, torch.float16
+    )
     attack_intervals: list[list[float]] = []
     deadline = time.monotonic() + args.duration
     cycles = 0
@@ -74,9 +83,8 @@ def run(args) -> None:
         active_deadline = cycle_start + period * args.duty_cycle
         active_start_epoch = time.time()
         while time.monotonic() < active_deadline:
-            for idx, (a, b) in enumerate(mats):
-                result = a @ b
-                mats[idx] = (b, result)
+            for left, right, out in mats:
+                torch.mm(left, right, out=out)
             if decoy is not None:
                 decoy.tick()
         torch.cuda.synchronize()
@@ -118,8 +126,8 @@ def main() -> None:
     parser.add_argument("--duration", type=float, default=30)
     parser.add_argument("--period", type=float, default=1.0)
     parser.add_argument("--duty-cycle", type=float, default=0.5)
-    parser.add_argument("--matrix-size", type=int, default=2048)
-    parser.add_argument("--active-streams", type=int, default=1)
+    parser.add_argument("--matrix-size", type=int, default=4096)
+    parser.add_argument("--active-streams", type=int, default=2)
     parser.add_argument("--jitter-frac", type=float, default=0.0)
     parser.add_argument("--progress-log", default=None)
     parser.add_argument("--decoy-step-s", type=float, default=None)

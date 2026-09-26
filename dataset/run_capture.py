@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from dataset.declared_context import sample_declared, sample_split_partner
+from dataset.declared_context import honest_declared_for_workload, sample_declared, sample_split_partner
 from dataset.finalize_session import finalize_session
 from dataset.identifiers import is_session_id, new_run_id, new_session_id, require_session_id
 
@@ -73,7 +73,23 @@ OPTIONAL_LLM_WORKLOADS = {**LLM_TRAIN_WORKLOADS, **INFERENCE_WORKLOADS}
 
 def merge_workload_summary(params: dict, summary: dict) -> dict:
     """Copy measured attack period and probe fields onto the private param record."""
-    for key in ("period_requested_s", "period_actual_s", "micro_batch", "preset"):
+    for key in (
+        "period_requested_s",
+        "period_actual_s",
+        "period_floored",
+        "host_period_s",
+        "period_scale",
+        "micro_batch",
+        "preset",
+        "mean_w",
+        "target_w",
+        "fb_used_mb",
+        "ltma_mode",
+        "baseline_w",
+        "aux_width",
+        "matrix_size",
+        "active_streams",
+    ):
         if summary.get(key) is not None:
             params[key] = summary[key]
     if summary.get("n_params") is not None:
@@ -112,6 +128,18 @@ def _atomic_write(path: Path, text: str, *, mode: int = 0o644) -> None:
     tmp.write_text(text, encoding="utf-8")
     os.chmod(tmp, mode)
     os.replace(tmp, path)
+
+
+def _torchrun_bin() -> str:
+    """Use the torchrun next to this interpreter. A bare name is missing when the venv is not activated.
+
+    Do not resolve the interpreter path: .venv/bin/python is a symlink and resolving it
+    leaves the directory that actually contains torchrun.
+    """
+    candidate = Path(sys.executable).parent / "torchrun"
+    if candidate.is_file():
+        return str(candidate)
+    return "torchrun"
 
 
 def _pick_duration(seed: int, session_id: str) -> float:
@@ -210,7 +238,7 @@ def build_plan(args) -> dict:
         if args.workload == "distributed":
             target_gpus = [0, 1]
             workload = [
-                "torchrun", "--standalone", "--nproc-per-node=2",
+                _torchrun_bin(), "--standalone", "--nproc-per-node=2",
                 "-m", module, "--mode", "distributed",
                 "--max-seconds", str(duration),
                 "--progress-log", str(progress_raw),
@@ -238,7 +266,7 @@ def build_plan(args) -> dict:
         chosen_preset = preset or default_preset
         preset = chosen_preset
         target_gpus = [0, 1] if multi else [args.gpu_id]
-        launcher = ["torchrun", "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
+        launcher = [_torchrun_bin(), "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
         workload = [
             *launcher, "-m", module,
             "--mode", mode,
@@ -262,6 +290,9 @@ def build_plan(args) -> dict:
         ]
         if seq_len is not None:
             probe.extend(["--seq-len", str(seq_len)])
+        if getattr(args, "probe_target_w", None) is not None:
+            probe.extend(["--probe-target-w", str(args.probe_target_w)])
+            workload.extend(["--probe-target-w", str(args.probe_target_w)])
         if not multi:
             probe.extend(["--gpu-id", str(args.gpu_id)])
     elif args.workload in INFERENCE_WORKLOADS:
@@ -300,7 +331,7 @@ def build_plan(args) -> dict:
         hosted = False
         module = "workloads.vision_workloads"
         target_gpus = [0, 1] if multi else [args.gpu_id]
-        launcher = ["torchrun", "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
+        launcher = [_torchrun_bin(), "--standalone", "--nproc-per-node=2"] if multi else [sys.executable]
         workload = [
             *launcher, "-m", module,
             "--mode", mode,
@@ -332,6 +363,18 @@ def build_plan(args) -> dict:
             "--duty-cycle", str(args.duty_cycle),
             "--host", host_name,
         ]
+        if getattr(args, "matrix_size", None) is not None:
+            workload.extend(["--matrix-size", str(int(args.matrix_size))])
+        if getattr(args, "active_streams", None) is not None:
+            workload.extend(["--active-streams", str(int(args.active_streams))])
+        if getattr(args, "aux_width", None) is not None:
+            workload.extend(["--aux-width", str(int(args.aux_width))])
+        if seq_len is not None:
+            workload.extend(["--seq-len", str(int(seq_len))])
+        if preset is not None:
+            workload.extend(["--llm-preset", str(preset)])
+        if batch_size is not None:
+            workload.extend(["--llm-micro-batch", str(int(batch_size))])
     else:
         raise ValueError(f"unknown workload: {args.workload}")
 
@@ -385,7 +428,11 @@ def build_plan(args) -> dict:
                 continue
             else:
                 if shared is None:
-                    shared = sample_declared(true_family, rng, **target_sample)
+                    if not gt_is_attack:
+                        user = f"user_{int(rng.integers(0, 50)):03d}"
+                        shared = honest_declared_for_workload(args.workload, gt_variant, user=user)
+                    else:
+                        shared = sample_declared(true_family, rng, **target_sample)
                 declared_by_gpu[gid] = dict(shared)
         if per_target_declared:
             for gid in target_ids:
@@ -514,6 +561,10 @@ def main() -> None:
     parser.add_argument("--rps", type=float, default=None)
     parser.add_argument("--dataloader", choices=["gpu", "cpu"], default=None)
     parser.add_argument("--host", choices=["mlp", "llm"], default="llm")
+    parser.add_argument("--matrix-size", type=int, default=None)
+    parser.add_argument("--active-streams", type=int, default=None)
+    parser.add_argument("--aux-width", type=int, default=None)
+    parser.add_argument("--probe-target-w", type=float, default=300.0)
     parser.add_argument("--session-id", default=None)
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--group-id", default=None)
@@ -601,7 +652,12 @@ def main() -> None:
             mode=0o600,
         )
         if probe.returncode:
-            raise RuntimeError(f"LLM probe failed exit={probe.returncode}")
+            err = (probe.stderr or probe.stdout or "").strip()
+            tail = err[-2000:] if err else ""
+            raise RuntimeError(
+                f"LLM probe failed exit={probe.returncode}"
+                + (f": {tail}" if tail else "")
+            )
         time.sleep(5)
 
     collector = subprocess.Popen(plan["collector"], cwd=ROOT)

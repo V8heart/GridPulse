@@ -12,10 +12,19 @@ import yaml
 from pipeline.attack_visibility import attack_visibility_group, parse_period_s
 from pipeline.baseline import CohortBaseline
 from pipeline.context_evidence import read_session_progress
-from pipeline.eval_stage1_auc_alpha import select_alpha
+from pipeline.eval_stage1_auc_alpha import cohort_weighted_fp, maybe_stepdown_alpha, select_alpha
+from dataset.declared_context import (
+    apply_expected_band_column,
+    apply_mid_group_column,
+    expected_band_for_job_type,
+    mid_group_for_job_type,
+)
+from dataset.make_real_split import make_real_split
 from pipeline.stage1_v2 import (
     CALIBRATION_SCHEMA_VERSION,
+    _select_u_scores,
     combine_u_score,
+    fill_session_observed_n_procs,
     idle_gate_decision,
     load_config,
     score_window,
@@ -117,9 +126,12 @@ def test_idle_gate_ignores_gpu_role_family_and_gt_label():
     assert d == e
 
 
-def test_idle_gate_missing_n_procs_does_not_apply():
-    assert idle_gate_decision({"mean_w": 24.0}, _score_cfg()) is None
-    assert idle_gate_decision({"observed_n_procs": float("nan"), "mean_w": 24.0}, _score_cfg()) is None
+def test_idle_gate_missing_n_procs_is_unknown():
+    missing = idle_gate_decision({"mean_w": 24.0}, _score_cfg())
+    nan = idle_gate_decision({"observed_n_procs": float("nan"), "mean_w": 24.0}, _score_cfg())
+    assert missing["idle_status"] == "unknown"
+    assert missing["is_candidate"] is None
+    assert nan["idle_status"] == "unknown"
 
 
 def test_score_window_idle_overrides_conformal():
@@ -161,6 +173,202 @@ def test_zero_proc_mask_for_fit_exclusion():
     assert zero_proc_mask(frame).tolist() == [True, False, True, False]
 
 
+def test_expected_band_is_declared_only():
+    assert expected_band_for_job_type("llm_finetune") == "high"
+    assert expected_band_for_job_type("hpo_sweep") == "low"
+    assert expected_band_for_job_type("vision_training") == "mid"
+    frame = apply_expected_band_column(pd.DataFrame({
+        "declared_job_type": ["hpo_sweep", "llm_finetune"],
+        "mean_w": [102.0, 397.0],
+    }))
+    assert frame["expected_band"].tolist() == ["low", "high"]
+    swapped = apply_expected_band_column(pd.DataFrame({
+        "declared_job_type": ["hpo_sweep", "llm_finetune"],
+        "mean_w": [397.0, 50.0],
+    }))
+    assert swapped["expected_band"].tolist() == ["low", "high"]
+    assert "declared_mid_group" not in frame.columns
+
+
+def test_fill_session_observed_n_procs():
+    frame = pd.DataFrame({
+        "session_id": ["a", "a", "a", "b"],
+        "observed_n_procs": [1.0, None, 3.0, None],
+    })
+    filled = fill_session_observed_n_procs(frame)
+    assert filled.loc[1, "observed_n_procs"] == 2.0
+    assert pd.isna(filled.loc[3, "observed_n_procs"])
+
+
+def test_score_window_unknown_keeps_conformal():
+    row = {"mean_w": 194.0, "declared_job_family": "training", "evidence": {}}
+    unknown = score_window(row, _baseline(), _mini_calibration(), _score_cfg())
+    through = score_window({**row, "observed_n_procs": 1}, _baseline(), _mini_calibration(), _score_cfg())
+    assert unknown["idle_status"] == "unknown"
+    assert unknown["is_candidate"] == through["is_candidate"]
+
+
+def test_band_fallback_uses_min_sessions_2():
+    rows = []
+    for session in ("s1", "s2"):
+        rows.append(pd.DataFrame({
+            "session_id": [session] * 40,
+            "declared_job_family": ["training"] * 40,
+            "expected_band": ["low"] * 40,
+            "gpu_model": ["RTX4090"] * 40,
+            "mean_w": np.linspace(80, 120, 40),
+            "swing_abs_w": np.linspace(10, 20, 40),
+            "band_frac_0.1_0.7": np.linspace(0.1, 0.2, 40),
+            "band_frac_0.7_2": np.linspace(0.1, 0.2, 40),
+            "dominant_freq_hz": np.ones(40),
+            "util_slope_w_per_pct": np.ones(40),
+            "util_residual_mad_w": np.ones(40),
+            "spectral_entropy": np.ones(40),
+        }))
+    frame = pd.concat(rows, ignore_index=True)
+    keys = ("declared_job_family", "expected_band", "gpu_model")
+    fitted = CohortBaseline().fit(frame, cohort_keys=keys, min_windows=30, min_sessions=3, min_sessions_band=2)
+    assert "full:training|low|RTX4090" not in fitted.stats
+    assert "band:training|low" in fitted.stats
+    assert fitted.stats["band:training|low"]["n_sessions"] == 2
+    z = fitted.robust_z(frame.iloc[0].to_dict())
+    assert z["baseline_level"] == "band"
+
+
+def test_min_sessions_blocks_thin_full_cohort():
+    rows = []
+    for session in ("s1", "s2"):
+        block = pd.DataFrame({
+            "session_id": [session] * 40,
+            "declared_job_family": ["training"] * 40,
+            "declared_job_type": ["llm_finetune"] * 40,
+            "gpu_model": ["RTX4090"] * 40,
+            "mean_w": np.linspace(180, 220, 40),
+            "swing_abs_w": np.linspace(10, 20, 40),
+            "band_frac_0.1_0.7": np.linspace(0.1, 0.2, 40),
+            "band_frac_0.7_2": np.linspace(0.1, 0.2, 40),
+            "dominant_freq_hz": np.ones(40),
+            "util_slope_w_per_pct": np.ones(40),
+            "util_residual_mad_w": np.ones(40),
+            "spectral_entropy": np.ones(40),
+        })
+        rows.append(block)
+    frame = pd.concat(rows, ignore_index=True)
+    keys = ("declared_job_family", "declared_job_type", "gpu_model")
+    thin = CohortBaseline().fit(frame, cohort_keys=keys, min_windows=30, min_sessions=3)
+    assert "full:training|llm_finetune|RTX4090" not in thin.stats
+    three = pd.concat([frame, frame.iloc[:40].assign(session_id="s3")], ignore_index=True)
+    ok = CohortBaseline().fit(three, cohort_keys=keys, min_windows=30, min_sessions=3)
+    assert "full:training|llm_finetune|RTX4090" in ok.stats
+    assert ok.stats["full:training|llm_finetune|RTX4090"]["n_sessions"] == 3
+    assert ok.stats["full:training|llm_finetune|RTX4090"]["n_windows"] == 120
+
+
+def test_mondrian_session_count_falls_back_to_family():
+    cal = _mini_calibration(
+        mondrian_n_sessions={"training": 2},
+        mondrian_min_sessions=3,
+    )
+    refs, level = _select_u_scores(cal, "training", profile="full", min_n=30)
+    assert level == "global"
+    cal["mondrian_n_sessions"] = {"training": 3}
+    refs, level = _select_u_scores(cal, "training", profile="full", min_n=30)
+    assert level == "family"
+    assert len(refs) >= 30
+    # Absent mondrian_n_sessions keeps the synth window-count path.
+    legacy, legacy_level = _select_u_scores(_mini_calibration(), "training", profile="full", min_n=30)
+    assert legacy_level == "family"
+    assert mid_group_for_job_type("llm_finetune") == "llm_train"
+    grouped = apply_mid_group_column(pd.DataFrame({"declared_job_type": ["vision_training", "llm_finetune"]}))
+    assert grouped["declared_mid_group"].tolist() == ["vision_train", "llm_train"]
+
+
+def test_mid_group_disguise_excludes_vision_train_recall():
+    from pipeline.report_round2_stage1 import mid_group_disguise_table
+
+    frame = pd.DataFrame({
+        "session_id": ["n1", "n2", "a1", "a2"],
+        "gpu_role": ["target"] * 4,
+        "gt_label": ["normal_resnet_train", "normal_llm_finetune", "swma", "cryptojacking"],
+        "declared_job_type": ["vision_training", "llm_finetune", "llm_finetune", "llm_finetune"],
+        "declared_mid_group": ["vision_train", "llm_train", "llm_train", "llm_train"],
+        "is_candidate": [True, False, True, True],
+    })
+    rows = {row["mid_group"]: row for row in mid_group_disguise_table(frame)}
+    assert rows["vision_train"]["recall_excluded"] is True
+    assert rows["vision_train"]["attack_recall"] is None
+    assert rows["vision_train"]["normal_fp"]["rate"] == 1.0
+    assert rows["llm_train"]["recall_excluded"] is False
+    assert rows["llm_train"]["attack_recall"]["rate"] == 1.0
+    assert "thin" in rows["llm_train"]["note"] or "more attacks" in rows["llm_train"]["note"]
+
+
+def test_make_real_split_seeds_train_job_types():
+    rows = []
+    for job, start in (("online_inference", 0), ("ddp_training", 6), ("notebook", 12)):
+        for index in range(6):
+            sid = f"s-{start + index:016x}"
+            rows.append(
+                {
+                    "session_id": sid,
+                    "group_id": f"g-{start + index:016x}",
+                    "gt_label": f"normal_{job}",
+                    "gt_is_attack": False,
+                    "gpu_role": "target",
+                    "declared_job_type": job,
+                    "valid": True,
+                }
+            )
+    report = make_real_split(pd.DataFrame(rows), outer_folds=3, seed=7)
+    fold0 = report["folds"][0]
+    assert "online_inference" in fold0["train_job_types"] or "online_inference" in fold0["missing_train_job_types"]
+    assert set(fold0["train_job_types"]) | set(fold0["missing_train_job_types"]) <= {
+        "online_inference",
+        "ddp_training",
+        "notebook",
+    }
+    assert not (set(fold0["train_groups"]) & set(fold0["cal_groups"]))
+    assert not (set(fold0["train_groups"]) & set(fold0["test_groups"]))
+
+
+def test_make_real_split_seeds_cal_cohorts():
+    rows = []
+    jobs = (("ddp_training", 0), ("vision_training", 6), ("hpo_sweep", 12))
+    for job, start in jobs:
+        for index in range(6):
+            rows.append(
+                {
+                    "session_id": f"s-{start + index:016x}",
+                    "group_id": f"g-{start + index:016x}",
+                    "gt_label": f"normal_{job}",
+                    "gt_is_attack": False,
+                    "gpu_role": "target",
+                    "declared_job_type": job,
+                    "valid": True,
+                }
+            )
+    report = make_real_split(pd.DataFrame(rows), outer_folds=3, seed=7)
+    fold0 = report["folds"][0]
+    assert {"training|high", "training|mid", "training|low"} <= set(fold0["cal_cohorts"])
+    assert fold0["missing_cal_cohorts"] == []
+    lone = [
+        {
+            "session_id": "s-00000000000000aa",
+            "group_id": "g-00000000000000aa",
+            "gt_label": "normal_vision_training",
+            "gt_is_attack": False,
+            "gpu_role": "target",
+            "declared_job_type": "vision_training",
+            "valid": True,
+        }
+    ]
+    thin = make_real_split(pd.DataFrame(lone), outer_folds=3, seed=7)
+    missing = set()
+    for fold in thin["folds"]:
+        missing.update(fold["missing_cal_cohorts"])
+    assert "training|mid" in missing
+
+
 def test_real_cohort_keys_are_declared_only_no_power_band():
     rows = pd.DataFrame({
         "declared_job_family": ["training"] * 40 + ["inference"] * 40,
@@ -182,8 +390,9 @@ def test_real_cohort_keys_are_declared_only_no_power_band():
     assert "full:training|llm_finetune|RTX4090" in baseline.stats
     assert "full:inference|online_inference|RTX4090" in baseline.stats
     real_cfg = yaml.safe_load(Path("config/stage1_v2_real.yaml").read_text(encoding="utf-8"))
-    assert real_cfg["cohort_keys"] == list(keys)
+    assert real_cfg["cohort_keys"] == ["declared_job_family", "expected_band", "gpu_model"]
     assert "power_band" not in real_cfg["cohort_keys"]
+    assert "mean_w" not in real_cfg["cohort_keys"]
 
 
 def test_force_zero_progress_log_missing_weight():
@@ -368,7 +577,7 @@ def test_visibility_groups_and_period_parse():
     assert parse_period_s(params) == 2.0
 
 
-def test_alpha_requires_detectable_min_recall():
+def test_alpha_ignores_detectable_min_recall():
     sweep = [
         {"alpha": 0.05, "cal_normal_candidate_rate": 0.04, "cal_attack_recall": 0.40, "cal_detectable_recall": 0.50},
         {"alpha": 0.10, "cal_normal_candidate_rate": 0.08, "cal_attack_recall": 0.80, "cal_detectable_recall": 0.75},
@@ -377,23 +586,78 @@ def test_alpha_requires_detectable_min_recall():
     selected, failed, rule = select_alpha(sweep, {"alpha_min_detectable_recall": 0.70})
     assert failed is False
     assert selected["alpha"] == 0.10
-    assert "0.70" in rule
-    none, failed2, _ = select_alpha(
+    assert "0.70" not in rule
+    assert "alpha_high_impact = alpha" in rule
+    picked, failed2, _ = select_alpha(
         [
             {"alpha": 0.05, "cal_normal_candidate_rate": 0.04, "cal_attack_recall": 0.2, "cal_detectable_recall": 0.2},
             {"alpha": 0.10, "cal_normal_candidate_rate": 0.09, "cal_attack_recall": 0.3, "cal_detectable_recall": 0.4},
         ],
         {"alpha_min_detectable_recall": 0.70},
     )
-    assert failed2 is True
-    assert none is None
+    assert failed2 is False
+    assert picked["alpha"] == 0.10
+
+
+def test_weighted_fp_substitutes_missing_cal_from_train():
+    cal = pd.DataFrame({
+        "session_id": ["c1", "c1", "c2"],
+        "declared_job_family": ["training"] * 3,
+        "expected_band": ["high"] * 3,
+        "gt_label": ["normal"] * 3,
+        "gpu_role": ["target"] * 3,
+        "is_candidate": [False, False, True],
+    })
+    train = pd.DataFrame({
+        "session_id": ["t1", "t2"],
+        "declared_job_family": ["training"] * 2,
+        "expected_band": ["low"] * 2,
+        "gt_label": ["normal"] * 2,
+        "gpu_role": ["target"] * 2,
+        "is_candidate": [True, True],
+    })
+    rate, substituted = cohort_weighted_fp(
+        cal,
+        train_normals=train,
+        missing_cal_cohorts=["training|low"],
+        weight_sessions={"training|high": 10, "training|low": 7},
+    )
+    assert substituted == ["training|low"]
+    assert abs(rate - (0.333333 * 10 + 1.0 * 7) / 17) < 1e-6
+    selected, step = maybe_stepdown_alpha(
+        {"alpha": 0.2, "cal_cohort_weighted_fp": 0.09, "fit_target_normal_fp": 0.30},
+        [
+            {"alpha": 0.10, "cal_cohort_weighted_fp": 0.06, "fit_target_normal_fp": 0.12},
+            {"alpha": 0.20, "cal_cohort_weighted_fp": 0.09, "fit_target_normal_fp": 0.30},
+        ],
+    )
+    assert step["applied"] is True
+    assert selected["alpha"] == 0.10
+    blocked, blocked_step = maybe_stepdown_alpha(
+        {"alpha": 0.05, "cal_cohort_weighted_fp": 0.04, "fit_target_normal_fp": 0.20},
+        [{"alpha": 0.05, "cal_cohort_weighted_fp": 0.04, "fit_target_normal_fp": 0.20}],
+    )
+    assert blocked["alpha"] == 0.05
+    assert blocked_step["applied"] is False
+    assert blocked_step["reason"] == "blocked"
 
 
 def test_real_stage1_config_does_not_replace_synth_defaults():
     synth = load_config("config/stage1_v2.yaml")
     real = load_config("config/stage1_v2_real.yaml")
     assert synth["cohort_keys"] == ["declared_job_family", "gpu_model"]
-    assert real["cohort_keys"] == ["declared_job_family", "declared_job_type", "gpu_model"]
+    assert real["cohort_keys"] == ["declared_job_family", "expected_band", "gpu_model"]
+    assert real["cohort_expected_band"] is True
+    assert real.get("cohort_mid_group") is False
+    assert real["alpha"] == 0.05
+    assert real["alpha_high_impact"] == real["alpha"]
+    assert real["min_sessions"] == 3
+    assert real["min_sessions_band"] == 2
     assert real["force_zero_progress_log_missing"] is True
     assert real["stage2"]["drop_progress_log_missing"] is True
-    assert real["alpha_min_detectable_recall"] == 0.70
+    assert real["evidence_weights"]["progress_log_missing"] == 0.0
+    assert real["idle_gate"]["mean_w_max"] == 40.0
+    assert real["alpha_min_detectable_recall"] == 0.0
+    round3 = yaml.safe_load(Path("dataset/real/pipeline/refit/round3/stage1_v2.yaml").read_text(encoding="utf-8"))
+    assert round3["cohort_keys"] == real["cohort_keys"]
+    assert "expected_band" not in (synth.get("cohort_keys") or [])

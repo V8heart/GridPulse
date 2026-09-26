@@ -14,17 +14,19 @@
 **우리가 하지 않는 것**: Bit2Watt의 kHz 원신호를 직접 탐지 (물리 계측 영역, 우선순위 제외).
 **우리가 하는 것**: 관측 가능한 해상도에서 의심 활동을 선별 → 알려진 공격과 대조 → 설명 생성.
 
-## 파이프라인 3단계
+## 파이프라인 (2-tier)
 
 ```
-DCGM/NVML 텔레메트리
+NVML 텔레메트리 (gp-telemetry/1.2)
    ↓
-[1단계] 상시 저비용 스크리닝 — 윈도우별 변동폭 z-score, 의심 후보만 선별
+[Stage1 v2] 30s 창 / 15s stride. 선언 코호트 robust-z + Mondrian conformal.
+            idle 게이트. 의심 후보만 통과
    ↓ (후보만)
-[2단계] 고해상도 특성 분석 — 주기성/duty 규칙성/평균유지 여부를 정성적 설명으로 변환
-   ↓
-[3단계] RAG 대조 + LLM 판정 — 알려진 공격 시그니처와 의미 기반 매칭, 위험도+근거 생성
+[Stage2 v2] structured evidence bundle → RAG 시그니처 대조 → LLM 판정
+            `--stage2 none` 이면 Stage1 envelope만 저장
 ```
+
+레거시 `--stage1 legacy`는 창 변동폭 z-score 스크리닝이다. 현재 공식 경로는 `--stage1 v2`.
 
 ## 서버 요구사항 (검증된 환경)
 
@@ -41,18 +43,19 @@ source .venv/bin/activate
 #   ollama serve   # 미실행 시
 #   검증된 모델: gemma3:12b  (qwen3:14b는 format=json에서 빈 응답이 나와 비권장)
 
-# 파이프라인 실행 (수집된 텔레메트리 CSV 대상)
+# 합성: Stage1 v2 + Stage2 v2 (Ollama)
 python pipeline/run_pipeline.py \
     --telemetry dataset/synthetic/all_v3.csv \
-    --baseline-mean 120 \
     --stage1 v2 \
     --stage2 v2 \
+    --stage1-config config/stage1_v2.yaml \
     --rag-backend tfidf \
     --llm-backend ollama \
     --llm-model gemma3:12b
 ```
 
 오프라인/빠른 검증만 할 때는 `--llm-backend stub`을 쓰면 됩니다.
+
 ### 합성 데이터셋과 평가
 
 ```bash
@@ -131,16 +134,59 @@ bash scripts/refit_stage1_v2_regen.sh --run-test  # 동결 후 1회
 
 pytest 기본: `pytest -q -m "not gpu"`.
 
+## Stage1 v2 공식 설정
+
+점수 식(u-score / conformal)은 합성·실측이 같다. **코호트 키와 alpha만 갈라진다.**
+관측 `mean_w` / `power_band`는 코호트 키에 넣지 않는다.
+
+| | 합성 `config/stage1_v2.yaml` | 실측 `config/stage1_v2_real.yaml` |
+|---|---|---|
+| 코호트 | `declared_job_family`, `gpu_model` | `declared_job_family`, `expected_band`, `gpu_model` |
+| 폴백 | full → family → global | full (세션 3+) → band (세션 2+) → family → global |
+| alpha | 0.10 | **0.05** |
+| `alpha_high_impact` | 0.20 (impact 완화) | **alpha와 동일** (완화 없음) |
+| `progress_log_missing` | 가중치 0 | 가중치 0 (`force_zero_progress_log_missing`) |
+
+실측 `expected_band`는 `declared_job_type`의 고정 표다 (`dataset/declared_context.py`).
+high: `llm_pretrain` / `llm_finetune` / `ddp_training`. mid: `vision_training`.
+low: `hpo_sweep`, `dataloader_bound`, serving, `notebook`. (`evaluation: low`는 실측 세션 없음.)
+
+Idle 게이트 (관측만, 라벨 미사용):
+
+- 창 `n_procs` 결측 → 같은 `session_id` 중앙값으로 채움. 그래도 없으면 `idle_status=unknown` (후보 불변)
+- `n_procs == 0` 이고 `mean_w ≤ 40` → 후보 제외 (`idle`)
+- `n_procs == 0` 이고 고전력 → `undeclared_load` (후보)
+
+실측 적합 산출물(round3, fold_00, seed 7):
+
+- 리포트: [`dataset/real/pipeline/refit/round3/stage1_report.md`](dataset/real/pipeline/refit/round3/stage1_report.md)
+- baseline / calibration: `dataset/real/pipeline/refit/round3/fold_00/`
+- alpha는 cal만. 세션 가중 정상 오탐 ≤ 0.10, 공격 recall 최대, 동점이면 작은 alpha.
+  결측 cal 코호트는 같은 코호트 train 오탐으로 대체. test로 alpha/강등하지 않음.
+
+```bash
+python pipeline/run_pipeline.py \
+  --telemetry dataset/real/pipeline/telemetry_with_procs.csv \
+  --stage1 v2 --stage2 none \
+  --stage1-config config/stage1_v2_real.yaml \
+  --baseline-model dataset/real/pipeline/refit/round3/fold_00/cohort_baseline_v2.json \
+  --calibration dataset/real/pipeline/refit/round3/fold_00/stage1_v2_calibration.json \
+  --sessions-root dataset/real/sessions \
+  --progress-source raw \
+  --stage1-out dataset/real/pipeline/stage1_real_refit_round3.json
+```
+
 ## 구성요소
 
 | 경로 | 역할 |
 |---|---|
 | `corpus/*.md` | 공격 시그니처 지식베이스. **새 공격은 여기 문서만 추가하면 대응** |
-| `pipeline/features.py` | 1·2단계: 텔레메트리 → 통계 피처 → 정성적 자연어 설명 |
-| `pipeline/rag_analyzer.py` | 3단계: RAG 검색(sbert/tfidf) + LLM 판정(ollama/stub) |
-| `pipeline/run_pipeline.py` | 전체 오케스트레이션 (+ 선택 `--physics-validate` 이벤트 트리거) |
+| `pipeline/stage1_v2.py`, `pipeline/baseline.py` | Stage1 v2: 창 피처, 코호트 robust-z, Mondrian, idle 게이트 |
+| `pipeline/features.py` | 창 통계 피처 + 정성 설명 (Stage1/Stage2가 공유) |
+| `pipeline/rag_analyzer.py` | Stage2 RAG 검색(sbert/tfidf) + 레거시 판정 경로 |
+| `pipeline/run_pipeline.py` | 오케스트레이션 (`--stage1 v2`, `--stage2 v2|none`, 선택 `--physics-validate`) |
 | `pipeline/fit_corpus_ranges.py` | Part A: train split only로 corpus feature range 산출 |
-| `pipeline/fit_stage1_v2.py`, `pipeline/eval_stage1.py` | Part B: cohort baseline/conformal calibration 및 Stage1 v2 평가 |
+| `pipeline/fit_stage1_v2.py`, `pipeline/eval_stage1.py`, `pipeline/eval_stage1_auc_alpha.py` | Part B: cohort baseline/conformal + cal-only alpha |
 | `pipeline/stage2_evidence.py`, `pipeline/stage2_llm.py`, `pipeline/eval_stage2.py` | Part C: structured evidence bundle과 Stage2 v2 평가 |
 | `pipeline/physics_correlation.py` | **§8 실험 전용**: 고정 시나리오 Physics CSV와 cyber JSON을 `attack_id`로 사후 결합(운영 트리거 아님) |
 | `dataset/` | 공통 스키마, 합성 데이터, 캡처·평가 도구 |
@@ -161,7 +207,8 @@ pytest 기본: `pytest -q -m "not gpu"`.
 Part A 변경으로 추론 입력에서는 `gt_label`, `gt_attack_id`, `attack_id`,
 `waveform_*`, `power_phys_w`, legacy `label`을 제거한다. `declared_job_type`과
 `declared_job_family`는 scheduler가 제공하는 선언 context로만 사용되며, 공격명과
-같은 oracle 문자열을 넣지 않는다. 예전 `top1_accuracy=1.0` 주장은 문서 질의와
+같은 oracle 문자열을 넣지 않는다. 실측 `expected_band`도 이 선언 유형 표에서만
+유도하고 관측 전력으로 만들지 않는다. 예전 `top1_accuracy=1.0` 주장은 문서 질의와
 라벨 context를 함께 쓰던 **누설 포함 상한**으로만 취급한다. 공식 Retrieval 평가는
 `--query-context off`에 해당하는 no-context/test-split 결과만 README나 보고서 수치로
 사용한다.
@@ -174,10 +221,10 @@ Part A 변경으로 추론 입력에서는 `gt_label`, `gt_attack_id`, `attack_i
 - R4: 정상 hard-negative는 DDP/FSDP trough, flat pretraining, bursty inference, mixed tenants를 포함한다.
 - R5: 공격 variant는 shallow, jitter, piggyback, mimicry, coordinated multi-GPU를 포함해 evasive case를 만든다.
 - R6: feature v2는 PSD band power, spectral entropy, Theil-Sen power-util residual, CUSUM changepoint를 포함한다.
-- R7: baseline은 `declared_job_family + gpu_model` cohort의 robust median/MAD에서 시작하고 부족하면 family/global로 fallback한다.
-- R8: threshold는 calibration split conformal p-value로 산출하며 test split을 tuning에 쓰지 않는다.
-- R9: progress log의 step/checkpoint/eval/request event가 주기와 변화점을 설명하면 오탐을 낮춘다.
-- R10: 높은 grid impact지만 conformal p-value가 후보 기준을 넘지 않으면 `grid_watch`로 남겨 운영 관찰 대상으로 분리한다.
+- R7: 합성 baseline은 `declared_job_family + gpu_model`. 실측은 `declared_job_family + expected_band + gpu_model`이며 폴백은 full → band → family → global. `expected_band`는 선언 작업 유형 표이며 관측 전력을 키로 쓰지 않는다.
+- R8: threshold / alpha는 calibration split만 사용한다. test split은 선택·강등에 쓰지 않는다.
+- R9: progress log의 step/checkpoint/eval/request event가 주기와 변화점을 설명할 수 있으나, 현재 합성·실측 모두 `progress_log_missing` 가중치는 0이다.
+- R10: 높은 grid impact지만 conformal p-value가 후보 기준을 넘지 않으면 `grid_watch`로 남겨 운영 관찰 대상으로 분리한다. 실측은 `alpha_high_impact = alpha`라 impact만으로 후보를 올리지 않는다.
 
 ## Corpus v2와 Stage 2 v2 (R11, R12)
 
@@ -194,6 +241,7 @@ Part A 변경으로 추론 입력에서는 `gt_label`, `gt_attack_id`, `attack_i
 - ✅ features.py: 규칙적 사각파(SWMA류) vs 평평한 고부하(크립토재킹류)를 정성적으로 정확히 구분
 - ✅ 합성 v3: 3개 기본 공격 + evasive SWMA 변종 + 6개 기존 정상 + AI datacenter 정상 hard-negative를 세션 경계 없이 생성
 - ✅ Stage1 v2: train/cal만 사용해 cohort baseline과 conformal calibration 산출
+- ✅ 실측 Stage1 (round3): expected_band 코호트, alpha=0.05, idle 게이트. 리포트 `dataset/real/pipeline/refit/round3/stage1_report.md`
 - ✅ Retrieval: 공식 수치는 no-context/test split 기준으로 보고하며, 구 `top1_accuracy=1.0`은 누설 포함 상한으로만 표기
 - ✅ Stage2 v2: corpus v2 evidence checklist, structured evidence bundle, deterministic stub/fallback 평가 경로 추가
 - ✅ NVML idle smoke capture와 observability summary 검증

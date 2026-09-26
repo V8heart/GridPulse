@@ -233,6 +233,7 @@ telemetry 행의 `gt_*`는 finalize가 labels와 맞춰 붙인다. **공격 활�
 | `gpu_role` | `target` 또는 `companion_idle` |
 | `group_id`, `capture_key` | §2 |
 | `declared_policy` | `honest` / `pool_random` / `host_family_matched` / `host_inherited` |
+| `declared_job_type` | GPU별 선언 작업 유형 (§7 풀). 정상 honest는 워크로드 정직 매핑 |
 | `workload_module`, `workload_cmd`, `host_workload` | 실행 정보 |
 | `run_id`, `source`, `created_epoch` | 추적 |
 | `valid`, `invalid_reason` | §10 |
@@ -258,10 +259,11 @@ telemetry 행의 `gt_*`는 finalize가 labels와 맞춰 붙인다. **공격 활�
 ## 7. declared 컨텍스트 부여 정책
 
 - `dataset.declared_context.sample_declared(..., policy=...)`
-- 정상: `honest` (`mismatch_rate=0.1`)
-- standalone 공격: `pool_random` 또는 `host_family_matched`(training 4종만) 절반씩
-- hosted 공격(piggyback/mimicry/ltma): `host_inherited` (숙주 declared 복사)
-- 정책은 `gt_params_json.declared_policy` / labels에만 기록
+- 정상 honest: `HONEST_WORKLOAD_TO_JOB_TYPE` 정직 매핑 (family 안 무작위 금지). 풀에 `vision_training`, `dataloader_bound` 포함
+- 합성 레거시 `sample_declared(..., policy=honest)`는 여전히 family 풀에서 샘플할 수 있음. 실측 캡처/`run_capture` 정상 경로는 매핑만 사용
+- standalone 공격: `pool_random` 또는 `host_family_matched` (위장, 재선언하지 않음)
+- hosted 공격(piggyback/mimicry/ltma): `host_inherited` (숙주 declared 복사, 재선언하지 않음)
+- 정책은 `gt_params_json.declared_policy` / labels에만 기록. `declared_job_type`은 labels에도 기록
 
 ---
 
@@ -329,3 +331,4 @@ telemetry 행의 `gt_*`는 finalize가 labels와 맞춰 붙인다. **공격 활�
 | 1.0 | 2026-09-21 | 최초 작성 |
 | 1.1 | 2026-09-21 | progress always-raw + finalize mask, 위장 로그 필수, `t` 기록 금지, declared_policy 층화 |
 | 1.2 | 2026-09-22 | private/staging 경로, gpu_role, group_id(≠run_id), gt_attack_intervals·창 overlap 정답, stdout을 private로 이전(v1.1 sessions/*/workload_stdout.log는 누설 통로로 폐기), warmup 기본 180s, 공통 duration pool, remask CLI, 금지 토큰 정의 명확화, companion/target 평가 규칙. 실측 정상은 honest + mismatch_rate=0 (합성 기본 10% mismatch는 실측 캡처에 쓰지 않음). 실측 pool_random은 training/inference 선언만 사용 |
+| 1.2.1 | 2026-09-26 | labels.csv에 `declared_job_type`. honest 정상은 워크로드 정직 매핑. 풀에 `vision_training`, `dataloader_bound` |

@@ -51,9 +51,11 @@ class CohortBaseline:
     cohort_keys: tuple[str, ...] = ("declared_job_family", "gpu_model")
     features: list[str] = field(default_factory=lambda: FEATURES_V2.copy())
     min_windows: int = 30
+    min_sessions: int = 1
+    min_sessions_band: int = 2
     stats: dict = field(default_factory=dict)
     mad_floors: dict[str, float] = field(default_factory=lambda: DEFAULT_MAD_FLOORS.copy())
-    fallback_counts: dict[str, int] = field(default_factory=lambda: {"full": 0, "family": 0, "global": 0})
+    fallback_counts: dict[str, int] = field(default_factory=lambda: {"full": 0, "band": 0, "family": 0, "global": 0})
 
     def fit(
         self,
@@ -62,17 +64,28 @@ class CohortBaseline:
         cohort_keys=("declared_job_family", "gpu_model"),
         features=FEATURES_V2,
         min_windows: int = 30,
+        min_sessions: int = 1,
+        min_sessions_band: int = 2,
         mad_floors: dict[str, float] | None = None,
     ) -> "CohortBaseline":
         self.cohort_keys = tuple(cohort_keys)
         self.features = list(features)
         self.min_windows = min_windows
+        self.min_sessions = int(min_sessions)
+        self.min_sessions_band = int(min_sessions_band)
         if mad_floors is not None:
             self.mad_floors = dict(mad_floors)
         self.stats = {}
-        self.fallback_counts = {"full": 0, "family": 0, "global": 0}
-        self._fit_level(windows, self.cohort_keys, "full")
-        self._fit_level(windows, self.cohort_keys[:1], "family")
+        self.fallback_counts = {"full": 0, "band": 0, "family": 0, "global": 0}
+        self._fit_level(windows, self.cohort_keys, "full", min_sessions=self.min_sessions)
+        if "expected_band" in self.cohort_keys:
+            self._fit_level(
+                windows,
+                (self.cohort_keys[0], "expected_band"),
+                "band",
+                min_sessions=self.min_sessions_band,
+            )
+        self._fit_level(windows, self.cohort_keys[:1], "family", min_sessions=self.min_sessions)
         self._fit_global(windows)
         return self
 
@@ -90,18 +103,40 @@ class CohortBaseline:
             values[feature] = {"median": med, "mad": max(mad, floor), "mad_raw": mad, "mad_floor": floor}
         return values
 
-    def _fit_level(self, windows: pd.DataFrame, keys: tuple[str, ...], level: str) -> None:
+    def _fit_level(
+        self,
+        windows: pd.DataFrame,
+        keys: tuple[str, ...],
+        level: str,
+        *,
+        min_sessions: int | None = None,
+    ) -> None:
         if not keys:
             return
+        session_floor = self.min_sessions if min_sessions is None else int(min_sessions)
         for key, group in windows.groupby(list(keys), dropna=False):
-            if len(group) < self.min_windows:
+            n_windows = int(len(group))
+            n_sessions = int(group["session_id"].nunique()) if "session_id" in group.columns else n_windows
+            if n_windows < self.min_windows or n_sessions < session_floor:
                 continue
             if not isinstance(key, tuple):
                 key = (key,)
-            self.stats[f"{level}:{'|'.join(map(str, key))}"] = {"n": len(group), "features": self._summarize(group)}
+            self.stats[f"{level}:{'|'.join(map(str, key))}"] = {
+                "n": n_windows,
+                "n_windows": n_windows,
+                "n_sessions": n_sessions,
+                "features": self._summarize(group),
+            }
 
     def _fit_global(self, windows: pd.DataFrame) -> None:
-        self.stats["global"] = {"n": len(windows), "features": self._summarize(windows)}
+        n_windows = int(len(windows))
+        n_sessions = int(windows["session_id"].nunique()) if "session_id" in windows.columns else n_windows
+        self.stats["global"] = {
+            "n": n_windows,
+            "n_windows": n_windows,
+            "n_sessions": n_sessions,
+            "features": self._summarize(windows),
+        }
 
     def robust_z(self, row: pd.Series | dict) -> dict[str, float]:
         stat, level = self._select_stats(row)
@@ -119,6 +154,12 @@ class CohortBaseline:
         full_key = "full:" + "|".join(str(row.get(k, "")) for k in self.cohort_keys)
         if full_key in self.stats:
             return self.stats[full_key], "full"
+        if "expected_band" in self.cohort_keys:
+            band_key = "band:" + "|".join(
+                str(row.get(k, "")) for k in (self.cohort_keys[0], "expected_band")
+            )
+            if band_key in self.stats:
+                return self.stats[band_key], "band"
         family_key = "family:" + str(row.get(self.cohort_keys[0], ""))
         if family_key in self.stats:
             return self.stats[family_key], "family"
@@ -170,6 +211,8 @@ class CohortBaseline:
             "cohort_keys": list(self.cohort_keys),
             "features": self.features,
             "min_windows": self.min_windows,
+            "min_sessions": self.min_sessions,
+            "min_sessions_band": self.min_sessions_band,
             "mad_floors": self.mad_floors,
             "fallback_counts": self.fallback_counts,
             "stats": self.stats,
@@ -182,7 +225,9 @@ class CohortBaseline:
             cohort_keys=tuple(data["cohort_keys"]),
             features=list(data["features"]),
             min_windows=int(data.get("min_windows", 30)),
+            min_sessions=int(data.get("min_sessions", 1)),
+            min_sessions_band=int(data.get("min_sessions_band", 2)),
             mad_floors=dict(data.get("mad_floors") or DEFAULT_MAD_FLOORS),
-            fallback_counts=dict(data.get("fallback_counts") or {"full": 0, "family": 0, "global": 0}),
+            fallback_counts=dict(data.get("fallback_counts") or {"full": 0, "band": 0, "family": 0, "global": 0}),
             stats=data["stats"],
         )

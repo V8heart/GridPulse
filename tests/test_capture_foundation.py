@@ -9,7 +9,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dataset.declared_context import FAMILY_TO_DECLARED, sample_declared, sample_split_partner
+from dataset.declared_context import (
+    FAMILY_TO_DECLARED,
+    honest_declared_for_workload,
+    honest_job_type_for_workload,
+    sample_declared,
+    sample_split_partner,
+)
 from dataset.identifiers import (
     group_id_from_parts,
     is_group_id,
@@ -51,6 +57,24 @@ def test_opaque_ids_and_regex():
     assert group_id_from_parts("entry", 3, {"model": "gpt-tiny"}) == gid
 
 
+def test_honest_workload_mapping_is_deterministic():
+    assert honest_job_type_for_workload("llm_finetune") == "llm_finetune"
+    assert honest_job_type_for_workload("pretrain_fsdp") == "ddp_training"
+    assert honest_job_type_for_workload("serving") == "online_inference"
+    assert honest_job_type_for_workload("resnet_single") == "vision_training"
+    assert honest_job_type_for_workload("dataloader_stall") == "dataloader_bound"
+    declared = honest_declared_for_workload("llm_finetune", user="user_009")
+    assert declared["declared_job_type"] == "llm_finetune"
+    assert declared["declared_user"] == "user_009"
+    random_honest = sample_declared("training", np.random.default_rng(0), policy="pool_random")
+    assert random_honest["declared_job_type"] in set(FAMILY_TO_DECLARED["training"]) | {
+        "batch_inference",
+        "online_inference",
+        "evaluation",
+        "notebook",
+    }
+
+
 def test_sample_declared_policies():
     rng = np.random.default_rng(0)
     honest = sample_declared("training", rng, policy="honest", mismatch_rate=0.0)
@@ -77,6 +101,8 @@ def test_sample_declared_policies():
         "online_inference",
         "evaluation",
         "notebook",
+        "vision_training",
+        "dataloader_bound",
     }
     host = sample_declared(
         "training",

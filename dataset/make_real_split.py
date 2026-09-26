@@ -10,6 +10,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from dataset.declared_context import expected_band_for_job_type, family_for_job_type
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -32,12 +34,27 @@ def _group_records(labels: pd.DataFrame) -> list[dict]:
     for group_id, rows in valid.groupby("group_id", sort=True):
         labels_in_group = sorted(set(rows["gt_label"].astype(str)))
         attack_state = "attack" if rows["gt_is_attack"].any() else "normal"
-        # Preserve label-level balance; mixed companion rows remain part of their group.
-        stratum = f"{attack_state}:{'+'.join(labels_in_group)}"
+        targets = rows
+        if "gpu_role" in rows.columns:
+            targets = rows[rows["gpu_role"].astype(str) == "target"]
+            if targets.empty:
+                targets = rows
+        job_type = None
+        if "declared_job_type" in targets.columns and targets["declared_job_type"].notna().any():
+            job_type = str(targets["declared_job_type"].dropna().astype(str).iloc[0])
+        band = expected_band_for_job_type(job_type) if job_type else None
+        family = family_for_job_type(job_type) if job_type else None
+        cohort = f"{family}|{band}" if family and band else None
+        if attack_state == "normal" and job_type:
+            stratum = f"normal:{job_type}"
+        else:
+            stratum = f"{attack_state}:{'+'.join(labels_in_group)}"
         records.append(
             {
                 "group_id": str(group_id),
                 "stratum": stratum,
+                "job_type": job_type,
+                "cohort": cohort if attack_state == "normal" else None,
                 "sessions": sorted(set(rows["session_id"])),
             }
         )
@@ -79,9 +96,60 @@ def make_real_split(
     for fold_index, test_records in enumerate(outer):
         test_groups = {record["group_id"] for record in test_records}
         remaining = [record for record in records if record["group_id"] not in test_groups]
-        inner = _assign_folds(remaining, 2, seed + 1000 + fold_index)
-        cal_records = inner[0]
-        train_records = inner[1]
+        rng = np.random.default_rng(seed + 1000 + fold_index)
+        by_job: dict[str, list[dict]] = defaultdict(list)
+        for record in remaining:
+            if record.get("job_type") and str(record["stratum"]).startswith("normal:"):
+                by_job[str(record["job_type"])].append(record)
+        seeded = []
+        seeded_ids = set()
+        for job_type in sorted(by_job):
+            items = list(by_job[job_type])
+            rng.shuffle(items)
+            chosen = items[0]
+            seeded.append(chosen)
+            seeded_ids.add(chosen["group_id"])
+        leftover = [record for record in remaining if record["group_id"] not in seeded_ids]
+        by_cohort: dict[str, list[dict]] = defaultdict(list)
+        for record in leftover:
+            if record.get("cohort") and str(record["stratum"]).startswith("normal:"):
+                by_cohort[str(record["cohort"])].append(record)
+        cal_seeded = []
+        cal_seeded_ids = set()
+        for cohort in sorted(by_cohort):
+            items = list(by_cohort[cohort])
+            rng.shuffle(items)
+            chosen = items[0]
+            cal_seeded.append(chosen)
+            cal_seeded_ids.add(chosen["group_id"])
+        leftover = [record for record in leftover if record["group_id"] not in cal_seeded_ids]
+        if leftover:
+            inner = _assign_folds(leftover, 2, seed + 2000 + fold_index)
+            cal_records = cal_seeded + inner[0]
+            train_records = seeded + inner[1]
+        else:
+            cal_records = cal_seeded
+            train_records = seeded
+        train_job_types = sorted(
+            {
+                str(item["job_type"])
+                for item in train_records
+                if item.get("job_type") and str(item["stratum"]).startswith("normal:")
+            }
+        )
+        remaining_normal_types = sorted(by_job)
+        remaining_cohorts = sorted(
+            {
+                str(item["cohort"])
+                for item in remaining
+                if item.get("cohort") and str(item["stratum"]).startswith("normal:")
+            }
+        )
+        cal_cohorts = {
+            str(item["cohort"])
+            for item in cal_records
+            if item.get("cohort") and str(item["stratum"]).startswith("normal:")
+        }
         fold = {
             "fold": fold_index,
             "train": sorted(session for item in train_records for session in item["sessions"]),
@@ -90,6 +158,10 @@ def make_real_split(
             "train_groups": sorted(item["group_id"] for item in train_records),
             "cal_groups": sorted(item["group_id"] for item in cal_records),
             "test_groups": sorted(test_groups),
+            "train_job_types": train_job_types,
+            "missing_train_job_types": [name for name in remaining_normal_types if name not in train_job_types],
+            "cal_cohorts": sorted(cal_cohorts),
+            "missing_cal_cohorts": [name for name in remaining_cohorts if name not in cal_cohorts],
         }
         group_sets = [set(fold[name]) for name in ("train_groups", "cal_groups", "test_groups")]
         if group_sets[0] & group_sets[1] or group_sets[0] & group_sets[2] or group_sets[1] & group_sets[2]:

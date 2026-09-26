@@ -15,6 +15,20 @@ if str(ROOT) not in sys.path:
 from workloads.progress_log import ProgressLog
 
 
+def _read_gpu_power_w(gpu_id: int) -> float | None:
+    try:
+        import pynvml
+
+        pynvml.nvmlInit()
+        try:
+            handle = pynvml.nvmlDeviceGetHandleByIndex(int(gpu_id))
+            return float(pynvml.nvmlDeviceGetPowerUsage(handle)) / 1000.0
+        finally:
+            pynvml.nvmlShutdown()
+    except Exception:
+        return None
+
+
 def _mlp_training_step(args, device, torch, nn):
     layers = [nn.Linear(args.width, args.width), nn.GELU()]
     for _ in range(max(0, args.depth - 1)):
@@ -39,11 +53,13 @@ def _mlp_training_step(args, device, torch, nn):
 def _build_host_step(args, device, torch, nn):
     if args.host == "llm":
         try:
-            from workloads.llm_workloads import make_tiny_training_step
+            from workloads.llm_workloads import make_host_training_step
 
+            preset = getattr(args, "llm_preset", None) or "small"
             return (
-                make_tiny_training_step(
+                make_host_training_step(
                     device,
+                    preset=preset,
                     batch_size=args.llm_micro_batch,
                     seq_len=args.seq_len,
                     seed=args.seed,
@@ -54,6 +70,25 @@ def _build_host_step(args, device, torch, nn):
             # Keep LTMA capturable on installations where the GPT path is unavailable.
             return _mlp_training_step(args, device, torch, nn), "mlp_fallback"
     return _mlp_training_step(args, device, torch, nn), "mlp"
+
+
+def mean_preserving_repeats(
+    *,
+    baseline_w: float | None,
+    recent_w: float | None,
+    phase_high: bool,
+    max_aux_repeats: int,
+    tolerance_w: float = 8.0,
+) -> int:
+    """Choose aux repeats so the window mean stays near the host-only baseline."""
+    high = max(1, int(max_aux_repeats))
+    if baseline_w is None or recent_w is None:
+        return high if phase_high else 0
+    if recent_w > baseline_w + tolerance_w:
+        return 0
+    if recent_w < baseline_w - tolerance_w:
+        return high
+    return high if phase_high else 0
 
 
 def run(args) -> None:
@@ -72,39 +107,69 @@ def run(args) -> None:
     device = torch.device(f"cuda:{args.gpu_id}")
     torch.cuda.set_device(device)
     host_step, host_kind = _build_host_step(args, device, torch, nn)
-    aux_w = args.width if host_kind.startswith("mlp") else 512
+    aux_w = int(getattr(args, "aux_width", None) or args.width)
+    if host_kind.startswith("mlp") and getattr(args, "aux_width", None) is None:
+        aux_w = int(args.width)
     aux_a = torch.randn(aux_w, aux_w, device=device, dtype=torch.float16)
     aux_b = torch.randn_like(aux_a)
-    deadline = time.monotonic() + args.duration
+    aux_out = torch.randn_like(aux_a)
+    started = time.monotonic()
+    deadline = started + args.duration
+    baseline_s = min(30.0, max(8.0, args.duration * 0.15))
+    baseline_deadline = started + baseline_s
+    modulate_s = 30.0
+    phase_high = True
+    phase_deadline = baseline_deadline + modulate_s
     step = inserted = 0
-    next_injection = random.randint(7, 23)
     attack_intervals: list[list[float]] = []
+    baseline_samples: list[float] = []
+    window_samples: list[float] = []
     log = ProgressLog(args.progress_log, int(args.gpu_id))
-    log.emit("workload_start", host=args.host)
+    log.emit("workload_start", host=args.host, ltma_mode="mean_preserving")
 
     try:
         while time.monotonic() < deadline:
             host_step()
             torch.cuda.synchronize()
-            # Host step only — never log injection as progress events.
-            log.emit("step_end", step=step)
-            step += 1
-
-            if step >= next_injection:
+            reading = _read_gpu_power_w(args.gpu_id)
+            now = time.monotonic()
+            if now < baseline_deadline:
+                if reading is not None:
+                    baseline_samples.append(reading)
+                log.emit("step_end", step=step)
+                step += 1
+                continue
+            if now >= phase_deadline:
+                phase_high = not phase_high
+                phase_deadline = now + modulate_s
+            baseline_w = (
+                sum(baseline_samples) / len(baseline_samples) if baseline_samples else None
+            )
+            recent_w = (
+                sum(window_samples[-20:]) / len(window_samples[-20:]) if window_samples else None
+            )
+            repeats = mean_preserving_repeats(
+                baseline_w=baseline_w,
+                recent_w=recent_w,
+                phase_high=phase_high,
+                max_aux_repeats=args.max_aux_repeats,
+            )
+            if repeats:
                 inj_start = time.time()
-                repeats = random.randint(1, args.max_aux_repeats)
                 for _ in range(repeats):
-                    aux_a = torch.tanh(aux_a @ aux_b)
+                    torch.mm(aux_a, aux_b, out=aux_out)
                 torch.cuda.synchronize()
                 attack_intervals.append([inj_start, time.time()])
-                if random.random() < 0.5:
-                    time.sleep(random.uniform(0.01, 0.15))
                 inserted += 1
-                next_injection = step + random.randint(5, 31)
+            if reading is not None:
+                window_samples.append(reading)
+            log.emit("step_end", step=step)
+            step += 1
         torch.cuda.synchronize()
     finally:
         log.emit("workload_end", steps=step, injections=inserted)
         log.close()
+    baseline_w = sum(baseline_samples) / len(baseline_samples) if baseline_samples else None
     print(
         json.dumps(
             {
@@ -115,6 +180,9 @@ def run(args) -> None:
                 "duration_s": args.duration,
                 "training_steps": step,
                 "injection_events": inserted,
+                "ltma_mode": "mean_preserving",
+                "baseline_w": baseline_w,
+                "aux_width": aux_w,
                 "approximation": True,
                 "native_progress_available": True,
                 "progress_log": args.progress_log,
@@ -136,10 +204,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--gpu-id", type=int, default=0)
     parser.add_argument("--duration", type=_duration, default=30.0)
     parser.add_argument("--host", choices=["mlp", "llm"], default="llm")
-    parser.add_argument("--llm-preset", default="tiny")
-    parser.add_argument("--llm-micro-batch", type=int, default=2)
-    parser.add_argument("--seq-len", type=int, default=64)
+    parser.add_argument("--llm-preset", default="small")
+    parser.add_argument("--llm-micro-batch", type=int, default=64)
+    parser.add_argument("--seq-len", type=int, default=512)
     parser.add_argument("--width", type=int, default=1024)
+    parser.add_argument("--aux-width", type=int, default=2048)
     parser.add_argument("--depth", type=int, default=4)
     parser.add_argument("--dtype", choices=["bf16", "fp16", "fp32"], default="bf16")
     parser.add_argument("--max-aux-repeats", type=int, default=4)

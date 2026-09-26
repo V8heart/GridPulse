@@ -31,6 +31,7 @@ LABEL_COLUMNS = [
     "capture_key",
     "seed",
     "declared_policy",
+    "declared_job_type",
     "workload_module",
     "workload_cmd",
     "host_workload",
@@ -320,6 +321,9 @@ def finalize_session(
                 "capture_key": private.get("capture_key"),
                 "seed": private.get("seed"),
                 "declared_policy": private.get("declared_policy"),
+                "declared_job_type": (private.get("declared_by_gpu") or {}).get(str(gpu_id), {}).get(
+                    "declared_job_type", "notebook" if role == "companion_idle" else None
+                ),
                 "workload_module": private.get("workload_module"),
                 "workload_cmd": private.get("workload_cmd"),
                 "host_workload": private.get("host_workload"),

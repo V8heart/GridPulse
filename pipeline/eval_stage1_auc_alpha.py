@@ -18,6 +18,68 @@ from pipeline.baseline import CohortBaseline
 from pipeline.stage1_v2 import build_windows, load_config, load_truth_index, score_window
 
 
+def _cohort_key(row) -> str:
+    family = str(row["declared_job_family"] if "declared_job_family" in row else "unknown")
+    band = row["expected_band"] if "expected_band" in row else None
+    if band is None or str(band) in {"", "nan", "None"}:
+        return family
+    return f"{family}|{band}"
+
+
+def _target_normals(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty:
+        return frame
+    out = frame[frame["gt_label"].astype(str).str.startswith("normal")]
+    if "gpu_role" in out.columns:
+        out = out[out["gpu_role"].astype(str).eq("target") | out["gpu_role"].isna()]
+    return out
+
+
+def cohort_weighted_fp(
+    cal_normals: pd.DataFrame,
+    *,
+    train_normals: pd.DataFrame | None = None,
+    missing_cal_cohorts: list[str] | None = None,
+    weight_sessions: dict[str, int] | None = None,
+) -> tuple[float | None, list[str]]:
+    """Session-weighted normal FP. Missing cal cohorts use train rates."""
+    substituted = []
+    rates: dict[str, float] = {}
+    if cal_normals is not None and not cal_normals.empty:
+        for cohort, group in cal_normals.groupby(cal_normals.apply(_cohort_key, axis=1)):
+            rates[str(cohort)] = float(group["is_candidate"].mean())
+    if missing_cal_cohorts and train_normals is not None and not train_normals.empty:
+        train_rates = {
+            str(cohort): float(group["is_candidate"].mean())
+            for cohort, group in train_normals.groupby(train_normals.apply(_cohort_key, axis=1))
+        }
+        for cohort in missing_cal_cohorts:
+            if cohort in train_rates:
+                rates[cohort] = train_rates[cohort]
+                substituted.append(cohort)
+    if not rates:
+        return None, substituted
+    if weight_sessions is None:
+        weight_sessions = {}
+        frames = [cal_normals]
+        if train_normals is not None:
+            frames.append(train_normals)
+        combined = pd.concat([f for f in frames if f is not None and not f.empty], ignore_index=True)
+        for cohort, group in combined.groupby(combined.apply(_cohort_key, axis=1)):
+            weight_sessions[str(cohort)] = int(group["session_id"].nunique()) if "session_id" in group.columns else int(len(group))
+    numer = 0.0
+    denom = 0.0
+    for cohort, rate in rates.items():
+        weight = float(weight_sessions.get(cohort) or 0)
+        if weight <= 0:
+            continue
+        numer += rate * weight
+        denom += weight
+    if denom <= 0:
+        return None, substituted
+    return float(numer / denom), substituted
+
+
 def _auc(scores: np.ndarray, labels: np.ndarray) -> float | None:
     pos = scores[labels == 1]
     neg = scores[labels == 0]
@@ -49,7 +111,9 @@ def run(
     df = pd.read_csv(telemetry, low_memory=False)
     manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
     cal_ids = set(map(str, manifest["cal"]))
+    train_ids = set(map(str, manifest.get("train") or []))
     cal = df[df["session_id"].astype(str).isin(cal_ids)]
+    train = df[df["session_id"].astype(str).isin(train_ids)] if train_ids else cal.iloc[0:0]
     config = load_config(config_path)
     baseline = CohortBaseline.load(baseline_model)
     calibration = json.loads(calibration_path.read_text(encoding="utf-8"))
@@ -73,6 +137,20 @@ def run(
         truth_index=truth_index,
         config=config,
         progress_source=progress_source,
+    )
+    train_windows = (
+        build_windows(
+            train,
+            window_s=window_s,
+            stride_s=stride_s,
+            progress_log_dir=progress_log_dir,
+            sessions_root=sessions_root,
+            truth_index=truth_index,
+            config=config,
+            progress_source=progress_source,
+        )
+        if not train.empty
+        else windows.iloc[0:0]
     )
 
     scored = []
@@ -108,11 +186,12 @@ def run(
             "root_cause": "feature_or_evidence" if (auc is not None and auc < 0.6) else "alpha_may_help",
         }
 
+    missing_cal = list(manifest.get("missing_cal_cohorts") or [])
     sweep = []
     for alpha in alphas:
         cfg = dict(config)
         cfg["alpha"] = alpha
-        cfg["alpha_high_impact"] = min(1.0, alpha * 2)
+        cfg["alpha_high_impact"] = alpha
         rows = []
         for _, row in windows.iterrows():
             rows.append(score_window(row.to_dict(), baseline, calibration, cfg))
@@ -128,14 +207,38 @@ def run(
             for r, vis in zip(rows, frame["visibility_group"].tolist())
             if vis == "detectable"
         ]
+        cal_scored = windows.copy()
+        cal_scored["is_candidate"] = [r["is_candidate"] for r in rows]
+        train_scored = train_windows.copy()
+        if not train_scored.empty:
+            train_scored["is_candidate"] = [
+                score_window(row.to_dict(), baseline, calibration, cfg)["is_candidate"]
+                for _, row in train_windows.iterrows()
+            ]
+        weighted, substituted = cohort_weighted_fp(
+            _target_normals(cal_scored),
+            train_normals=_target_normals(train_scored) if not train_scored.empty else None,
+            missing_cal_cohorts=missing_cal,
+        )
+        fit_fp = None
+        fit_frames = [_target_normals(cal_scored)]
+        if not train_scored.empty:
+            fit_frames.append(_target_normals(train_scored))
+        fit_all = pd.concat(fit_frames, ignore_index=True)
+        if not fit_all.empty:
+            fit_fp = float(fit_all["is_candidate"].mean())
         sweep.append({
             "alpha": alpha,
             "cal_normal_candidate_rate": float(normal_rate) if normal_rate is not None else None,
+            "cal_cohort_weighted_fp": weighted,
             "cal_attack_recall": float(attack_recall) if attack_recall is not None else None,
             "cal_detectable_recall": float(np.mean(det)) if det else None,
+            "fit_target_normal_fp": fit_fp,
+            "substituted_from_train": substituted,
         })
 
     selected, selection_failed, rule = select_alpha(sweep, config)
+    selected, stepdown = maybe_stepdown_alpha(selected, sweep)
     return {
         "fit_split": "cal",
         "u_score_auc_overall": auc_overall,
@@ -144,41 +247,63 @@ def run(
         "selection_rule": rule,
         "selection_failed": selection_failed,
         "selected_alpha": selected,
+        "alpha_stepdown": stepdown,
+        "missing_cal_cohorts": missing_cal,
         "limitation": "Under conformal scoring, FPR often tracks alpha; low-AUC classes need feature/evidence work, not alpha alone.",
         "test_sealed": True,
     }
 
 
 def select_alpha(sweep: list[dict], config: dict) -> tuple[dict | None, bool, str]:
-    min_recall = float(config.get("alpha_min_detectable_recall", 0.0) or 0.0)
-    has_detectable = any(s.get("cal_detectable_recall") is not None for s in sweep)
+    del config
+    use_weighted = any(s.get("cal_cohort_weighted_fp") is not None for s in sweep)
+    key = "cal_cohort_weighted_fp" if use_weighted else "cal_normal_candidate_rate"
     eligible = [
         s for s in sweep
-        if s["cal_normal_candidate_rate"] is not None and s["cal_normal_candidate_rate"] <= 0.10
+        if s.get(key) is not None and s[key] <= 0.10
     ]
-    if has_detectable and min_recall > 0:
-        eligible = [
-            s for s in eligible
-            if s.get("cal_detectable_recall") is not None and s["cal_detectable_recall"] >= min_recall
-        ]
     selection_failed = False
     if eligible:
         selected = max(eligible, key=lambda s: (s["cal_attack_recall"] or 0.0, -s["alpha"]))
-    elif has_detectable and min_recall > 0:
-        selected = None
-        selection_failed = True
     else:
-        selected = min(sweep, key=lambda s: s["cal_normal_candidate_rate"] or 1.0)
-
+        selected = min(sweep, key=lambda s: (s.get(key) if s.get(key) is not None else 1.0))
     rule = (
-        "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha"
-        if not (has_detectable and min_recall > 0)
-        else (
-            f"cal normal candidate_rate <= 0.10 and detectable recall >= {min_recall:.2f}; "
-            "maximize attack recall; tie -> smaller alpha"
-        )
+        f"{key} <= 0.10, maximize attack recall; tie -> smaller alpha; "
+        "alpha_high_impact = alpha (no impact relaxation); "
+        "missing cal cohorts substituted from train"
     )
     return selected, selection_failed, rule
+
+
+def maybe_stepdown_alpha(selected: dict | None, sweep: list[dict]) -> tuple[dict | None, dict]:
+    if not selected:
+        return selected, {"applied": False, "reason": "no_selection"}
+    weighted = selected.get("cal_cohort_weighted_fp")
+    fit_fp = selected.get("fit_target_normal_fp")
+    if weighted is None or fit_fp is None or weighted <= 0:
+        return selected, {"applied": False, "reason": "missing_rates"}
+    if fit_fp <= 2.0 * weighted:
+        return selected, {
+            "applied": False,
+            "cal_cohort_weighted_fp": weighted,
+            "fit_target_normal_fp": fit_fp,
+        }
+    lower = [s for s in sweep if s["alpha"] < selected["alpha"]]
+    if not lower:
+        return selected, {
+            "applied": False,
+            "reason": "blocked",
+            "cal_cohort_weighted_fp": weighted,
+            "fit_target_normal_fp": fit_fp,
+        }
+    nxt = max(lower, key=lambda s: s["alpha"])
+    return nxt, {
+        "applied": True,
+        "from_alpha": selected["alpha"],
+        "to_alpha": nxt["alpha"],
+        "cal_cohort_weighted_fp": weighted,
+        "fit_target_normal_fp": fit_fp,
+    }
 
 
 def main() -> None:
@@ -227,7 +352,7 @@ def main() -> None:
             data = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
             selected = report["selected_alpha"]
             data["alpha"] = float(selected["alpha"])
-            data["alpha_high_impact"] = float(min(1.0, selected["alpha"] * 2))
+            data["alpha_high_impact"] = float(selected["alpha"])
             data.setdefault("alpha_selection", {})
             data["alpha_selection"]["selected_on"] = "cal"
             data["alpha_selection"]["rule"] = report["selection_rule"]

@@ -12,25 +12,25 @@ entries:
     repeats: 8
     params_grid:
       preset: [small]
-      seq_len: [64, 128]
+      seq_len: [128, 256, 512]
       grad_accum: [1, 2]
   - workload: llm_pretrain_fsdp
     repeats: 8
     params_grid:
       preset: [small]
-      seq_len: [64, 128]
+      seq_len: [128, 256, 512]
       grad_accum: [1, 2]
   - workload: llm_flat_pretrain
     repeats: 8
     params_grid:
       preset: [small]
-      seq_len: [64, 128]
+      seq_len: [128, 256, 512]
       grad_accum: [1, 2]
   - workload: llm_finetune
     repeats: 8
     params_grid:
       preset: [small]
-      seq_len: [64, 128]
+      seq_len: [128, 256, 512]
       grad_accum: [1, 2]
   - workload: llm_inference_serving
     repeats: 6
@@ -68,24 +68,28 @@ entries:
     params: {duty_cycle: 0.5}
     params_grid:
       period: [0.5, 1.0, 2.0, 4.0]
+      matrix_size: [2048, 4096]
   - workload: swma_shallow
     repeats: 6
     declared_policies: [pool_random, host_family_matched]
     params: {duty_cycle: 0.5}
     params_grid:
       period: [0.5, 1.0, 2.0, 4.0]
+      matrix_size: [512, 1024]
   - workload: swma_jitter
     repeats: 6
     declared_policies: [pool_random, host_family_matched]
     params: {duty_cycle: 0.5}
     params_grid:
       period: [0.5, 1.0, 2.0, 4.0]
+      matrix_size: [2048, 4096]
   - workload: swma_coordinated
     repeats: 6
     declared_policies: [pool_random, host_family_matched]
     params: {duty_cycle: 0.5}
     params_grid:
       period: [0.5, 1.0, 2.0, 4.0]
+      matrix_size: [2048, 4096]
   - workload: swma_piggyback
     repeats: 6
     params: {duty_cycle: 0.5, host: llm}
@@ -102,3 +106,5 @@ entries:
   - workload: cryptojacking
     repeats: 6
     declared_policies: [pool_random, host_family_matched]
+    params_grid:
+      matrix_size: [2048, 3072, 4096]

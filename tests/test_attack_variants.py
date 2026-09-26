@@ -106,7 +106,14 @@ def test_hosted_starts_after_30_steps_and_excludes_prefix(tmp_path, monkeypatch,
 import subprocess
 import sys
 
-from bit2watt_impl.attack_variants import SWMA_VARIANTS, build_variant_plan
+from bit2watt_impl.attack_variants import (
+    SWMA_VARIANTS,
+    build_variant_plan,
+    host_warmup_wait_s,
+    hosted_period,
+)
+from bit2watt_impl.ltma_inject import mean_preserving_repeats
+from bit2watt_impl.swma_workload import allocate_independent_streams
 
 
 def test_variant_plan_hosted_vs_standalone():
@@ -150,6 +157,12 @@ def test_dry_plan_argv_snapshots():
     plan = json.loads(proc.stdout)
     assert "--progress-log" in plan["argv_host"]
     assert "--progress-log" not in plan["argv_attack"]
+    assert "--preset" in plan["argv_host"]
+    assert "small" in plan["argv_host"]
+    assert "tiny" not in plan["argv_host"]
+    host = plan["argv_host"]
+    assert host[host.index("--batch-size") + 1] == "64"
+    assert host[host.index("--seq-len") + 1] == "512"
 
     proc2 = subprocess.run(
         [
@@ -184,5 +197,43 @@ def test_merge_records_requested_and_actual_period():
 
 
 def test_swma_variant_params():
+    assert SWMA_VARIANTS["basic"]["matrix_size"] == 4096
+    assert SWMA_VARIANTS["basic"]["active_streams"] == 2
     assert SWMA_VARIANTS["shallow"]["matrix_size"] < SWMA_VARIANTS["basic"]["matrix_size"]
     assert SWMA_VARIANTS["jitter"]["jitter_frac"] > 0
+
+
+def test_hosted_period_floor_and_wait():
+    floored = hosted_period(0.01, 0.3)
+    assert floored["period_requested_s"] == 0.003
+    assert floored["period_actual_s"] == 0.05
+    assert floored["period_floored"] is True
+    natural = hosted_period(0.4, 0.3)
+    assert natural["period_floored"] is False
+    assert natural["period_actual_s"] == 0.12
+    assert host_warmup_wait_s(120) == 180.0
+    assert host_warmup_wait_s(200) == 260.0
+    assert host_warmup_wait_s(400) == 300.0
+
+
+def test_swma_independent_streams_and_ltma_controller():
+    import torch
+
+    streams = allocate_independent_streams(torch, "cpu", 8, 2, torch.float32)
+    assert len(streams) == 2
+    left0, right0, out0 = streams[0]
+    left1, _right1, _out1 = streams[1]
+    torch.mm(left0, right0, out=out0)
+    assert not torch.equal(left0, left1)
+    assert mean_preserving_repeats(
+        baseline_w=200.0, recent_w=220.0, phase_high=True, max_aux_repeats=4
+    ) == 0
+    assert mean_preserving_repeats(
+        baseline_w=200.0, recent_w=180.0, phase_high=False, max_aux_repeats=4
+    ) == 4
+    assert mean_preserving_repeats(
+        baseline_w=200.0, recent_w=201.0, phase_high=True, max_aux_repeats=4
+    ) == 4
+    assert mean_preserving_repeats(
+        baseline_w=None, recent_w=None, phase_high=False, max_aux_repeats=4
+    ) == 0

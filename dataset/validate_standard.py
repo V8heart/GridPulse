@@ -222,7 +222,8 @@ def validate_session_dir(
     if roles and "target" not in roles:
         result.fail("session has no target GPU")
 
-    warmup_s = float(meta.get("warmup_s") or 180)
+    raw_warmup = meta.get("warmup_s")
+    warmup_s = 180.0 if raw_warmup is None else float(raw_warmup)
     if "timestamp" in frame and float(frame["timestamp"].max()) <= warmup_s:
         result.fail("session duration not longer than warmup_s")
 
