@@ -2,12 +2,22 @@
 from __future__ import annotations
 
 import json
+import os
 import urllib.request
 from dataclasses import asdict, dataclass
 
 from pipeline.corpus_schema import CorpusDoc, checklist_satisfied
 
-VALID_VERDICTS = {"known", "partial", "unknown"}
+VALID_VERDICTS = {"known", "partial", "unknown", "normal"}
+
+
+def ollama_url(path: str = "/api/generate") -> str:
+    host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+    if "://" not in host:
+        host = f"http://{host}"
+    if not path.startswith("/"):
+        path = f"/{path}"
+    return f"{host}{path}"
 
 
 @dataclass(frozen=True)
@@ -35,6 +45,18 @@ def _validate(data: dict) -> Stage2Verdict:
         contradicting_evidence=list(data["contradicting_evidence"]),
         explanation=str(data["explanation"]),
         fallback_used=bool(data.get("fallback_used", False)),
+    )
+
+
+def normal_verdict(name: str | None) -> Stage2Verdict:
+    return Stage2Verdict(
+        verdict="normal",
+        closest_match=name,
+        confidence=1.0,
+        matched_evidence=[],
+        contradicting_evidence=[],
+        explanation=f"RAG top-1 '{name}' is a benign corpus document",
+        fallback_used=False,
     )
 
 
@@ -100,14 +122,13 @@ def judge(
     }
     try:
         req = urllib.request.Request(
-            "http://localhost:11434/api/generate",
+            ollama_url("/api/generate"),
             data=json.dumps(
                 {
                     "model": model,
                     "prompt": json.dumps(prompt, ensure_ascii=False),
                     "stream": False,
                     "format": "json",
-                    "options": {"temperature": 0},
                 }
             ).encode(),
             headers={"Content-Type": "application/json"},

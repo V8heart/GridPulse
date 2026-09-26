@@ -26,6 +26,18 @@ def test_pipeline_reads_session_dir_progress_log(tmp_path: Path):
     assert events[0]["t"] == 2.5
 
 
+def test_session_reader_raw_log_opt_in(tmp_path: Path):
+    session = tmp_path / "s-0123456789abcdef"
+    session.mkdir()
+    (session / "session.json").write_text(json.dumps({"t0_epoch": 1000.0}))
+    (session / "progress.raw.jsonl").write_text(
+        json.dumps({"event": "step_end", "t_epoch": 1003.0}) + "\n"
+    )
+    events = read_session_progress(session, source="raw")
+    assert len(events) == 1
+    assert events[0]["t"] == 3.0
+
+
 def test_session_reader_never_uses_raw_log(tmp_path: Path):
     session = tmp_path / "s-0123456789abcdef"
     session.mkdir()

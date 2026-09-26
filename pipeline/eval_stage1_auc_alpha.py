@@ -13,8 +13,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from pipeline.attack_visibility import attack_visibility_group, parse_period_s
 from pipeline.baseline import CohortBaseline
-from pipeline.stage1_v2 import build_windows, load_config, score_window
+from pipeline.stage1_v2 import build_windows, load_config, load_truth_index, score_window
 
 
 def _auc(scores: np.ndarray, labels: np.ndarray) -> float | None:
@@ -40,6 +41,10 @@ def run(
     window_s: float,
     stride_s: float,
     alphas: list[float],
+    labels_csv: Path | None = None,
+    sessions_root: Path | None = None,
+    progress_source: str = "visible",
+    write_config: bool = True,
 ) -> dict:
     df = pd.read_csv(telemetry, low_memory=False)
     manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
@@ -56,16 +61,35 @@ def run(
         }
     if calibration.get("evidence_thresholds"):
         config["evidence_thresholds"] = calibration["evidence_thresholds"]
-    windows = build_windows(cal, window_s=window_s, stride_s=stride_s, progress_log_dir=progress_log_dir, config=config)
+    truth_index = None
+    if labels_csv is not None:
+        truth_index = load_truth_index(labels_csv, sessions_root=sessions_root)
+    windows = build_windows(
+        cal,
+        window_s=window_s,
+        stride_s=stride_s,
+        progress_log_dir=progress_log_dir,
+        sessions_root=sessions_root,
+        truth_index=truth_index,
+        config=config,
+        progress_source=progress_source,
+    )
 
     scored = []
     for _, row in windows.iterrows():
         out = score_window(row.to_dict(), baseline, calibration, config)
         scored.append({
-            "gt_label": str(row["gt_label"]),
+            "gt_label": str(row.get("gt_label", "")),
+            "gt_variant": row.get("gt_variant"),
+            "period_s": row.get("period_s"),
+            "visibility_group": row.get("visibility_group") or attack_visibility_group(
+                gt_label=str(row.get("gt_label", "")),
+                gt_variant=row.get("gt_variant"),
+                period_s=row.get("period_s") if pd.notna(row.get("period_s")) else parse_period_s(row.get("gt_params_json")),
+            ),
             "u_score": out["u_score"],
             "p_value": out["p_value"],
-            "is_attack": not str(row["gt_label"]).startswith("normal"),
+            "is_attack": not str(row.get("gt_label", "")).startswith("normal"),
         })
     frame = pd.DataFrame(scored)
     y = frame["is_attack"].astype(int).to_numpy()
@@ -99,28 +123,62 @@ def run(
         attack_recall = np.mean([
             r["is_candidate"] for r, lab in zip(rows, labels) if not str(lab).startswith("normal")
         ]) if any(not str(lab).startswith("normal") for lab in labels) else None
+        det = [
+            r["is_candidate"]
+            for r, vis in zip(rows, frame["visibility_group"].tolist())
+            if vis == "detectable"
+        ]
         sweep.append({
             "alpha": alpha,
             "cal_normal_candidate_rate": float(normal_rate) if normal_rate is not None else None,
             "cal_attack_recall": float(attack_recall) if attack_recall is not None else None,
+            "cal_detectable_recall": float(np.mean(det)) if det else None,
         })
 
-    eligible = [s for s in sweep if s["cal_normal_candidate_rate"] is not None and s["cal_normal_candidate_rate"] <= 0.10]
-    if eligible:
-        selected = max(eligible, key=lambda s: (s["cal_attack_recall"], -s["alpha"]))
-    else:
-        selected = min(sweep, key=lambda s: s["cal_normal_candidate_rate"] or 1.0)
-
+    selected, selection_failed, rule = select_alpha(sweep, config)
     return {
         "fit_split": "cal",
         "u_score_auc_overall": auc_overall,
         "u_score_auc_by_label": by_label,
         "alpha_sweep": sweep,
-        "selection_rule": "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha",
+        "selection_rule": rule,
+        "selection_failed": selection_failed,
         "selected_alpha": selected,
         "limitation": "Under conformal scoring, FPR often tracks alpha; low-AUC classes need feature/evidence work, not alpha alone.",
         "test_sealed": True,
     }
+
+
+def select_alpha(sweep: list[dict], config: dict) -> tuple[dict | None, bool, str]:
+    min_recall = float(config.get("alpha_min_detectable_recall", 0.0) or 0.0)
+    has_detectable = any(s.get("cal_detectable_recall") is not None for s in sweep)
+    eligible = [
+        s for s in sweep
+        if s["cal_normal_candidate_rate"] is not None and s["cal_normal_candidate_rate"] <= 0.10
+    ]
+    if has_detectable and min_recall > 0:
+        eligible = [
+            s for s in eligible
+            if s.get("cal_detectable_recall") is not None and s["cal_detectable_recall"] >= min_recall
+        ]
+    selection_failed = False
+    if eligible:
+        selected = max(eligible, key=lambda s: (s["cal_attack_recall"] or 0.0, -s["alpha"]))
+    elif has_detectable and min_recall > 0:
+        selected = None
+        selection_failed = True
+    else:
+        selected = min(sweep, key=lambda s: s["cal_normal_candidate_rate"] or 1.0)
+
+    rule = (
+        "cal normal candidate_rate <= 0.10, maximize attack recall; tie -> smaller alpha"
+        if not (has_detectable and min_recall > 0)
+        else (
+            f"cal normal candidate_rate <= 0.10 and detectable recall >= {min_recall:.2f}; "
+            "maximize attack recall; tie -> smaller alpha"
+        )
+    )
+    return selected, selection_failed, rule
 
 
 def main() -> None:
@@ -136,6 +194,10 @@ def main() -> None:
     parser.add_argument("--alphas", nargs="+", type=float, default=[0.05, 0.10, 0.20])
     parser.add_argument("--auc-out", type=Path, default=ROOT / "dataset/eval/stage1_cal_score_auc.json")
     parser.add_argument("--sweep-out", type=Path, default=ROOT / "dataset/eval/stage1_alpha_sweep.json")
+    parser.add_argument("--labels", type=Path, default=ROOT / "dataset/synthetic/index/labels.csv")
+    parser.add_argument("--sessions-root", type=Path, default=None)
+    parser.add_argument("--progress-source", choices=["visible", "raw"], default="visible")
+    parser.add_argument("--write-config", action="store_true", default=False)
     args = parser.parse_args()
     report = run(
         args.telemetry,
@@ -147,6 +209,9 @@ def main() -> None:
         window_s=args.window_s,
         stride_s=args.stride_s,
         alphas=list(args.alphas),
+        labels_csv=args.labels,
+        sessions_root=args.sessions_root,
+        progress_source=args.progress_source,
     )
     args.auc_out.write_text(json.dumps({
         "u_score_auc_overall": report["u_score_auc_overall"],
@@ -154,22 +219,22 @@ def main() -> None:
         "limitation": report["limitation"],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     args.sweep_out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    # Persist selected alpha into stage1 config (same cal rule; no test tuning).
-    try:
-        import yaml
+    if args.write_config and report.get("selected_alpha") and not report.get("selection_failed"):
+        try:
+            import yaml
 
-        cfg_path = args.stage1_config
-        data = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
-        selected = report["selected_alpha"]
-        data["alpha"] = float(selected["alpha"])
-        data["alpha_high_impact"] = float(min(1.0, selected["alpha"] * 2))
-        data.setdefault("alpha_selection", {})
-        data["alpha_selection"]["selected_on"] = "cal"
-        data["alpha_selection"]["rule"] = report["selection_rule"]
-        data["alpha_selection"]["selected"] = selected
-        cfg_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
-    except Exception as exc:
-        print(f"warning: could not update yaml alpha: {exc}")
+            cfg_path = args.stage1_config
+            data = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+            selected = report["selected_alpha"]
+            data["alpha"] = float(selected["alpha"])
+            data["alpha_high_impact"] = float(min(1.0, selected["alpha"] * 2))
+            data.setdefault("alpha_selection", {})
+            data["alpha_selection"]["selected_on"] = "cal"
+            data["alpha_selection"]["rule"] = report["selection_rule"]
+            data["alpha_selection"]["selected"] = selected
+            cfg_path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+        except Exception as exc:
+            print(f"warning: could not update yaml alpha: {exc}")
     md_path = args.sweep_out.with_suffix(".md")
     md = [
         "# Stage1 alpha sweep (cal only)",
@@ -178,12 +243,13 @@ def main() -> None:
         "",
         f"selected: `{report['selected_alpha']}`",
         "",
-        "| alpha | cal_normal_candidate_rate | cal_attack_recall |",
-        "|-------|---------------------------|-------------------|",
+        "| alpha | cal_normal_candidate_rate | cal_attack_recall | cal_detectable_recall |",
+        "|-------|---------------------------|-------------------|-----------------------|",
     ]
     for row in report["alpha_sweep"]:
         md.append(
-            f"| {row['alpha']} | {row['cal_normal_candidate_rate']} | {row['cal_attack_recall']} |"
+            f"| {row['alpha']} | {row['cal_normal_candidate_rate']} | "
+            f"{row['cal_attack_recall']} | {row.get('cal_detectable_recall')} |"
         )
     md.extend(
         [

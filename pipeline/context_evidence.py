@@ -73,14 +73,23 @@ def read_progress_log(
 def read_session_progress(
     session_dir: str | Path | None,
     session_json: str | Path = "session.json",
+    *,
+    source: str = "visible",
 ) -> list[dict]:
-    """Read only a session's public progress log and normalize its time axis."""
+    """Read a session progress log and normalize its time axis.
+
+    ``source="visible"`` (default) uses public ``progress.jsonl`` only.
+    ``source="raw"`` is eval-only and reads ``progress.raw.jsonl``.
+    """
     if not session_dir:
         return []
     root = Path(session_dir)
     if any(part in {".staging", "private"} for part in root.parts):
         return []
-    visible = root / "progress.jsonl"
+    if source not in {"visible", "raw"}:
+        raise ValueError(f"unknown progress source: {source}")
+    filename = "progress.raw.jsonl" if source == "raw" else "progress.jsonl"
+    visible = root / filename
     if not visible.is_file():
         return []
     metadata_path = Path(session_json)

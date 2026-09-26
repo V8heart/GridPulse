@@ -27,6 +27,7 @@ from pipeline.stage1_v2 import (
     load_config,
     load_truth_index,
     score_window,
+    zero_proc_mask,
 )
 from pipeline.evidence_vocab import strip_recompute_bools, to_bool_evidence
 
@@ -111,6 +112,7 @@ def fit(
     sessions_root: Path | None,
     window_s: float,
     stride_s: float,
+    progress_source: str = "visible",
 ) -> dict:
     df = pd.read_csv(telemetry, low_memory=False)
     manifest = json.loads(split_manifest.read_text(encoding="utf-8"))
@@ -128,6 +130,7 @@ def fit(
         sessions_root=sessions_root,
         truth_index=truth_index,
         config=config,
+        progress_source=progress_source,
     )
     cal_windows = build_windows(
         cal_df,
@@ -137,13 +140,18 @@ def fit(
         sessions_root=sessions_root,
         truth_index=truth_index,
         config=config,
+        progress_source=progress_source,
     )
     train_normals = train_windows[train_windows["gt_label"].astype(str).str.startswith("normal")]
     cal_normals = cal_windows[cal_windows["gt_label"].astype(str).str.startswith("normal")]
+    train_normals = train_normals.loc[~zero_proc_mask(train_normals)].copy()
+    cal_normals = cal_normals.loc[~zero_proc_mask(cal_normals)].copy()
 
     mad_floors = dict(config.get("mad_floors") or DEFAULT_MAD_FLOORS)
+    cohort_keys = tuple(config.get("cohort_keys") or ("declared_job_family", "gpu_model"))
     baseline = CohortBaseline().fit(
         train_normals,
+        cohort_keys=cohort_keys,
         min_windows=int(config.get("min_windows", 30)),
         mad_floors=mad_floors,
     )
@@ -165,8 +173,10 @@ def fit(
         policy.get("version") == config.get("progress_log_policy_required", POLICY_VERSION)
         or policy.get("version") == POLICY_VERSION
     )
-    if not policy_ok:
+    if not policy_ok or config.get("force_zero_progress_log_missing"):
         config["evidence_weights"]["progress_log_missing"] = 0.0
+        weight_report["evidence_surprisal_weights"]["progress_log_missing"] = 0.0
+        policy_ok = False if config.get("force_zero_progress_log_missing") else policy_ok
 
     feature_abs_z, _ = _collect_feature_abs_z(cal_normals, baseline)
 
@@ -260,6 +270,7 @@ def main() -> None:
     parser.add_argument("--labels", type=Path, default=ROOT / "dataset/synthetic/index/labels.csv")
     parser.add_argument("--window-s", type=float, default=30.0)
     parser.add_argument("--stride-s", type=float, default=15.0)
+    parser.add_argument("--progress-source", choices=["visible", "raw"], default="visible")
     args = parser.parse_args()
     report = fit(
         args.telemetry,
@@ -272,6 +283,7 @@ def main() -> None:
         sessions_root=args.sessions_root,
         window_s=args.window_s,
         stride_s=args.stride_s,
+        progress_source=args.progress_source,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

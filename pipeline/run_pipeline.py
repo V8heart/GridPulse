@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -284,6 +285,45 @@ def _write_stage1_envelope(path: Path | None, wdf: pd.DataFrame, *, telemetry: s
     return envelope
 
 
+def _write_stage2_results(path: Path | None, results: list) -> None:
+    """Atomically persist Stage2 rows so a finished session survives a later crash."""
+    if path is None:
+        return
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_name(target.name + ".tmp")
+    tmp.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    os.replace(tmp, target)
+
+
+def _segment_candidate_frame(candidates: pd.DataFrame, config: dict) -> pd.DataFrame:
+    from pipeline.stage2_segments import aggregate_bool_evidence, merge_candidate_segments
+
+    stage2_cfg = config.get("stage2") or {}
+    rate_min = float(stage2_cfg.get("evidence_rate_min", 0.6))
+    drop = ("progress_log_missing",) if stage2_cfg.get("drop_progress_log_missing") else ()
+    rows = []
+    for idxs in merge_candidate_segments(candidates):
+        part = candidates.loc[idxs]
+        first = part.iloc[0].to_dict()
+        evs = []
+        for _, item in part.iterrows():
+            ev = item.get("evidence_bool") or item.get("evidence") or {}
+            if isinstance(ev, dict):
+                evs.append({key: value for key, value in ev.items() if isinstance(value, bool)})
+        bools, rates = aggregate_bool_evidence(evs, rate_min=rate_min, drop_keys=drop)
+        first["start"] = int(part["start"].min())
+        first["end"] = int(part["end"].max()) if "end" in part else first.get("end")
+        first["window_ids"] = [str(x) for x in part["window_id"].tolist()] if "window_id" in part else []
+        first["n_windows"] = int(len(part))
+        first["evidence_bool"] = bools
+        first["evidence_rates"] = rates
+        if "u_score" in part:
+            first["u_score"] = float(pd.to_numeric(part["u_score"], errors="coerce").median())
+        rows.append(first)
+    return pd.DataFrame(rows) if rows else candidates.iloc[0:0]
+
+
 def run(args):
     df = pd.read_csv(args.telemetry)
     print(f"[입력] {args.telemetry}: {len(df)}행")
@@ -342,13 +382,15 @@ def run(args):
             progress_log_dir=getattr(args, "progress_log_dir", None),
             sessions_root=getattr(args, "sessions_root", None),
             config=config,
+            progress_source=getattr(args, "progress_source", "visible"),
         )
         if not current.empty:
             scores = [score_window(row.to_dict(), baseline_model, calibration, config) for _, row in current.iterrows()]
-            for key in ("u_score", "p_value", "baseline_level", "impact_level", "grid_watch", "impact_raw"):
+            for key in ("u_score", "p_value", "baseline_level", "impact_level", "grid_watch", "impact_raw", "idle_status"):
                 current[key] = [item.get(key) for item in scores]
             current["is_candidate"] = [item["is_candidate"] for item in scores]
             current["candidate_reasons"] = [",".join(item["candidate_reasons"]) for item in scores]
+            current["evidence_bool"] = [item.get("evidence_bool") for item in scores]
             current["impact_components"] = [item["impact_components"] for item in scores]
             current["robust_z"] = [item["robust_z"] for item in scores]
             current["stage1_version"] = "v2"
@@ -392,21 +434,30 @@ def run(args):
         stage1_version=stage1_mode,
     )
 
+    out_path = Path(args.out) if getattr(args, "out", None) else None
     if len(candidates) == 0:
         print("의심 후보 없음. 정상으로 판단.")
-        if getattr(args, "out", None):
-            target = Path(args.out)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(json.dumps([], ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f"저장: {args.out}")
+        _write_stage2_results(out_path, [])
+        if out_path:
+            print(f"저장: {out_path}")
+        return []
+
+    if getattr(args, "stage2", "legacy") == "none":
+        print("Stage2 skipped (--stage2 none)")
         return []
 
     # RAG 검색기 준비 (1회)
     retriever = SignatureRetriever(backend=args.rag_backend)
 
+    sort_cols = [c for c in ("session_id", "gpu_id", "start") if c in candidates.columns]
+    if sort_cols:
+        candidates = candidates.sort_values(sort_cols, kind="mergesort").reset_index(drop=True)
+    if getattr(args, "stage2", "legacy") == "v2":
+        candidates = _segment_candidate_frame(candidates, stage1_config)
+
     results = []
 
-    for _, cand in candidates.iterrows():
+    for index, cand in candidates.iterrows():
         key = (str(cand["session_id"]), cand["gpu_id"])
         group = grouped_frames[key]
         start = int(cand["start"])
@@ -449,18 +500,26 @@ def run(args):
         context_query = context_to_query(context) if getattr(args, "query_context", "off") == "declared" else ""
         query = f"{desc} {context_query}".strip()
         retrieved = retriever.search(query, top_k=3, features=feats)
-        verdict = analyze_with_llm(desc, retrieved, context=context,
-                                    backend=args.llm_backend, model=args.llm_model)
         top_meta = getattr(retrieved[0], "meta", {}) if retrieved else {}
-        if top_meta.get("category") == "benign":
+        stage2_mode = getattr(args, "stage2", "legacy")
+        if stage2_mode == "legacy":
+            verdict = analyze_with_llm(desc, retrieved, context=context,
+                                        backend=args.llm_backend, model=args.llm_model)
+            if top_meta.get("category") == "benign":
+                verdict = {
+                    **verdict,
+                    "risk": "정상",
+                    "benign_match": retrieved[0].name,
+                    "reason": (
+                        f"benign corpus '{retrieved[0].name}' 수치 조건과 문서가 함께 "
+                        f"매칭되어 경보를 억제합니다. {verdict.get('reason', '')}"
+                    ).strip(),
+                }
+        else:
             verdict = {
-                **verdict,
-                "risk": "정상",
-                "benign_match": retrieved[0].name,
-                "reason": (
-                    f"benign corpus '{retrieved[0].name}' 수치 조건과 문서가 함께 "
-                    f"매칭되어 경보를 억제합니다. {verdict.get('reason', '')}"
-                ).strip(),
+                "risk": "주의",
+                "closest_match": retrieved[0].name if retrieved else "unknown",
+                "reason": "",
             }
         original = original_groups[key].iloc[start:end]
         raw_attack_id = (
@@ -559,7 +618,7 @@ def run(args):
             from pipeline.corpus_schema import parse_corpus_v2
             from pipeline.rag_analyzer import CORPUS_DIR
             from pipeline.stage2_evidence import build_evidence_bundle
-            from pipeline.stage2_llm import judge
+            from pipeline.stage2_llm import judge, normal_verdict
 
             docs = []
             for result in retrieved:
@@ -570,19 +629,28 @@ def run(args):
             top1_name = None
             if retrieved:
                 top1_name = retrieved[0].name if hasattr(retrieved[0], "name") else retrieved[0][0]
-            bundle = build_evidence_bundle(row)
-            stage2 = judge(
-                bundle,
-                docs,
-                backend=args.llm_backend,
-                model=args.llm_model,
-                fallback="legacy",
-                retriever_top1=top1_name,
-            )
+            drop_missing = bool((stage1_config.get("stage2") or {}).get("drop_progress_log_missing"))
+            if cand.get("evidence_bool"):
+                row["evidence_bool"] = cand.get("evidence_bool")
+            bundle = build_evidence_bundle(row, drop_progress_log_missing=drop_missing)
+            if top_meta.get("category") == "benign":
+                stage2 = normal_verdict(top1_name)
+            else:
+                stage2 = judge(
+                    bundle,
+                    docs,
+                    backend=args.llm_backend,
+                    model=args.llm_model,
+                    fallback="legacy",
+                    retriever_top1=top1_name,
+                )
+            risk = {"known": "의심", "normal": "정상", "unknown": "주의", "partial": "주의"}.get(stage2.verdict, "주의")
             row["stage2_version"] = "v2"
             row["stage2_evidence_bundle"] = bundle
+            row["window_ids"] = cand.get("window_ids") or [row["window_id"]]
+            row["evidence_rates"] = cand.get("evidence_rates") or {}
             row["verdict"] = {
-                "risk": "의심" if stage2.verdict == "known" else "주의",
+                "risk": risk,
                 "closest_match": stage2.closest_match or "unknown",
                 "reason": stage2.explanation,
                 "verdict": stage2.verdict,
@@ -596,6 +664,18 @@ def run(args):
             row["stage2_version"] = "legacy"
 
         results.append(row)
+        this_session = str(cand["session_id"])
+        is_last = int(index) >= len(candidates) - 1
+        next_session = None if is_last else str(candidates.iloc[int(index) + 1]["session_id"])
+        if is_last or next_session != this_session:
+            _write_stage2_results(out_path, results)
+            if out_path:
+                n_session = sum(1 for row in results if str(row["session_id"]) == this_session)
+                print(
+                    f"[2단계] session {this_session}: {n_session}개 저장 "
+                    f"(누적 {len(results)}/{len(candidates)})",
+                    flush=True,
+                )
 
     print(f"\n[결과] 의심 후보 {len(results)}개 분석 완료:\n")
     for r in results:
@@ -606,11 +686,9 @@ def run(args):
         print(f"    → 근거: {v.get('reason')}")
         print(f"    → RAG: {r['rag_top']}\n")
 
-    if args.out:
-        target = Path(args.out)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps(results, ensure_ascii=False, indent=2))
-        print(f"저장: {args.out}")
+    _write_stage2_results(out_path, results)
+    if out_path:
+        print(f"저장: {out_path}")
     return results
 
 
@@ -625,7 +703,7 @@ def main():
     ap.add_argument("--stride", type=int, default=STRIDE, help="윈도우 이동 간격(행)")
     ap.add_argument("--z-threshold", type=float, default=2.5)
     ap.add_argument("--stage1", choices=["legacy", "v2"], default="legacy")
-    ap.add_argument("--stage2", choices=["legacy", "v2"], default="legacy")
+    ap.add_argument("--stage2", choices=["legacy", "v2", "none"], default="legacy")
     ap.add_argument("--baseline-model", default="dataset/eval/cohort_baseline_v2.json")
     ap.add_argument("--stage1-config", default="config/stage1_v2.yaml")
     ap.add_argument("--calibration", default="dataset/eval/stage1_v2_calibration.json")
@@ -633,6 +711,7 @@ def main():
     ap.add_argument("--stride-s", type=float, default=15.0)
     ap.add_argument("--progress-log-dir", default="dataset/synthetic/steps")
     ap.add_argument("--sessions-root", default=None)
+    ap.add_argument("--progress-source", choices=["visible", "raw"], default="visible")
     ap.add_argument("--query-context", choices=["off", "declared"], default="off")
     ap.add_argument("--rag-backend", choices=["sbert", "tfidf"], default="sbert")
     ap.add_argument("--llm-backend", choices=["ollama", "stub"], default="stub")

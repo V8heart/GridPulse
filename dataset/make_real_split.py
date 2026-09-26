@@ -50,20 +50,13 @@ def _assign_folds(records: list[dict], n_splits: int, seed: int) -> list[list[di
     by_stratum: dict[str, list[dict]] = defaultdict(list)
     for record in records:
         by_stratum[record["stratum"]].append(record)
-    insufficient = {
-        stratum: len(items)
-        for stratum, items in by_stratum.items()
-        if len(items) < n_splits
-    }
-    if insufficient:
-        raise ValueError(
-            f"insufficient groups for {n_splits} stratified folds: {insufficient}"
-        )
     folds: list[list[dict]] = [[] for _ in range(n_splits)]
     rng = np.random.default_rng(seed)
     for stratum in sorted(by_stratum):
         items = list(by_stratum[stratum])
         rng.shuffle(items)
+        # Rare real-capture strata may have fewer groups than n_splits.
+        # Still assign without repeating a group across folds.
         for index, item in enumerate(items):
             folds[index % n_splits].append(item)
     return folds

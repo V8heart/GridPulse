@@ -8,7 +8,7 @@ from pathlib import Path
 RAW_FORBIDDEN = {"power_w", "util_gpu_pct", "power", "util", "timeseries", "andes_log", "embeddings"}
 
 
-def build_evidence_bundle(row: dict) -> dict:
+def build_evidence_bundle(row: dict, *, drop_progress_log_missing: bool = False) -> dict:
     """Create an LLM-safe evidence bundle without raw telemetry arrays."""
     from pipeline.evidence_vocab import to_bool_evidence
 
@@ -33,6 +33,8 @@ def build_evidence_bundle(row: dict) -> dict:
         bool_evidence = dict(raw_evidence)
     else:
         bool_evidence = to_bool_evidence(merged_for_bool)
+    if drop_progress_log_missing:
+        bool_evidence.pop("progress_log_missing", None)
 
     declared = row.get("declared_context") if isinstance(row.get("declared_context"), dict) else {}
     bundle = {

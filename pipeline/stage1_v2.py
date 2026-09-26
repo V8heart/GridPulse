@@ -10,6 +10,7 @@ import pandas as pd
 from dataset.window_truth import label_window, parse_intervals
 from pipeline.baseline import CohortBaseline, FEATURES_V2
 from pipeline.changepoint import cusum_changepoints
+from pipeline.attack_visibility import attack_visibility_group, parse_period_s
 from pipeline.context_evidence import (
     explained_changepoints,
     period_match,
@@ -55,6 +56,18 @@ DEFAULT_CONFIG = {
     "grid_weights": {"0.05_0.1": 0.5, "0.1_0.7": 1.0, "0.7_2": 0.7, "2_nyq": 0.2},
     "grid_weights_provenance": "provisional_placeholder",
     "progress_log_policy_required": "v1_eligible_uniform_drop",
+    "cohort_keys": ["declared_job_family", "gpu_model"],
+    "force_zero_progress_log_missing": False,
+    "alpha_min_detectable_recall": 0.0,
+    "idle_gate": {
+        "enabled": True,
+        "mean_w_max": 40.0,
+        "n_procs_agg": "median",
+    },
+    "stage2": {
+        "evidence_rate_min": 0.6,
+        "drop_progress_log_missing": False,
+    },
 }
 
 CALIBRATION_SCHEMA_VERSION = "mondrian_v1"
@@ -89,6 +102,52 @@ def load_config(path: str | Path | None = None) -> dict:
             else:
                 config[key] = value
     return config
+
+
+def median_observed_n_procs(subset: pd.DataFrame) -> int | None:
+    if "observed_n_procs" not in subset.columns:
+        return None
+    series = pd.to_numeric(subset["observed_n_procs"], errors="coerce").dropna()
+    if series.empty:
+        return None
+    return int(round(float(series.median())))
+
+
+def idle_gate_decision(row: dict, config: dict) -> dict | None:
+    """Observe-only idle policy. Never uses gpu_role, declared family, or gt_label."""
+    gate = config.get("idle_gate") or {}
+    if gate.get("enabled", True) is False:
+        return None
+    raw = row.get("observed_n_procs")
+    if raw is None or (isinstance(raw, float) and pd.isna(raw)):
+        return None
+    try:
+        n_procs = int(raw)
+    except (TypeError, ValueError):
+        return None
+    if n_procs > 0:
+        return None
+    mean_w = row.get("mean_w")
+    if mean_w is None:
+        evidence = row.get("evidence") or {}
+        mean_w = evidence.get("mean_w") if isinstance(evidence, dict) else None
+    if mean_w is None or (isinstance(mean_w, float) and pd.isna(mean_w)):
+        return None
+    max_w = float(gate.get("mean_w_max", 40.0))
+    if float(mean_w) <= max_w:
+        return {"is_candidate": False, "idle_status": "idle", "candidate_reasons": []}
+    return {
+        "is_candidate": True,
+        "idle_status": "undeclared_load",
+        "candidate_reasons": ["undeclared_load"],
+    }
+
+
+def zero_proc_mask(windows: pd.DataFrame) -> pd.Series:
+    if windows.empty or "observed_n_procs" not in windows.columns:
+        return pd.Series(False, index=windows.index)
+    n_procs = pd.to_numeric(windows["observed_n_procs"], errors="coerce")
+    return n_procs.eq(0)
 
 
 def load_truth_index(
@@ -128,6 +187,9 @@ def load_truth_index(
             ),
             "group_id": None if pd.isna(row.get("group_id")) else str(row.get("group_id")),
             "source": None if pd.isna(row.get("source")) else str(row.get("source")),
+            "gt_params_json": (
+                None if pd.isna(row.get("gt_params_json")) else str(row.get("gt_params_json"))
+            ),
             "t0_epoch": t0_epoch,
         }
     return index
@@ -315,8 +377,9 @@ def combine_u_score(
     weights = dict(calibration.get("evidence_surprisal_weights") or config.get("evidence_weights") or {})
     policy_ok = bool(calibration.get("progress_log_policy_ok", False))
     # Until synth is regenerated under required policy, force weight 0.
-    if not policy_ok:
+    if not policy_ok or config.get("force_zero_progress_log_missing"):
         weights["progress_log_missing"] = 0.0
+        policy_ok = False if config.get("force_zero_progress_log_missing") else policy_ok
     evidence_score = 0.0
     active = []
     if include_evidence:
@@ -377,6 +440,14 @@ def score_window(
         level == "high" and p_value <= config.get("alpha_high_impact", 0.10)
     )
     max_abs_z = max(z_values.values(), default=0.0)
+    reasons = sorted(z_values, key=z_values.get, reverse=True)[:3]
+    idle = idle_gate_decision(row, config)
+    idle_status = None
+    if idle is not None:
+        is_candidate = bool(idle["is_candidate"])
+        idle_status = idle["idle_status"]
+        if idle["candidate_reasons"]:
+            reasons = list(idle["candidate_reasons"])
     return {
         "u_score": float(u_score),
         "p_value": p_value,
@@ -387,8 +458,9 @@ def score_window(
         "impact_raw": raw_impact,
         "impact_level": level,
         "is_candidate": bool(is_candidate),
+        "idle_status": idle_status,
         "grid_watch": bool(level == "high" and not is_candidate),
-        "candidate_reasons": sorted(z_values, key=z_values.get, reverse=True)[:3],
+        "candidate_reasons": reasons,
         "evidence_bool": bool_evidence,
         "declared_family_mean_abs_z": family_stats.get("declared_family_mean_abs_z"),
         "best_other_family_mean_abs_z": family_stats.get("best_other_family_mean_abs_z"),
@@ -412,6 +484,7 @@ def build_windows(
     progress_log_dir: str | Path | None = None,
     sessions_root: str | Path | None = None,
     truth_index: dict[tuple[str, int], dict] | None = None,
+    progress_source: str = "visible",
 ) -> pd.DataFrame:
     rows = []
     for (session_id, gpu_id), group in df.groupby(["session_id", "gpu_id"], sort=False):
@@ -420,7 +493,10 @@ def build_windows(
         window = max(8, int(round(window_s * hz)))
         stride = max(1, int(round(stride_s * hz)))
         if sessions_root is not None:
-            events = read_session_progress(Path(sessions_root) / str(session_id))
+            events = read_session_progress(
+                Path(sessions_root) / str(session_id),
+                source=progress_source,
+            )
         else:
             events = read_progress_log(
                 Path(progress_log_dir) / f"{session_id}.jsonl" if progress_log_dir else None
@@ -484,6 +560,7 @@ def build_windows(
                 "declared_job_type": str(subset.get("declared_job_type", pd.Series(["unknown"])).iloc[0]),
                 "declared_job_family": str(subset.get("declared_job_family", pd.Series(["unknown"])).iloc[0]),
                 "gpu_model": str(subset.get("gpu_model", pd.Series(["unknown"])).iloc[0]),
+                "observed_n_procs": median_observed_n_procs(subset),
                 "evidence": {**raw_evidence, **bool_evidence},
                 "evidence_bool": bool_evidence,
                 "multi_gpu_sync_index": 0.0,
@@ -516,7 +593,14 @@ def build_windows(
                     "declared_policy": truth.get("declared_policy"),
                     "group_id": truth.get("group_id"),
                     "source": truth.get("source"),
+                    "period_s": parse_period_s(truth.get("gt_params_json")),
+                    "visibility_group": None,
                 })
+                flat["visibility_group"] = attack_visibility_group(
+                    gt_label=gt_label,
+                    gt_variant=truth.get("gt_variant"),
+                    period_s=flat.get("period_s"),
+                )
             rows.append(flat)
     windows = pd.DataFrame(rows)
     if windows.empty:
